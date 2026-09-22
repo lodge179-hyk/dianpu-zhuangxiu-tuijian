@@ -1,0 +1,297 @@
+{
+  "batchId": "baseline-b8f10f79-8627-4693-b2ac-43961b7399bf",
+  "purpose": "baseline",
+  "createdAt": "2026-09-13T05:54:50.273Z",
+  "tasks": [
+    {
+      "index": 0,
+      "fingerprint": "f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "b68c4dcba20a2e7d4936d9232dfd443c470df8ab895ac7628a4d3ff464e26473"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "b8eeecd526f1275264144b85aef53c8b405f48c81a9ff54a1671b792e2c677ca"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "e1686e256cbd136df47de17595dfd4c80a1ba15f32232f42f6072f96d0e90f6b"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "7770d1aee8899883d45598af097d88eec4add0d484c506b0ce9c2312f915e405"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "81bb2961cae57b484c6a45f8551cf66e225a72e54c485f3badd6bc1e271abf48"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "060d61526e78ba704a3e1c8997a10c2a8e719a6453572b75ddb6d4a8a25a686e"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "bae3b2e5da52ab32976a622b90ab6374306dde5304c5e69ad275b4e498e3184b"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "58858a1d0f9351b4e25f4b13734fefcdf188637ae7852f4c644b1c6e5c5a8f2b"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "d57cb76fc43181059be666683a2972bf4ef566f64bc2606e411833861f508e45"
+        }
+      ],
+      "status": "failed",
+      "key": "baseline-b8f10f79-8627-4693-b2ac-43961b7399bf:0:f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+      "taskId": "7b2b9c89-59b6-4164-9523-bf980910c688",
+      "watchStartedAt": "2026-09-13T05:54:51.003Z",
+      "lastObservedAt": "2026-09-13T05:55:55.960Z",
+      "snapshot": {
+        "id": "7b2b9c89-59b6-4164-9523-bf980910c688",
+        "revision": 9,
+        "createdAt": "2026-09-13T05:54:50.966Z",
+        "updatedAt": "2026-09-13T05:55:55.709Z",
+        "startedAt": "2026-09-13T05:54:50.992Z",
+        "firstCompletedAt": "2026-09-13T05:55:55.709Z",
+        "batchId": "baseline-b8f10f79-8627-4693-b2ac-43961b7399bf",
+        "clientRequestId": "baseline-b8f10f79-8627-4693-b2ac-43961b7399bf:0:f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+        "layoutVersion": "shared-v1",
+        "testPurpose": "baseline",
+        "assetEvents": [],
+        "stateEvents": [
+          {
+            "at": "2026-09-13T05:54:50.992Z",
+            "from": "draft",
+            "to": "queued"
+          },
+          {
+            "at": "2026-09-13T05:54:51.003Z",
+            "from": "queued",
+            "to": "analyzing"
+          },
+          {
+            "at": "2026-09-13T05:55:28.036Z",
+            "from": "analyzing",
+            "to": "planning"
+          },
+          {
+            "at": "2026-09-13T05:55:55.709Z",
+            "from": "planning",
+            "to": "failed"
+          }
+        ],
+        "adoptionReviews": [],
+        "completedAt": "2026-09-13T05:55:55.709Z",
+        "status": "failed",
+        "progress": 18,
+        "testCategory": "女装",
+        "brief": "早秋女装上新，突出主推款并建立统一高级感。",
+        "visualDescription": "柔和自然光，米白与暖灰背景，真实面料纹理。",
+        "products": [
+          {
+            "id": "p1",
+            "name": "主推上身款",
+            "isHero": true,
+            "images": [
+              "2d2b1550-c205-4cc0-b7f5-a2ac050b1138.jpg",
+              "5cc499eb-0253-4974-903f-5c9bc97625dc.jpg",
+              "71c08ceb-906c-428b-9fd7-d0b6cba36d56.jpg"
+            ]
+          },
+          {
+            "id": "p2",
+            "name": "黑色工装连衣裙",
+            "isHero": false,
+            "images": [
+              "79ab9cec-a755-4b4b-baab-7369b4fdc8cd.jpg",
+              "e3051dfb-c6dc-4243-af6d-48354fe96719.jpg",
+              "b8293e32-b159-42f3-be0e-ad044c3002b1.jpg"
+            ]
+          },
+          {
+            "id": "p3",
+            "name": "早秋皮短裤",
+            "isHero": false,
+            "images": [
+              "f8a3208f-73f2-49f3-bf97-3f77a38b13a7.jpg",
+              "8afc386c-6fad-4af2-b94e-7da820666deb.jpg",
+              "80e86551-2c57-4377-917c-0bfd37d6285f.jpg"
+            ]
+          }
+        ],
+        "styleReferences": [],
+        "productAnalyses": [
+          {
+            "productId": "p1",
+            "summary": "女士修身坑纹短袖亨利领短款T恤",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "坑纹针织面料",
+              "亨利领门襟纽扣设计",
+              "短款修身版型"
+            ],
+            "views": [
+              {
+                "image": "2d2b1550-c205-4cc0-b7f5-a2ac050b1138.jpg",
+                "confidence": 0.95,
+                "box": {
+                  "left": 0.36,
+                  "top": 0.4,
+                  "width": 0.26,
+                  "height": 0.24
+                }
+              },
+              {
+                "image": "5cc499eb-0253-4974-903f-5c9bc97625dc.jpg",
+                "confidence": 0.98,
+                "box": {
+                  "left": 0.1,
+                  "top": 0.02,
+                  "width": 0.65,
+                  "height": 0.56
+                }
+              },
+              {
+                "image": "71c08ceb-906c-428b-9fd7-d0b6cba36d56.jpg",
+                "confidence": 0.96,
+                "box": {
+                  "left": 0.28,
+                  "top": 0.37,
+                  "width": 0.27,
+                  "height": 0.2
+                }
+              }
+            ]
+          },
+          {
+            "productId": "p2",
+            "summary": "Saint Laurent黑色吊带工装短款连衣裙",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "品牌标识吊牌",
+              "双细肩带设计",
+              "腰部抽绳收腰",
+              "带纽扣工装口袋"
+            ],
+            "views": [
+              {
+                "image": "79ab9cec-a755-4b4b-baab-7369b4fdc8cd.jpg",
+                "confidence": 0.98,
+                "box": {
+                  "left": 0.21,
+                  "top": 0.16,
+                  "width": 0.68,
+                  "height": 0.88
+                }
+              },
+              {
+                "image": "e3051dfb-c6dc-4243-af6d-48354fe96719.jpg",
+                "confidence": 0.97,
+                "box": {
+                  "left": 0.21,
+                  "top": 0.13,
+                  "width": 0.62,
+                  "height": 0.9
+                }
+              },
+              {
+                "image": "b8293e32-b159-42f3-be0e-ad044c3002b1.jpg",
+                "confidence": 0.95,
+                "box": {
+                  "left": 0,
+                  "top": 0,
+                  "width": 0.57,
+                  "height": 0.91
+                }
+              }
+            ]
+          },
+          {
+            "productId": "p3",
+            "summary": "早秋高腰黑色皮质短裤",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "皮革材质纹理",
+              "高腰版型",
+              "侧边纽扣设计",
+              "直筒短款裤型"
+            ],
+            "views": [
+              {
+                "image": "f8a3208f-73f2-49f3-bf97-3f77a38b13a7.jpg",
+                "confidence": 0.96,
+                "box": {
+                  "left": 0.25,
+                  "top": 0.54,
+                  "width": 0.34,
+                  "height": 0.18
+                }
+              },
+              {
+                "image": "8afc386c-6fad-4af2-b94e-7da820666deb.jpg",
+                "confidence": 0.95,
+                "box": {
+                  "left": 0.3,
+                  "top": 0.49,
+                  "width": 0.37,
+                  "height": 0.15
+                }
+              },
+              {
+                "image": "80e86551-2c57-4377-917c-0bfd37d6285f.jpg",
+                "confidence": 0.97,
+                "box": {
+                  "left": 0.39,
+                  "top": 0.43,
+                  "width": 0.46,
+                  "height": 0.19
+                }
+              }
+            ]
+          }
+        ],
+        "plans": [],
+        "assets": [],
+        "modelCalls": [
+          {
+            "id": "7d1432fb-650b-448a-bfc0-a58873f57c05",
+            "createdAt": "2026-09-13T05:54:52.461Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "analysis",
+            "status": "success",
+            "durationMs": 35550,
+            "inputTokens": 11961,
+            "outputTokens": 1214
+          },
+          {
+            "id": "c825474e-642a-4a48-91b3-2b5f986a697f",
+            "createdAt": "2026-09-13T05:55:28.040Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "planning",
+            "status": "failed",
+            "error": "规划缺少合法置顶招牌",
+            "durationMs": 27642,
+            "inputTokens": 337,
+            "outputTokens": 1530
+          }
+        ],
+        "currentStep": "任务执行失败",
+        "error": "规划缺少合法置顶招牌"
+      }
+    }
+  ],
+  "lastError": "任务 7b2b9c89-59b6-4164-9523-bf980910c688 为 failed；批次停止，不自动重跑",
+  "stoppedAt": "2026-09-13T05:55:55.962Z"
+}

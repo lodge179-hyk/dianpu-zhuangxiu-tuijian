@@ -1,4 +1,36 @@
-# vinext-starter
+# 微购相册店铺装修推荐验证项目
+
+当前项目用于验证：根据用户商品图片和经营描述，自动规划可在微购复刻的店铺首页，并逐步生成对应装修素材。
+
+## 本地 MVP 启动
+
+1. 将 `.env.example` 复制为 `.env.local`，填写方舟 API Key、视觉模型和 Seedream 模型；不要提交该文件。
+2. 运行 `npm run dev:mvp`，它会同时启动 5173 端口的工作台和 5174 端口的本地任务服务。
+3. 打开 `http://localhost:5173/`。任务、上传图片和生成结果保存在本机 `data/`。
+
+未配置模型时可以验证上传、规划、队列、暂停恢复和界面；模型生成槽位会标记为风险，不能在未确认时正式选择方案。
+
+## 首轮真实任务
+
+- `npm run validate:batch -- --check-only`：只检查 10 个任务清单和本地图片，不调用模型、不产生费用。
+- `npm run validate:batch -- --confirm-costs --budget=<已明确额度> --state=validation/batches/technical.json`：模型配置完成后按顺序执行 10 个真实任务；该命令会产生真实模型费用。
+- 任务清单位于 `validation/batch-manifest.json`，当前覆盖女装、美妆礼盒、鞋靴、二手机车和跨品类难例。
+- 批量生成后仍需在首页逐项处理风险并选择愿意采用的方案，最终结果在 `/metrics` 查看。
+
+- [开发日志](./DEVELOPMENT_LOG.md)
+- [可行性验证计划](./VALIDATION_PLAN.md)
+- [可行性结论与 MVP 定义](./FEASIBILITY_CONCLUSION.md)
+- [当前 MVP 唯一实施定义](./MVP_DEFINITION.md)
+
+## 当前验收状态
+
+- 本地上传、任务持久化、固定三案规划、素材队列、暂停继续、风险放行、换图/恢复及方案选择链路已实现。
+- 未配置模型时，生成类素材只作为本地构图预览并标为风险，不会冒充真实模型验收结果。
+- 真实生图、视觉质检以及 10 个真实任务门槛，需要在本机 `.env.local` 配置完成后执行。
+
+## 工程运行环境
+
+以下为底层 Vinext/Sites 工程说明；当前 MVP 不启用云端账号、D1、R2 或部署能力。
 
 A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
 
@@ -115,3 +147,13 @@ Like the Sites package, `npm run build` runs `vinext build` directly; it does no
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+## 当前稳定性测试
+
+- 完整预检：`npm run validate:batch -- --check-only`，逐张解码并检查输入契约，无模型调用。
+- 独立基线：`npm run validate:batch -- --baseline --limit=1 --confirm-costs --state=validation/batches/baseline.json`。这是一个单独授权的真实样本，会产生费用；未得到基线执行授权时只运行预检。
+- 十任务：先确定预算并配置服务的 MVP_PRICING_FILE，再使用上面的预算命令。该表中每个数值是每次相应请求的保守预算上界；成功调用展示估算，失败/未知调用仍预留预算，不把未知实际费用当零。
+- 中断后使用完全相同的清单、预算和state路径；输入SHA256不一致会拒绝继续。任务暂停需明确添加 --resume，不会自行恢复。
+- 默认30分钟单任务监测上限。暂停、失败、服务断开会停止批次；幂等创建标记防止重开产生重复任务。
+- 当前现有素材包含混合难例，不能宣称完成三个真实店铺品类商业验证。
+- 进度与剩余要求：EXECUTION_PLAN.md；每次实施记录：DEVELOPMENT_LOG.md。

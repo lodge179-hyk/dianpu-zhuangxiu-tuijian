@@ -1,0 +1,42 @@
+.validation-summary.complete {
+  background: #18211d;
+  color: #fff;
+}
+
+.validation-summary p {
+  flex: 1;
+}
+
+.validation-summary > button,
+.validation-summary > a {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.validation-summary > button:hover,
+.validation-summary > a:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+@media (max-width: 640px) {
+  .validation-summary {
+    flex-wrap: wrap;
+  }
+
+  .validation-summary > button,
+  .validation-summary > a {
+    width: 100%;
+  }
+}

@@ -11,9 +11,17 @@ const { d1, r2 } = hostingConfig;
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
+const localVars: Record<string, string> = {};
+if (process.env.ARK_API_KEY) {
+  localVars.ARK_API_KEY = process.env.ARK_API_KEY;
+  localVars.ARK_RESPONSES_ENDPOINT = process.env.ARK_RESPONSES_ENDPOINT ?? "https://ark.cn-beijing.volces.com/api/v3/responses";
+  localVars.ARK_VISION_MODEL = process.env.ARK_VISION_MODEL ?? "doubao-seed-2-1-pro-260628";
+}
+
 const localBindingConfig = {
   main: "vinext/server/fetch-handler",
   compatibility_flags: ["nodejs_compat"],
+  vars: localVars,
   d1_databases: d1
     ? [
         {
@@ -33,7 +41,7 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
   // Use Miniflare's local Request.cf placeholder unless fetching is requested.
   process.env.CLOUDFLARE_CF_FETCH_ENABLED ??= "false";
   process.env.WRANGLER_SEND_METRICS ??= "false";
@@ -46,20 +54,27 @@ export default defineConfig(async () => {
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";
 
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
-  const { cloudflare } = await import("@cloudflare/vite-plugin");
+  const cloudflarePlugin = command === "build" ? (await import("@cloudflare/vite-plugin")).cloudflare({
+    viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
+    inspectorPort: false,
+    config: localBindingConfig,
+  }) : undefined;
 
   return {
-    server: isCodexSeatbeltSandbox
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
+    server: {
+      ...(isCodexSeatbeltSandbox ? { watch: { useFsEvents: false, usePolling: true } } : {}),
+      proxy: {
+        "/mvp-service": {
+          target: "http://127.0.0.1:5174",
+          changeOrigin: true,
+          rewrite: (requestPath: string) => requestPath.replace(/^\/mvp-service/, ""),
+        },
+      },
+    },
     plugins: [
       vinext(),
       sites(),
-      cloudflare({
-        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-        inspectorPort: false,
-        config: localBindingConfig,
-      }),
+      ...(cloudflarePlugin ? [cloudflarePlugin] : []),
     ],
   };
 });

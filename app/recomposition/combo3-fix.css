@@ -1,0 +1,10 @@
+.rc-poster.combo3 {
+  grid-template-rows: 1fr 1fr;
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
+.rc-single-plan {
+  grid-template-columns: minmax(360px, 520px);
+  justify-content: center;
+}

@@ -1,0 +1,24 @@
+.plan-note li input{min-width:0;flex:1;border:1px solid var(--line);border-radius:7px;padding:6px;font-size:11px}
+.minor-action,.select-plan{border:0;border-radius:9px;padding:9px 12px;font-size:11px;cursor:pointer}
+.minor-action{background:#edf2ef;color:#405149}
+.asset-review{border-top:1px solid var(--line);margin-top:16px;padding-top:16px}
+.asset-review>strong{font-size:12px}
+.asset-review article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;border-bottom:1px solid #edf0ee;padding:10px 0}
+.asset-review article>span{display:flex;flex-direction:column;min-width:0}
+.asset-review article b{font-size:11px}
+.asset-review article small{color:#7b8981;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asset-review article em{font-style:normal;font-size:9px}
+.asset-review article button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 7px;font-size:9px;grid-row:2}
+.verdict-pass{color:#118252}.verdict-risk{color:#b17308}.verdict-reject{color:#c44131}
+.select-plan{width:100%;margin-top:16px;background:#17241e;color:#fff;display:flex;align-items:center;justify-content:center;gap:6px}
+.select-plan:disabled{background:#e2e7e4;color:#7d8982}
+.asset-buttons{grid-column:1/-1;display:flex;gap:5px;flex-wrap:wrap}
+.asset-buttons button,.asset-buttons label{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 7px;font-size:9px;display:flex;align-items:center;gap:3px;cursor:pointer}
+.asset-buttons input{display:none}
+.usage-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:15px}
+.usage-summary span{background:#f3f6f4;border-radius:8px;padding:9px;display:flex;flex-direction:column;font-size:9px;color:#7a8780}
+.usage-summary b{font-size:11px;color:#26342d;margin-bottom:2px}
+
+@media(max-width:900px){.task-sidebar{display:flex;gap:8px;overflow-x:auto;align-items:center}.side-title{min-width:145px;margin:0}.task-row{display:flex!important;min-width:190px;margin:0}.no-task{min-width:150px;margin:0}}
+
+.asset-source-comparison{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}.asset-source-comparison figure{margin:0}.asset-source-comparison img{width:100%;max-height:180px;object-fit:contain;background:#f3f4f3}.asset-source-comparison figcaption{font-size:10px;line-height:1.5}

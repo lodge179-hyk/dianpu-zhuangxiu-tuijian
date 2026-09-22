@@ -1,0 +1,15 @@
+{
+  "productRoot": "C:/Users/Administrator/Desktop/生图模型测试素材/商品图",
+  "tasks": [
+    { "category": "女装", "brief": "早秋女装上新，突出主推款并建立统一高级感。", "visualDescription": "柔和自然光，米白与暖灰背景，真实面料纹理。", "products": [{"folder":"165 108斤上身4码效果  yy8051","name":"主推上身款"},{"match":"吊带抹胸连衣裙","name":"黑色工装连衣裙"},{"folder":"早秋新款 小众皮短裤 sml","name":"早秋皮短裤"}] },
+    { "category": "女装", "brief": "强调皮质单品的版型差异，引导顾客快速比较款式。", "visualDescription": "低饱和灰褐色，侧光突出皮革纹理，克制现代。", "products": [{"folder":"早秋款 小众双口袋皮短裤 sml","name":"双口袋皮短裤"},{"folder":"早秋新款 小众皮短裤 sml_001","name":"小众皮短裤新款"},{"match":"吊带抹胸连衣裙","name":"黑色工装连衣裙"}] },
+    { "category": "女装", "brief": "以穿搭氛围优先，随后展示主推和搭配单品。", "visualDescription": "自然窗光，干净留白，黑色与米色形成简洁对比。", "products": [{"match":"吊带抹胸连衣裙","name":"主推工装连衣裙"},{"folder":"165 108斤上身4码效果  yy8051","name":"上身搭配款"},{"folder":"早秋款 小众双口袋皮短裤 sml","name":"双口袋皮短裤"}] },
+    { "category": "美妆礼盒", "brief": "七夕礼赠主题，突出主推色号并方便快速选礼盒。", "visualDescription": "柔粉与香槟金，通透棚拍光，保持包装文字与色号。", "products": [{"match":"YSL爱心216礼盒","name":"YSL爱心216礼盒"},{"match":"兰蔻节日限定口红313","name":"兰蔻313礼盒"},{"match":"GUCCI热门口红礼盒（214）","name":"GUCCI 214礼盒"}] },
+    { "category": "美妆礼盒", "brief": "用冷暖色号对比帮助顾客快速选择口红礼盒。", "visualDescription": "高级静物棚拍，浅灰背景，玻璃高光，包装结构必须真实。", "products": [{"match":"GUCCI热门口红礼盒（308）","name":"GUCCI 308礼盒"},{"match":"YSL唇冻05礼盒","name":"YSL唇冻05礼盒"},{"match":"YSL限定442礼盒","name":"YSL 442礼盒"}] },
+    { "category": "美妆礼盒", "brief": "突出礼盒组合价值，兼顾品牌氛围与商品强曝光。", "visualDescription": "暖调节日氛围，丝绒与镜面材质，包装标识不得改变。", "products": [{"match":"YSL气垫+口红礼盒系列","name":"YSL气垫口红组合"},{"match":"阿玛尼渐变142礼盒","name":"阿玛尼142礼盒"},{"match":"兰蔻节日限定口红375","name":"兰蔻375礼盒"}] },
+    { "category": "美妆礼盒", "brief": "做一套更偏快速选款的口红首页，主推棕调色号。", "visualDescription": "焦糖棕与奶油色，柔和反射光，保留管身和包装细节。", "products": [{"match":"阿玛尼20 Live棕礼盒","name":"阿玛尼20 Live棕"},{"match":"GUCCI热门口红礼盒（308）","name":"GUCCI 308礼盒"},{"match":"YSL限定442礼盒","name":"YSL 442礼盒"}] },
+    { "category": "鞋靴主推混合难例", "brief": "主推运动鞋，验证鞋底、鞋面结构和配色能否保真。", "visualDescription": "浅褐城市街头场景，硬朗侧光，鞋体比例和结构清晰。", "products": [{"match":"LOUIS VUITTON Skate","name":"浅褐色运动鞋"},{"folder":"早秋新款 小众皮短裤 sml","name":"皮短裤搭配"},{"match":"吊带抹胸连衣裙","name":"工装连衣裙搭配"}] },
+    { "category": "机车主推混合难例", "brief": "主推二手机车，优先展示车况与完整机械结构。", "visualDescription": "干净工业车库，自然硬光，车身结构、轮组和涂装不得改变。", "products": [{"match":"春风450SRS","name":"春风450SRS"},{"match":"LOUIS VUITTON Skate","name":"浅褐色运动鞋"},{"match":"YSL爱心216礼盒","name":"YSL爱心礼盒"}] },
+    { "category": "跨品类难例", "brief": "验证身份敏感商品混合输入时，系统仍能生成三套合法且可比较的首页。", "visualDescription": "中性浅灰背景，统一光线和材质表达，不改包装、机械与鞋体结构。", "products": [{"match":"春风450SRS","name":"春风450SRS"},{"match":"LOUIS VUITTON Skate","name":"浅褐色运动鞋"},{"match":"YSL气垫+口红礼盒系列","name":"YSL气垫口红组合"}] }
+  ]
+}

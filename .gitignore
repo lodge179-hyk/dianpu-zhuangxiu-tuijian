@@ -31,12 +31,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
 next-env.d.ts
+*.tsbuildinfo
 /dist/
 /pnpm-lock.yaml
 /pnpm-workspace.yaml
@@ -46,3 +48,39 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+/data/
+
+# Private repository: local secrets, generated output and caches
+.env*
+bin/
+obj/
+.vs/
+.idea/
+.vscode/
+output/
+outputs/
+tmp/
+temp/
+*.log
+*.log.*
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.tmp*
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+Thumbs.db
+Desktop.ini
+*.key
+*.p12
+*.pfx
+
+# Validation runtime locks
+/validation/batches/*.lock

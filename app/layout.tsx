@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./constraints.css";
+import "./mvp-actions.css";
+import "./metrics.css";
+import "./test-category.css";
 
 export const metadata: Metadata = {
-  title: "布局验证台｜微购店铺装修方案",
-  description: "用同一批商品素材比较三种可复刻的微购首页布局。",
+  title: "店铺装修生成｜微购首页方案",
+  description: "上传商品与经营目标，生成三套可在微购复刻的完整店铺首页。",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

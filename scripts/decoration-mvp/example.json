@@ -1,0 +1,13 @@
+{
+  "nickname": "彩妆礼盒精选",
+  "avatarText": "礼",
+  "avatarPath": "",
+  "style": "暖色石材，真实礼盒陈列",
+  "scene": "../../output/ui-layout-validation/repeat-run-03/carousel-ai-v1.png",
+  "posterCrops": [[0,450,500,500],[480,400,500,500],[948,450,500,500]],
+  "products": [
+    {"name":"YSL 爱心216礼盒","price":"182","image":"../../output/ui-layout-validation/repeat-beauty/square-source-0.jpg","reference":"../../output/ui-layout-validation/repeat-beauty/product-0.jpg","crop":[0,400,1242,1242]},
+    {"name":"兰蔻礼盒","price":"142","image":"../../output/ui-layout-validation/repeat-beauty/square-source-1.jpg","reference":"../../output/ui-layout-validation/repeat-beauty/product-1.jpg","crop":[0,400,1242,1242]},
+    {"name":"GUCCI 214礼盒","price":"188","image":"../../output/ui-layout-validation/repeat-beauty/square-source-2.jpg","reference":"../../output/ui-layout-validation/repeat-beauty/product-2.jpg","crop":[0,427,1280,1280]}
+  ]
+}

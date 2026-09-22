@@ -1,0 +1,3012 @@
+{
+  "batchId": "technical-5bfa329d-d899-47ee-a9d5-08e488d14752",
+  "purpose": "technical",
+  "untilBalance": true,
+  "createdAt": "2026-09-13T06:24:54.225Z",
+  "tasks": [
+    {
+      "index": 0,
+      "fingerprint": "f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "b68c4dcba20a2e7d4936d9232dfd443c470df8ab895ac7628a4d3ff464e26473"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "b8eeecd526f1275264144b85aef53c8b405f48c81a9ff54a1671b792e2c677ca"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "e1686e256cbd136df47de17595dfd4c80a1ba15f32232f42f6072f96d0e90f6b"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "7770d1aee8899883d45598af097d88eec4add0d484c506b0ce9c2312f915e405"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "81bb2961cae57b484c6a45f8551cf66e225a72e54c485f3badd6bc1e271abf48"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "060d61526e78ba704a3e1c8997a10c2a8e719a6453572b75ddb6d4a8a25a686e"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "bae3b2e5da52ab32976a622b90ab6374306dde5304c5e69ad275b4e498e3184b"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "58858a1d0f9351b4e25f4b13734fefcdf188637ae7852f4c644b1c6e5c5a8f2b"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "d57cb76fc43181059be666683a2972bf4ef566f64bc2606e411833861f508e45"
+        }
+      ],
+      "status": "completed",
+      "key": "technical-5bfa329d-d899-47ee-a9d5-08e488d14752:0:f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+      "taskId": "1255a608-617b-40c1-a4af-78f6e4fe9c6b",
+      "watchStartedAt": "2026-09-13T06:24:55.245Z",
+      "lastObservedAt": "2026-09-13T06:43:40.037Z",
+      "snapshot": {
+        "id": "1255a608-617b-40c1-a4af-78f6e4fe9c6b",
+        "revision": 108,
+        "createdAt": "2026-09-13T06:24:55.190Z",
+        "updatedAt": "2026-09-13T06:43:39.539Z",
+        "startedAt": "2026-09-13T06:24:55.219Z",
+        "firstCompletedAt": "2026-09-13T06:43:39.539Z",
+        "batchId": "technical-5bfa329d-d899-47ee-a9d5-08e488d14752",
+        "clientRequestId": "technical-5bfa329d-d899-47ee-a9d5-08e488d14752:0:f952de62572757c9ea116fe5bdcfbb1e7edb7838e168d15047d0a09b5062e2a3",
+        "layoutVersion": "shared-v1",
+        "testPurpose": "technical",
+        "assetEvents": [
+          {
+            "at": "2026-09-13T06:27:00.316Z",
+            "assetId": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+            "kind": "updated",
+            "before": {
+              "id": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+              "moduleId": "atmosphere-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:170",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+              "moduleId": "atmosphere-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:170",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:27:03.164Z",
+            "assetId": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+            "kind": "updated",
+            "before": {
+              "id": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+              "moduleId": "atmosphere-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:170",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+              "moduleId": "atmosphere-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:170",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，可直接使用。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:28:25.828Z",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "kind": "updated",
+            "before": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:28:28.785Z",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "kind": "updated",
+            "before": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": true,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "failed",
+              "verdict": "reject",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "小立领亨利门襟纽扣设计被改变，原本门襟纽扣数量、形态与结果图不符，且手机外观上原有的文字印花被去除，不符合保护要求"
+            }
+          },
+          {
+            "at": "2026-09-13T06:29:43.293Z",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "kind": "updated",
+            "before": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "reject",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "小立领亨利门襟纽扣设计被改变，原本门襟纽扣数量、形态与结果图不符，且手机外观上原有的文字印花被去除，不符合保护要求"
+            },
+            "after": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "小立领亨利门襟纽扣设计被改变，原本门襟纽扣数量、形态与结果图不符，且手机外观上原有的文字印花被去除，不符合保护要求"
+            }
+          },
+          {
+            "at": "2026-09-13T06:29:47.391Z",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "kind": "updated",
+            "before": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "小立领亨利门襟纽扣设计被改变，原本门襟纽扣数量、形态与结果图不符，且手机外观上原有的文字印花被去除，不符合保护要求"
+            },
+            "after": {
+              "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "693.6429:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "仅移除了手机壳上的文字图案，上衣的小立领亨利门襟纽扣、竖坑条肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，无违规问题。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:30:59.127Z",
+            "assetId": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+            "kind": "updated",
+            "before": {
+              "id": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:31:01.500Z",
+            "assetId": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+            "kind": "updated",
+            "before": {
+              "id": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "保留了小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型与短袖袖型，画面为单一连续画面，无违规改动。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:32:46.262Z",
+            "assetId": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+            "kind": "updated",
+            "before": {
+              "id": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "detail",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "detail",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:32:50.014Z",
+            "assetId": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+            "kind": "updated",
+            "before": {
+              "id": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "detail",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+              "moduleId": "atmosphere-0",
+              "productId": "p1",
+              "role": "detail",
+              "ratio": "385.3571:539.5",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣、竖坑条肌理、短款修身版型、短袖袖型均保留，画面为单张连续图，无违规改动。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:34:05.687Z",
+            "assetId": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+            "kind": "updated",
+            "before": {
+              "id": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+              "moduleId": "atmosphere-2",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:4",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+              "moduleId": "atmosphere-2",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:4",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:34:08.349Z",
+            "assetId": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+            "kind": "updated",
+            "before": {
+              "id": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+              "moduleId": "atmosphere-2",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:4",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+              "moduleId": "atmosphere-2",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:4",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "保留了上衣小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型与短袖袖型的核心特征，为单一连续画面，无违规问题。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:34:08.597Z",
+            "assetId": "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+            "kind": "updated",
+            "before": {
+              "id": "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+              "moduleId": "atmosphere-3",
+              "productId": "p2",
+              "role": "product",
+              "ratio": "1:1",
+              "initialRoute": "original",
+              "route": "original",
+              "status": "pending",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 0,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+              "moduleId": "atmosphere-3",
+              "productId": "p2",
+              "role": "product",
+              "ratio": "1:1",
+              "adaptation": {
+                "verdict": "risk",
+                "mode": "preserved",
+                "sourceFilename": "26536d92-bf50-4ea3-a993-561524eb77a6.jpg",
+                "reason": "没有可确认安全的满铺裁切，暂时完整显示原图；请核对原图或换用其他角度"
+              },
+              "retryEligible": false,
+              "initialRoute": "original",
+              "route": "original",
+              "status": "ready",
+              "verdict": "risk",
+              "initialVerdict": "risk",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "没有可确认安全的满铺裁切，暂时完整显示原图；请核对原图或换用其他角度"
+            }
+          },
+          {
+            "at": "2026-09-13T06:34:08.723Z",
+            "assetId": "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6",
+            "kind": "updated",
+            "before": {
+              "id": "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6",
+              "moduleId": "atmosphere-3",
+              "productId": "p3",
+              "role": "product",
+              "ratio": "1:1",
+              "initialRoute": "original",
+              "route": "original",
+              "status": "pending",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 0,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6",
+              "moduleId": "atmosphere-3",
+              "productId": "p3",
+              "role": "product",
+              "ratio": "1:1",
+              "adaptation": {
+                "verdict": "pass",
+                "mode": "crop",
+                "sourceFilename": "53275112-e468-45fa-b35b-0ac1a3680ff6.jpg",
+                "reason": "裁切完整保留受保护区域",
+                "crop": {
+                  "left": 0,
+                  "top": 707,
+                  "width": 1080,
+                  "height": 1080
+                }
+              },
+              "retryEligible": false,
+              "initialRoute": "original",
+              "route": "original",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "裁切完整保留受保护区域"
+            }
+          },
+          {
+            "at": "2026-09-13T06:34:08.946Z",
+            "assetId": "0211d586-8c01-4435-98c2-b3fe24168177",
+            "kind": "updated",
+            "before": {
+              "id": "0211d586-8c01-4435-98c2-b3fe24168177",
+              "moduleId": "quick-0",
+              "productId": "p1",
+              "role": "category",
+              "ratio": "1:1",
+              "initialRoute": "crop",
+              "route": "crop",
+              "status": "pending",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 0,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "0211d586-8c01-4435-98c2-b3fe24168177",
+              "moduleId": "quick-0",
+              "productId": "p1",
+              "role": "category",
+              "ratio": "1:1",
+              "adaptation": {
+                "verdict": "pass",
+                "mode": "crop",
+                "sourceFilename": "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+                "reason": "裁切完整保留受保护区域",
+                "crop": {
+                  "left": 0,
+                  "top": 407,
+                  "width": 1440,
+                  "height": 1440
+                }
+              },
+              "retryEligible": false,
+              "initialRoute": "crop",
+              "route": "crop",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "裁切完整保留受保护区域"
+            }
+          },
+          {
+            "at": "2026-09-13T06:35:42.101Z",
+            "assetId": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+            "kind": "updated",
+            "before": {
+              "id": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+              "moduleId": "quick-1",
+              "productId": "p1",
+              "role": "scene",
+              "ratio": "1080:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+              "moduleId": "quick-1",
+              "productId": "p1",
+              "role": "scene",
+              "ratio": "1080:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:35:44.554Z",
+            "assetId": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+            "kind": "updated",
+            "before": {
+              "id": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+              "moduleId": "quick-1",
+              "productId": "p1",
+              "role": "scene",
+              "ratio": "1080:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+              "moduleId": "quick-1",
+              "productId": "p1",
+              "role": "scene",
+              "ratio": "1080:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，仅对手机壳文字进行了处理，无其他违规问题，可直接使用。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:35:44.745Z",
+            "assetId": "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+            "kind": "updated",
+            "before": {
+              "id": "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+              "moduleId": "quick-2",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "1:1",
+              "initialRoute": "original",
+              "route": "original",
+              "status": "pending",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 0,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+              "moduleId": "quick-2",
+              "productId": "p1",
+              "role": "product",
+              "ratio": "1:1",
+              "adaptation": {
+                "verdict": "pass",
+                "mode": "crop",
+                "sourceFilename": "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+                "reason": "裁切完整保留受保护区域",
+                "crop": {
+                  "left": 0,
+                  "top": 407,
+                  "width": 1440,
+                  "height": 1440
+                }
+              },
+              "retryEligible": false,
+              "initialRoute": "original",
+              "route": "original",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "裁切完整保留受保护区域"
+            }
+          },
+          {
+            "at": "2026-09-13T06:37:02.118Z",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "kind": "updated",
+            "before": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:37:05.566Z",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "kind": "updated",
+            "before": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": true,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "failed",
+              "verdict": "reject",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "上衣的竖坑条针织面料肌理被改变，原本的竖向坑条消失，面料变为平滑质感，且手机壳上的文字印花被去除，不符合商品特征保护要求。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:38:23.145Z",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "kind": "updated",
+            "before": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "reject",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "上衣的竖坑条针织面料肌理被改变，原本的竖向坑条消失，面料变为平滑质感，且手机壳上的文字印花被去除，不符合商品特征保护要求。"
+            },
+            "after": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "上衣的竖坑条针织面料肌理被改变，原本的竖向坑条消失，面料变为平滑质感，且手机壳上的文字印花被去除，不符合商品特征保护要求。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:38:25.646Z",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "kind": "updated",
+            "before": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "上衣的竖坑条针织面料肌理被改变，原本的竖向坑条消失，面料变为平滑质感，且手机壳上的文字印花被去除，不符合商品特征保护要求。"
+            },
+            "after": {
+              "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+              "moduleId": "quick-3",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "4:3",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "reject",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 2,
+              "manualAttempts": 0,
+              "currentVersion": 2,
+              "previousVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型、短袖袖型均保留，为单一连续画面，无违规改动，可使用。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:39:36.348Z",
+            "assetId": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+            "kind": "updated",
+            "before": {
+              "id": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+              "moduleId": "product-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:145",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+              "moduleId": "product-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:145",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:39:39.161Z",
+            "assetId": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+            "kind": "updated",
+            "before": {
+              "id": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+              "moduleId": "product-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:145",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+              "moduleId": "product-sign",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "376:145",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，为单一连续画面，无违规问题。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:40:53.914Z",
+            "assetId": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+            "kind": "updated",
+            "before": {
+              "id": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+              "moduleId": "product-1",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:1",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+              "moduleId": "product-1",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:1",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:40:56.728Z",
+            "assetId": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+            "kind": "updated",
+            "before": {
+              "id": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+              "moduleId": "product-1",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:1",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+              "moduleId": "product-1",
+              "productId": "p1",
+              "role": "hero",
+              "ratio": "3:1",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，无违规修改，可直接使用。"
+            }
+          },
+          {
+            "at": "2026-09-13T06:42:14.832Z",
+            "assetId": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+            "kind": "updated",
+            "before": {
+              "id": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+              "moduleId": "product-3",
+              "productId": "p2",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+              "moduleId": "product-3",
+              "productId": "p2",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:42:18.456Z",
+            "assetId": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+            "kind": "updated",
+            "before": {
+              "id": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+              "moduleId": "product-3",
+              "productId": "p2",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+              "moduleId": "product-3",
+              "productId": "p2",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "risk",
+              "initialVerdict": "risk",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "画面裁切丢失了右侧购物袋上的品牌标识与购物袋完整形态，整体商品核心结构设计保留，属于轻微裁切问题"
+            }
+          },
+          {
+            "at": "2026-09-13T06:43:36.547Z",
+            "assetId": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+            "kind": "updated",
+            "before": {
+              "id": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+              "moduleId": "product-3",
+              "productId": "p3",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "generating",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 0
+            },
+            "after": {
+              "id": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+              "moduleId": "product-3",
+              "productId": "p3",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            }
+          },
+          {
+            "at": "2026-09-13T06:43:39.258Z",
+            "assetId": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+            "kind": "updated",
+            "before": {
+              "id": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+              "moduleId": "product-3",
+              "productId": "p3",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "checking",
+              "verdict": "pending",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1
+            },
+            "after": {
+              "id": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+              "moduleId": "product-3",
+              "productId": "p3",
+              "role": "scene",
+              "ratio": "539.5:1080",
+              "retryEligible": false,
+              "lastAttemptManual": false,
+              "initialRoute": "preserve",
+              "route": "preserve",
+              "status": "ready",
+              "verdict": "pass",
+              "initialVerdict": "pass",
+              "approvedRisk": false,
+              "manuallyRejected": false,
+              "automaticAttempts": 1,
+              "manualAttempts": 0,
+              "currentVersion": 1,
+              "error": "保留了黑色真皮肌理、高腰、宽松短款裤型，明线分割结构与侧边纽扣设计，核心商品特征无改动，为单一连续画面，可直接使用。"
+            }
+          }
+        ],
+        "stateEvents": [
+          {
+            "at": "2026-09-13T06:24:55.219Z",
+            "from": "draft",
+            "to": "queued"
+          },
+          {
+            "at": "2026-09-13T06:24:55.244Z",
+            "from": "queued",
+            "to": "analyzing"
+          },
+          {
+            "at": "2026-09-13T06:25:25.584Z",
+            "from": "analyzing",
+            "to": "planning"
+          },
+          {
+            "at": "2026-09-13T06:25:50.279Z",
+            "from": "planning",
+            "to": "generating"
+          },
+          {
+            "at": "2026-09-13T06:43:39.273Z",
+            "from": "generating",
+            "to": "checking"
+          },
+          {
+            "at": "2026-09-13T06:43:39.539Z",
+            "from": "checking",
+            "to": "completed"
+          }
+        ],
+        "adoptionReviews": [],
+        "completedAt": "2026-09-13T06:43:39.539Z",
+        "status": "completed",
+        "progress": 100,
+        "testCategory": "女装",
+        "brief": "早秋女装上新，突出主推款并建立统一高级感。",
+        "visualDescription": "柔和自然光，米白与暖灰背景，真实面料纹理。",
+        "products": [
+          {
+            "id": "p1",
+            "name": "主推上身款",
+            "isHero": true,
+            "images": [
+              "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+              "98962da6-a690-41c2-8158-f512256199e8.jpg",
+              "b43af0f3-9a47-4e44-af0f-638c3f96e67d.jpg"
+            ]
+          },
+          {
+            "id": "p2",
+            "name": "黑色工装连衣裙",
+            "isHero": false,
+            "images": [
+              "26536d92-bf50-4ea3-a993-561524eb77a6.jpg",
+              "4c5bbc05-af44-4fcd-ae2a-dada118a5b1e.jpg",
+              "2d34f917-8039-49ca-995f-7d93e36ba576.jpg"
+            ]
+          },
+          {
+            "id": "p3",
+            "name": "早秋皮短裤",
+            "isHero": false,
+            "images": [
+              "53275112-e468-45fa-b35b-0ac1a3680ff6.jpg",
+              "5862688c-bbb3-45d0-8aac-3b8c174371a5.jpg",
+              "c63d9861-1d5f-4db1-a527-bcec7e40473d.jpg"
+            ]
+          }
+        ],
+        "styleReferences": [],
+        "productAnalyses": [
+          {
+            "productId": "p1",
+            "summary": "亨利领纽扣短袖修身坑条短款上衣（白色款为展示款，另有粉色款）",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "小立领亨利门襟纽扣设计",
+              "竖坑条针织面料肌理",
+              "短款修身版型",
+              "短袖袖型"
+            ],
+            "views": [
+              {
+                "image": "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+                "confidence": 0.97,
+                "box": {
+                  "left": 0.365,
+                  "top": 0.408,
+                  "width": 0.26,
+                  "height": 0.24
+                }
+              },
+              {
+                "image": "98962da6-a690-41c2-8158-f512256199e8.jpg",
+                "confidence": 0.98,
+                "box": {
+                  "left": 0.105,
+                  "top": 0.01,
+                  "width": 0.64,
+                  "height": 0.83
+                }
+              },
+              {
+                "image": "b43af0f3-9a47-4e44-af0f-638c3f96e67d.jpg",
+                "confidence": 0.96,
+                "box": {
+                  "left": 0.285,
+                  "top": 0.368,
+                  "width": 0.27,
+                  "height": 0.195
+                }
+              }
+            ]
+          },
+          {
+            "productId": "p2",
+            "summary": "Saint Laurent黑色吊带收腰工装短连衣裙",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "双肩细吊带设计",
+              "松紧抽绳收腰结构",
+              "双侧带扣立体工装大口袋",
+              "垂附的品牌吊牌",
+              "褶皱抹胸式上沿",
+              "短款直筒裙型"
+            ],
+            "views": [
+              {
+                "image": "26536d92-bf50-4ea3-a993-561524eb77a6.jpg",
+                "confidence": 0.99,
+                "box": {
+                  "left": 0.215,
+                  "top": 0.17,
+                  "width": 0.465,
+                  "height": 0.78
+                }
+              },
+              {
+                "image": "4c5bbc05-af44-4fcd-ae2a-dada118a5b1e.jpg",
+                "confidence": 0.98,
+                "box": {
+                  "left": 0.21,
+                  "top": 0.145,
+                  "width": 0.42,
+                  "height": 0.82
+                }
+              },
+              {
+                "image": "2d34f917-8039-49ca-995f-7d93e36ba576.jpg",
+                "confidence": 0.95,
+                "box": {
+                  "left": 0,
+                  "top": 0,
+                  "width": 0.57,
+                  "height": 0.92
+                }
+              }
+            ]
+          },
+          {
+            "productId": "p3",
+            "summary": "黑色皮质高腰阔腿A字早秋皮短裤",
+            "identitySensitive": true,
+            "protectedFeatures": [
+              "黑色真皮面料自然肌理",
+              "高腰设计",
+              "侧边装饰纽扣",
+              "明线分割缝线结构",
+              "宽松短款裤型"
+            ],
+            "views": [
+              {
+                "image": "53275112-e468-45fa-b35b-0ac1a3680ff6.jpg",
+                "confidence": 0.97,
+                "box": {
+                  "left": 0.245,
+                  "top": 0.535,
+                  "width": 0.345,
+                  "height": 0.19
+                }
+              },
+              {
+                "image": "5862688c-bbb3-45d0-8aac-3b8c174371a5.jpg",
+                "confidence": 0.96,
+                "box": {
+                  "left": 0.305,
+                  "top": 0.495,
+                  "width": 0.375,
+                  "height": 0.155
+                }
+              },
+              {
+                "image": "c63d9861-1d5f-4db1-a527-bcec7e40473d.jpg",
+                "confidence": 0.98,
+                "box": {
+                  "left": 0.39,
+                  "top": 0.435,
+                  "width": 0.47,
+                  "height": 0.215
+                }
+              }
+            ]
+          }
+        ],
+        "plans": [
+          {
+            "id": "1255a608-617b-40c1-a4af-78f6e4fe9c6b-atmosphere",
+            "strategy": "atmosphere",
+            "name": "氛围叙事型",
+            "rationale": "以早秋松弛氛围感为叙事主线，通过大尺寸视觉模块传递高级柔和调性，逐步引出主推款及搭配单品，强化米白暖灰调的统一高级质感，契合早秋上新的情绪共鸣需求",
+            "shopSign": {
+              "id": "atmosphere-sign",
+              "type": "shopSign",
+              "variant": "default",
+              "title": "早秋质感女装馆",
+              "productIds": [
+                "p1"
+              ],
+              "assetIds": [
+                "c152f7cc-7333-4ab1-986f-113a25eb5ff1"
+              ]
+            },
+            "modules": [
+              {
+                "id": "atmosphere-0",
+                "type": "poster",
+                "variant": "combo1",
+                "title": "早秋序章 柔感上新",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+                  "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+                  "27ed26a8-a1b2-4be9-8c96-34cc110968a1"
+                ]
+              },
+              {
+                "id": "atmosphere-1",
+                "type": "text",
+                "variant": "multiLine",
+                "title": "柔感早秋",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": []
+              },
+              {
+                "id": "atmosphere-2",
+                "type": "carousel",
+                "variant": "large",
+                "title": "主推柔感亨利领上衣",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0"
+                ]
+              },
+              {
+                "id": "atmosphere-3",
+                "type": "showcase",
+                "variant": "double",
+                "title": "早秋搭配灵感",
+                "productIds": [
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+                  "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6"
+                ]
+              },
+              {
+                "id": "atmosphere-4",
+                "type": "text",
+                "variant": "link",
+                "title": "查看全部早秋新品",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": []
+              }
+            ]
+          },
+          {
+            "id": "1255a608-617b-40c1-a4af-78f6e4fe9c6b-quick",
+            "strategy": "quick",
+            "name": "快速选购型",
+            "rationale": "以高效选购为核心，清晰分类导航快速分流，优先展示主推款后直接陈列全品类商品，减少浏览路径，帮助用户快速定位所需早秋单品",
+            "shopSign": {
+              "id": "quick-sign",
+              "type": "shopSign",
+              "variant": "minimal",
+              "title": "微购早秋女装",
+              "productIds": [
+                "p1",
+                "p2",
+                "p3"
+              ],
+              "assetIds": []
+            },
+            "modules": [
+              {
+                "id": "quick-0",
+                "type": "navigation",
+                "variant": "four",
+                "title": "快速导航",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "0211d586-8c01-4435-98c2-b3fe24168177",
+                  "0211d586-8c01-4435-98c2-b3fe24168177",
+                  "0211d586-8c01-4435-98c2-b3fe24168177",
+                  "0211d586-8c01-4435-98c2-b3fe24168177"
+                ]
+              },
+              {
+                "id": "quick-1",
+                "type": "poster",
+                "variant": "single",
+                "title": "主推款上新特惠",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "5c8284bb-5d4e-45a4-8508-4f08d908a7bc"
+                ]
+              },
+              {
+                "id": "quick-2",
+                "type": "showcase",
+                "variant": "slider",
+                "title": "人气热卖",
+                "productIds": [
+                  "p1",
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+                  "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+                  "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6",
+                  "d8b5cef8-5676-4952-b9c8-4b363893bb9c"
+                ]
+              },
+              {
+                "id": "quick-3",
+                "type": "carousel",
+                "variant": "medium",
+                "title": "多色可选亨利领上衣",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0"
+                ]
+              },
+              {
+                "id": "quick-4",
+                "type": "showcase",
+                "variant": "triple",
+                "title": "早秋必入单品",
+                "productIds": [
+                  "p1",
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+                  "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+                  "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6"
+                ]
+              },
+              {
+                "id": "quick-5",
+                "type": "text",
+                "variant": "singleLine",
+                "title": "全场早秋新品满减进行中",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": []
+              }
+            ]
+          },
+          {
+            "id": "1255a608-617b-40c1-a4af-78f6e4fe9c6b-product",
+            "strategy": "product",
+            "name": "商品聚焦型",
+            "rationale": "完全围绕商品本身展开，突出真实面料质感与款式细节，重点强化主推款的展示权重，逐一呈现核心单品的版型与设计特点，符合高级质感的视觉要求",
+            "shopSign": {
+              "id": "product-sign",
+              "type": "shopSign",
+              "variant": "classic",
+              "title": "质感女装精选",
+              "productIds": [
+                "p1"
+              ],
+              "assetIds": [
+                "9d535e03-dee6-4d59-a423-5ab4d5fdf886"
+              ]
+            },
+            "modules": [
+              {
+                "id": "product-0",
+                "type": "showcase",
+                "variant": "single",
+                "title": "主推款 坑条亨利领短上衣",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "d8b5cef8-5676-4952-b9c8-4b363893bb9c"
+                ]
+              },
+              {
+                "id": "product-1",
+                "type": "carousel",
+                "variant": "small",
+                "title": "面料细节与版型展示",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": [
+                  "c0f1162d-7d60-42d3-b83b-6417742256a7"
+                ]
+              },
+              {
+                "id": "product-2",
+                "type": "text",
+                "variant": "multiLine",
+                "title": "单品设计说明",
+                "productIds": [
+                  "p1"
+                ],
+                "assetIds": []
+              },
+              {
+                "id": "product-3",
+                "type": "poster",
+                "variant": "double",
+                "title": "系列搭配推荐",
+                "productIds": [
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+                  "c05b9c70-c558-48a8-8cf9-699f5d421bc6"
+                ]
+              },
+              {
+                "id": "product-4",
+                "type": "showcase",
+                "variant": "double",
+                "title": "同系列质感单品",
+                "productIds": [
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+                  "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6"
+                ]
+              },
+              {
+                "id": "product-5",
+                "type": "carousel",
+                "variant": "medium",
+                "title": "多场景穿搭参考",
+                "productIds": [
+                  "p1",
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": [
+                  "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0"
+                ]
+              },
+              {
+                "id": "product-6",
+                "type": "text",
+                "variant": "link",
+                "title": "查看商品详情与尺码",
+                "productIds": [
+                  "p1",
+                  "p2",
+                  "p3"
+                ],
+                "assetIds": []
+              }
+            ]
+          }
+        ],
+        "assets": [
+          {
+            "id": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+            "moduleId": "atmosphere-sign",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "376:170",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，可直接使用。"
+          },
+          {
+            "id": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "moduleId": "atmosphere-0",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "693.6429:1080",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "reject",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 2,
+            "manualAttempts": 0,
+            "currentVersion": 2,
+            "previousVersion": 1,
+            "error": "仅移除了手机壳上的文字图案，上衣的小立领亨利门襟纽扣、竖坑条肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，无违规问题。"
+          },
+          {
+            "id": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+            "moduleId": "atmosphere-0",
+            "productId": "p1",
+            "role": "product",
+            "ratio": "385.3571:539.5",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "保留了小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型与短袖袖型，画面为单一连续画面，无违规改动。"
+          },
+          {
+            "id": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+            "moduleId": "atmosphere-0",
+            "productId": "p1",
+            "role": "detail",
+            "ratio": "385.3571:539.5",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣、竖坑条肌理、短款修身版型、短袖袖型均保留，画面为单张连续图，无违规改动。"
+          },
+          {
+            "id": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+            "moduleId": "atmosphere-2",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "3:4",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "保留了上衣小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型与短袖袖型的核心特征，为单一连续画面，无违规问题。"
+          },
+          {
+            "id": "8823f8d9-423e-49b7-9ac7-f5bdaa9a23ee",
+            "moduleId": "atmosphere-3",
+            "productId": "p2",
+            "role": "product",
+            "ratio": "1:1",
+            "adaptation": {
+              "verdict": "risk",
+              "mode": "preserved",
+              "sourceFilename": "26536d92-bf50-4ea3-a993-561524eb77a6.jpg",
+              "reason": "没有可确认安全的满铺裁切，暂时完整显示原图；请核对原图或换用其他角度"
+            },
+            "retryEligible": false,
+            "initialRoute": "original",
+            "route": "original",
+            "status": "ready",
+            "verdict": "risk",
+            "initialVerdict": "risk",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "没有可确认安全的满铺裁切，暂时完整显示原图；请核对原图或换用其他角度"
+          },
+          {
+            "id": "5dcd13bf-077f-4f5d-9d27-7e494f7ca4b6",
+            "moduleId": "atmosphere-3",
+            "productId": "p3",
+            "role": "product",
+            "ratio": "1:1",
+            "adaptation": {
+              "verdict": "pass",
+              "mode": "crop",
+              "sourceFilename": "53275112-e468-45fa-b35b-0ac1a3680ff6.jpg",
+              "reason": "裁切完整保留受保护区域",
+              "crop": {
+                "left": 0,
+                "top": 707,
+                "width": 1080,
+                "height": 1080
+              }
+            },
+            "retryEligible": false,
+            "initialRoute": "original",
+            "route": "original",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "裁切完整保留受保护区域"
+          },
+          {
+            "id": "0211d586-8c01-4435-98c2-b3fe24168177",
+            "moduleId": "quick-0",
+            "productId": "p1",
+            "role": "category",
+            "ratio": "1:1",
+            "adaptation": {
+              "verdict": "pass",
+              "mode": "crop",
+              "sourceFilename": "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+              "reason": "裁切完整保留受保护区域",
+              "crop": {
+                "left": 0,
+                "top": 407,
+                "width": 1440,
+                "height": 1440
+              }
+            },
+            "retryEligible": false,
+            "initialRoute": "crop",
+            "route": "crop",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "裁切完整保留受保护区域"
+          },
+          {
+            "id": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+            "moduleId": "quick-1",
+            "productId": "p1",
+            "role": "scene",
+            "ratio": "1080:1080",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，仅对手机壳文字进行了处理，无其他违规问题，可直接使用。"
+          },
+          {
+            "id": "d8b5cef8-5676-4952-b9c8-4b363893bb9c",
+            "moduleId": "quick-2",
+            "productId": "p1",
+            "role": "product",
+            "ratio": "1:1",
+            "adaptation": {
+              "verdict": "pass",
+              "mode": "crop",
+              "sourceFilename": "c647984a-d4ed-4ff9-b185-b06b2ac4f316.jpg",
+              "reason": "裁切完整保留受保护区域",
+              "crop": {
+                "left": 0,
+                "top": 407,
+                "width": 1440,
+                "height": 1440
+              }
+            },
+            "retryEligible": false,
+            "initialRoute": "original",
+            "route": "original",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "裁切完整保留受保护区域"
+          },
+          {
+            "id": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "moduleId": "quick-3",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "4:3",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "reject",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 2,
+            "manualAttempts": 0,
+            "currentVersion": 2,
+            "previousVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织肌理、短款修身版型、短袖袖型均保留，为单一连续画面，无违规改动，可使用。"
+          },
+          {
+            "id": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+            "moduleId": "product-sign",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "376:145",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，为单一连续画面，无违规问题。"
+          },
+          {
+            "id": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+            "moduleId": "product-1",
+            "productId": "p1",
+            "role": "hero",
+            "ratio": "3:1",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "商品的小立领亨利门襟纽扣设计、竖坑条针织面料肌理、短款修身版型、短袖袖型均保留，画面为单一连续画面，无违规修改，可直接使用。"
+          },
+          {
+            "id": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+            "moduleId": "product-3",
+            "productId": "p2",
+            "role": "scene",
+            "ratio": "539.5:1080",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "risk",
+            "initialVerdict": "risk",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "画面裁切丢失了右侧购物袋上的品牌标识与购物袋完整形态，整体商品核心结构设计保留，属于轻微裁切问题"
+          },
+          {
+            "id": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+            "moduleId": "product-3",
+            "productId": "p3",
+            "role": "scene",
+            "ratio": "539.5:1080",
+            "retryEligible": false,
+            "lastAttemptManual": false,
+            "initialRoute": "preserve",
+            "route": "preserve",
+            "status": "ready",
+            "verdict": "pass",
+            "initialVerdict": "pass",
+            "approvedRisk": false,
+            "manuallyRejected": false,
+            "automaticAttempts": 1,
+            "manualAttempts": 0,
+            "currentVersion": 1,
+            "error": "保留了黑色真皮肌理、高腰、宽松短款裤型，明线分割结构与侧边纽扣设计，核心商品特征无改动，为单一连续画面，可直接使用。"
+          }
+        ],
+        "modelCalls": [
+          {
+            "id": "3faac410-1d01-4a49-8938-6e8f7eb1685c",
+            "createdAt": "2026-09-13T06:24:56.906Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "analysis",
+            "status": "success",
+            "durationMs": 28635,
+            "inputTokens": 11963,
+            "outputTokens": 1336
+          },
+          {
+            "id": "e94d1e3c-5eb0-4a77-bdd5-2039c4377f58",
+            "createdAt": "2026-09-13T06:25:25.587Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "planning",
+            "status": "success",
+            "durationMs": 24459,
+            "inputTokens": 489,
+            "outputTokens": 1594
+          },
+          {
+            "id": "a4442934-0b94-4851-b4be-15435b0d1ca8",
+            "createdAt": "2026-09-13T06:25:50.737Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+            "ratio": "376:170",
+            "durationMs": 69484,
+            "outputTokens": 17820
+          },
+          {
+            "id": "3722b6d2-6373-4fd6-ac1d-6ec4aec6be8e",
+            "createdAt": "2026-09-13T06:27:00.332Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "c152f7cc-7333-4ab1-986f-113a25eb5ff1",
+            "durationMs": 2802,
+            "inputTokens": 2756,
+            "outputTokens": 47
+          },
+          {
+            "id": "25e72de9-f39f-4754-9557-1795ca628e3d",
+            "createdAt": "2026-09-13T06:27:03.294Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "ratio": "693.6429:1080",
+            "durationMs": 82428,
+            "outputTokens": 17384
+          },
+          {
+            "id": "8d767afb-a434-442b-98d8-67bbf05e45b1",
+            "createdAt": "2026-09-13T06:28:25.863Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "durationMs": 2886,
+            "inputTokens": 2789,
+            "outputTokens": 47
+          },
+          {
+            "id": "b1a8a134-7907-46d6-b735-46fd75bb3ca0",
+            "createdAt": "2026-09-13T06:28:28.807Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "ratio": "693.6429:1080",
+            "durationMs": 74393,
+            "outputTokens": 17384,
+            "retryReason": "首次生成未通过，切换保留式编辑"
+          },
+          {
+            "id": "4685de8e-35dd-478f-aa8b-b556dda3dc0a",
+            "createdAt": "2026-09-13T06:29:43.326Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "b5b88ae3-47f4-4b17-b297-df1f09ed6f79",
+            "durationMs": 4037,
+            "inputTokens": 2789,
+            "outputTokens": 55
+          },
+          {
+            "id": "69fcde01-ab07-485e-9178-4f14cfe7b5ae",
+            "createdAt": "2026-09-13T06:29:47.552Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+            "ratio": "385.3571:539.5",
+            "durationMs": 71478,
+            "outputTokens": 17472
+          },
+          {
+            "id": "9ac58668-33a2-4b23-b070-d29f66f9b92c",
+            "createdAt": "2026-09-13T06:30:59.153Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "eb5f1df7-6cd9-422c-8c40-4b4bee43e655",
+            "durationMs": 2313,
+            "inputTokens": 2744,
+            "outputTokens": 46
+          },
+          {
+            "id": "28945d12-37b1-40c4-ae1f-441f2af60872",
+            "createdAt": "2026-09-13T06:31:01.652Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+            "ratio": "385.3571:539.5",
+            "durationMs": 104537,
+            "outputTokens": 17472
+          },
+          {
+            "id": "f491d517-54ae-4d99-b4bd-efb769abb229",
+            "createdAt": "2026-09-13T06:32:46.279Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "27ed26a8-a1b2-4be9-8c96-34cc110968a1",
+            "durationMs": 3700,
+            "inputTokens": 2744,
+            "outputTokens": 46
+          },
+          {
+            "id": "3875730e-87f7-4715-a618-d9870f910efb",
+            "createdAt": "2026-09-13T06:32:50.347Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+            "ratio": "3:4",
+            "durationMs": 75237,
+            "outputTokens": 17864
+          },
+          {
+            "id": "8cf39efa-8a79-48b7-986c-e4bb3e6ead1c",
+            "createdAt": "2026-09-13T06:34:05.703Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "ea6c1a58-a8fa-470a-bd33-e261ed8d58b0",
+            "durationMs": 2622,
+            "inputTokens": 2755,
+            "outputTokens": 48
+          },
+          {
+            "id": "82cfff67-eb17-4123-9594-cc28c3fce351",
+            "createdAt": "2026-09-13T06:34:09.092Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+            "ratio": "1080:1080",
+            "durationMs": 92942,
+            "outputTokens": 16384
+          },
+          {
+            "id": "003065ed-0252-4650-806d-affb27c52f30",
+            "createdAt": "2026-09-13T06:35:42.115Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "5c8284bb-5d4e-45a4-8508-4f08d908a7bc",
+            "durationMs": 2396,
+            "inputTokens": 2780,
+            "outputTokens": 56
+          },
+          {
+            "id": "88815a47-6f6f-4179-9b79-b4e576fe126f",
+            "createdAt": "2026-09-13T06:35:44.886Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "ratio": "4:3",
+            "durationMs": 77158,
+            "outputTokens": 17864
+          },
+          {
+            "id": "ebfd1dc9-faa5-478d-8117-5c1361799993",
+            "createdAt": "2026-09-13T06:37:02.129Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "durationMs": 3405,
+            "inputTokens": 2755,
+            "outputTokens": 49
+          },
+          {
+            "id": "417e40f9-df01-4eca-95ad-7d220a39b358",
+            "createdAt": "2026-09-13T06:37:05.583Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "ratio": "4:3",
+            "durationMs": 77487,
+            "outputTokens": 17864,
+            "retryReason": "首次生成未通过，切换保留式编辑"
+          },
+          {
+            "id": "f3222dbc-b623-48ed-8bb8-c4755163a48d",
+            "createdAt": "2026-09-13T06:38:23.161Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "2e1aa207-e1ea-48ba-ab81-09b8ac6cadb0",
+            "durationMs": 2444,
+            "inputTokens": 2755,
+            "outputTokens": 49
+          },
+          {
+            "id": "ddcdee9a-aa24-4404-8bd0-a56de6496840",
+            "createdAt": "2026-09-13T06:38:25.766Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+            "ratio": "376:145",
+            "durationMs": 70512,
+            "outputTokens": 17384
+          },
+          {
+            "id": "e046662e-0a1a-4d51-992f-cdab39085052",
+            "createdAt": "2026-09-13T06:39:36.370Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "9d535e03-dee6-4d59-a423-5ab4d5fdf886",
+            "durationMs": 2752,
+            "inputTokens": 2760,
+            "outputTokens": 47
+          },
+          {
+            "id": "cb624cf1-c5ab-4f94-8b47-fe321f52d3f8",
+            "createdAt": "2026-09-13T06:39:39.290Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+            "ratio": "3:1",
+            "durationMs": 74572,
+            "outputTokens": 17328
+          },
+          {
+            "id": "a660584c-6c25-458c-b699-8b6a04161578",
+            "createdAt": "2026-09-13T06:40:53.932Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "c0f1162d-7d60-42d3-b83b-6417742256a7",
+            "durationMs": 2757,
+            "inputTokens": 2786,
+            "outputTokens": 52
+          },
+          {
+            "id": "c189ec7e-5870-4b92-80fb-2f25244357be",
+            "createdAt": "2026-09-13T06:40:56.825Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+            "ratio": "539.5:1080",
+            "durationMs": 77939,
+            "outputTokens": 17672
+          },
+          {
+            "id": "e90e2bae-5077-41d7-8406-b07b7ac7aa7b",
+            "createdAt": "2026-09-13T06:42:14.847Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "17ca90a0-45d3-4f35-b84b-9be711dadf01",
+            "durationMs": 3572,
+            "inputTokens": 2770,
+            "outputTokens": 37
+          },
+          {
+            "id": "53af2c30-64d7-4be4-b2aa-04a8d9cd3c16",
+            "createdAt": "2026-09-13T06:42:18.580Z",
+            "model": "doubao-seedream-5-0-pro-260628",
+            "requestType": "generation",
+            "status": "success",
+            "assetId": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+            "ratio": "539.5:1080",
+            "durationMs": 77891,
+            "outputTokens": 17672
+          },
+          {
+            "id": "6b3b340e-c049-42f2-8ed6-ecb8ebf4db91",
+            "createdAt": "2026-09-13T06:43:36.563Z",
+            "model": "doubao-seed-2-1-pro-260628",
+            "requestType": "quality_check",
+            "status": "success",
+            "assetId": "c05b9c70-c558-48a8-8cf9-699f5d421bc6",
+            "durationMs": 2666,
+            "inputTokens": 2732,
+            "outputTokens": 47
+          }
+        ],
+        "currentStep": "三套方案已完成"
+      }
+    },
+    {
+      "index": 1,
+      "fingerprint": "d6694fa5488c6991493b5ecd6f50f24e2e1d7afbb1f000b5b346a3f068a256e2",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "07066f810f50adb3401f955b262dab5ab0cd6c79698ee9e6a96f4cd4d8dd5771"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "5a167c0f49099878070d789441afedc89c6ff1e02512b93ba84febb15732213f"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "58eaef6e9fbe2977e3565b1f4ee085a43acbdcd597aaf811f1e531c2bcc6a5f5"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "0912a698b7c441d387cbe3889bda0b573fa86db075bc3d35ab1b7665ff34c736"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "b5a02a711a5f8ed23422af449deabc9220886c6803325990d126a8e683aa4dd9"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "555ba96c082199229802eefe9a22e00424a806e65a752854506c452d599b8fc0"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "7770d1aee8899883d45598af097d88eec4add0d484c506b0ce9c2312f915e405"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "81bb2961cae57b484c6a45f8551cf66e225a72e54c485f3badd6bc1e271abf48"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "060d61526e78ba704a3e1c8997a10c2a8e719a6453572b75ddb6d4a8a25a686e"
+        }
+      ],
+      "status": "running",
+      "key": "technical-5bfa329d-d899-47ee-a9d5-08e488d14752:1:d6694fa5488c6991493b5ecd6f50f24e2e1d7afbb1f000b5b346a3f068a256e2",
+      "taskId": "bfa29c27-654a-47fc-af58-0a96015e002c",
+      "watchStartedAt": "2026-09-13T06:43:40.618Z"
+    },
+    {
+      "index": 2,
+      "fingerprint": "0b85cdab396f8f8b84057cc6b034672c8e223757a0a55f4cca71140cbc1759a2",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "7770d1aee8899883d45598af097d88eec4add0d484c506b0ce9c2312f915e405"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "81bb2961cae57b484c6a45f8551cf66e225a72e54c485f3badd6bc1e271abf48"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "060d61526e78ba704a3e1c8997a10c2a8e719a6453572b75ddb6d4a8a25a686e"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "b68c4dcba20a2e7d4936d9232dfd443c470df8ab895ac7628a4d3ff464e26473"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "b8eeecd526f1275264144b85aef53c8b405f48c81a9ff54a1671b792e2c677ca"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "e1686e256cbd136df47de17595dfd4c80a1ba15f32232f42f6072f96d0e90f6b"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "07066f810f50adb3401f955b262dab5ab0cd6c79698ee9e6a96f4cd4d8dd5771"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "5a167c0f49099878070d789441afedc89c6ff1e02512b93ba84febb15732213f"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "58eaef6e9fbe2977e3565b1f4ee085a43acbdcd597aaf811f1e531c2bcc6a5f5"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 3,
+      "fingerprint": "0b5e3c37b94bb8f8317f9872feb068ff99a7abfd1be665c4007015f9e41f4a51",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "407e914bf39907ecdf82e95f0f5d11472947f4a60616ac012c73cbc78fa95152"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "ccf26a464e02b4aeab9d5624af2fb23df61833968b68832a607be163c0987b2b"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "4a4f908b7ccb30a6a786489ab9ba35f237b0c12353ff14938e305c9d2ea94fd7"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "b2971f64b22053134962ddcaa35a4507daf6ddc18db496670e64af32548eefbb"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "35e36155f1bb73d9f1455a77a50bd4c0437fd0a59fa0932fb96fa3eacc556183"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "c96e9a7ebbd9ee944aeb9035e1af8faec606048cc046a18e9e72fc60023be877"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "026ea28933354cffdcb315ac7aaebc65a55fefefe262a468a43e1967bb3aad4f"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "b634d3b4fd359e3f5f2f0d54a5df32d1ec5dd75c3eb869bb56bd82c208066ace"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "4c8a0275dcdfd5f78930201f7bdc070cb186fe2203985e19854b9d4bf900bf2c"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 4,
+      "fingerprint": "67cd71eabd3a5665e118bd53734a0748cf618ac0f18d48ffef3c1ab4b6dbecef",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "5b4ab8e4a15926e245f7716def9df03c70e9a5e1bf9afb5b8791e442796b6318"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "b634d3b4fd359e3f5f2f0d54a5df32d1ec5dd75c3eb869bb56bd82c208066ace"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "942f3e23f573e3ba14f83e39beafc68373904005aeeefc4e4ffb67358f2d239e"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "a77f860a832865d176fcfd42eb166a33c251f99085760b101c521917dc40cdc0"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "163509d096c9665a29fa7905187c533663adc3310152a5d1fc68feeface49740"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "c5d321f753b0944cfdd5aed821dd49652d47057c72e45ba6480972a64bc9214b"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "3e9d63e1b20d3b644c6bfb5c355c78ab2a34e6980e9fb7a15c1a3bab86f3d698"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "bec9fb9e3de437f81a0ec2d1c178f5b9d3d712076d5be8879a21458950403ba5"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "f2ae6d68dce21a4f3e09c9dedf0b1bb87d193cbe9ba1c9342c917070d1ef8171"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 5,
+      "fingerprint": "bceb7a402f65c69df8acf017f51de6538c86e6319948c08e11359d49edc02801",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "8888be02e7bd0c8a8173df8c222d83d5514ba1b9366cfa2057083ce919d3448f"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "7ef680f98698c39dbed093806f30267a06be2d8f25bf0518e5233f374e155026"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "d77f1ed2dc6ff0a63c92f5b9d1c8a4efdccc4af1840d948ac3b5820767bad5bb"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "aa22d07db9276f819abe3c1b057661f55b9185237b2daecb3a876534a4dc9442"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "f35985ef4778427461c0f0b795b4911c0579c75d69a6fe95b705d11c6dae76c9"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "a2c03bbaa276e86fa87fe4a833e1c5c99209a51b5881ba188d42656830695c88"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "c499fe667c9cb1daec7e4a5c978171c00a1126c4a86a99db3bcadb2ec4a7afb9"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "6eb910233f161afdf58a611f498e3dfae90b61316eca971c33e0f6ea0a79015e"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "fcaceb7ed91a0e7b76cb025be32282879be6a0775c0ffe563fab8202af46fe47"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 6,
+      "fingerprint": "08c1ccf672a5a2403e2aa14b8846578c59bfbf6e3437f28f4c2f2527c0045402",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "918cc67284efc3f986db898c534a60b57cb23e9c61244378c32d255fce4bf808"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "a2c03bbaa276e86fa87fe4a833e1c5c99209a51b5881ba188d42656830695c88"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "c0653e95e9e11cf953bbb9b731a553311097021439b1fe34c987d96da2729de1"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "5b4ab8e4a15926e245f7716def9df03c70e9a5e1bf9afb5b8791e442796b6318"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "b634d3b4fd359e3f5f2f0d54a5df32d1ec5dd75c3eb869bb56bd82c208066ace"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "942f3e23f573e3ba14f83e39beafc68373904005aeeefc4e4ffb67358f2d239e"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "3e9d63e1b20d3b644c6bfb5c355c78ab2a34e6980e9fb7a15c1a3bab86f3d698"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "bec9fb9e3de437f81a0ec2d1c178f5b9d3d712076d5be8879a21458950403ba5"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "f2ae6d68dce21a4f3e09c9dedf0b1bb87d193cbe9ba1c9342c917070d1ef8171"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 7,
+      "fingerprint": "a69b5c308d4f8b91d0224696d0b1a5f1ea5bfab7810c152942e2b613db05503c",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "b3e8617fd457de090b6db3b0b674be833c92e7bfc68ed1de6f8c48e0a18b9c77"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "36b58734e5bfe3107e78d26dcd9d5cd9d8ad91df55210b593c5397c33c01785d"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "a16d7d5138d1315510330f5c50be8e439c1afec9379955ef70a938df380cda1f"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "bae3b2e5da52ab32976a622b90ab6374306dde5304c5e69ad275b4e498e3184b"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "58858a1d0f9351b4e25f4b13734fefcdf188637ae7852f4c644b1c6e5c5a8f2b"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "d57cb76fc43181059be666683a2972bf4ef566f64bc2606e411833861f508e45"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "7770d1aee8899883d45598af097d88eec4add0d484c506b0ce9c2312f915e405"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "81bb2961cae57b484c6a45f8551cf66e225a72e54c485f3badd6bc1e271abf48"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "060d61526e78ba704a3e1c8997a10c2a8e719a6453572b75ddb6d4a8a25a686e"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 8,
+      "fingerprint": "939ed9a6aac197de009bcee1ea47c2e1703e4cbeed832c6ef3ff514b3dcd5265",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "39f9569fe901091b30546355bf7b345f3f44d44b66b25c7d034d04eb191040f3"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "87027761404a16f460a4a9f9906bbfd3e40f058397224ba18104440978c24d8e"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "2158e0e8eca4c96121326403a7417919095692e1e3ddcd9ca217a2c2d702cab4"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "b3e8617fd457de090b6db3b0b674be833c92e7bfc68ed1de6f8c48e0a18b9c77"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "36b58734e5bfe3107e78d26dcd9d5cd9d8ad91df55210b593c5397c33c01785d"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "a16d7d5138d1315510330f5c50be8e439c1afec9379955ef70a938df380cda1f"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "407e914bf39907ecdf82e95f0f5d11472947f4a60616ac012c73cbc78fa95152"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "ccf26a464e02b4aeab9d5624af2fb23df61833968b68832a607be163c0987b2b"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "4a4f908b7ccb30a6a786489ab9ba35f237b0c12353ff14938e305c9d2ea94fd7"
+        }
+      ],
+      "status": "prepared"
+    },
+    {
+      "index": 9,
+      "fingerprint": "b7aff7dc4abe3e173157ecbb37eb80fc3f960944a5cd7d120c48269a88cce082",
+      "files": [
+        {
+          "key": "p0-0",
+          "filename": "img_001.jpg",
+          "hash": "39f9569fe901091b30546355bf7b345f3f44d44b66b25c7d034d04eb191040f3"
+        },
+        {
+          "key": "p0-1",
+          "filename": "img_002.jpg",
+          "hash": "87027761404a16f460a4a9f9906bbfd3e40f058397224ba18104440978c24d8e"
+        },
+        {
+          "key": "p0-2",
+          "filename": "img_003.jpg",
+          "hash": "2158e0e8eca4c96121326403a7417919095692e1e3ddcd9ca217a2c2d702cab4"
+        },
+        {
+          "key": "p1-0",
+          "filename": "img_001.jpg",
+          "hash": "b3e8617fd457de090b6db3b0b674be833c92e7bfc68ed1de6f8c48e0a18b9c77"
+        },
+        {
+          "key": "p1-1",
+          "filename": "img_002.jpg",
+          "hash": "36b58734e5bfe3107e78d26dcd9d5cd9d8ad91df55210b593c5397c33c01785d"
+        },
+        {
+          "key": "p1-2",
+          "filename": "img_003.jpg",
+          "hash": "a16d7d5138d1315510330f5c50be8e439c1afec9379955ef70a938df380cda1f"
+        },
+        {
+          "key": "p2-0",
+          "filename": "img_001.jpg",
+          "hash": "8888be02e7bd0c8a8173df8c222d83d5514ba1b9366cfa2057083ce919d3448f"
+        },
+        {
+          "key": "p2-1",
+          "filename": "img_002.jpg",
+          "hash": "7ef680f98698c39dbed093806f30267a06be2d8f25bf0518e5233f374e155026"
+        },
+        {
+          "key": "p2-2",
+          "filename": "img_003.jpg",
+          "hash": "d77f1ed2dc6ff0a63c92f5b9d1c8a4efdccc4af1840d948ac3b5820767bad5bb"
+        }
+      ],
+      "status": "prepared"
+    }
+  ]
+}

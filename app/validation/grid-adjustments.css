@@ -1,0 +1,3 @@
+.score-board{grid-template-columns:repeat(3,1fr)}
+.route-legend{grid-template-columns:180px repeat(3,1fr)}
+.comparison-grid{grid-template-columns:180px repeat(3,1fr)}
