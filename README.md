@@ -2,6 +2,12 @@
 
 当前目标：帮助不懂装修的客户看懂店铺的整体装修效果，再逐步提供可使用的装修素材。
 
+## 分支实验：AI 规划模块与素材批次
+
+`codex/store-planning-workflow` 增加独立的[装修规划入口](experiments/store-decoration/planning/README.md)：上传截图由 AI 安排模块、素材复用及最多两张生图总图；也可导入其他 AI 的方案。生成总图后上传，程序检测边界、裁剪并填入已有固定组件。
+
+在 `experiments/store-decoration/planning/` 执行 `npm ci`、`npm start`，打开 `http://127.0.0.1:5182`。可先使用“查看已存素材示例”，无需模型配置。截图规划读取本机配置，生图仍由执行 AI 完成。本分支尚未合并；A13 原预览及历史应用保持原样，实际效果由用户检验。
+
 ## 当前版本：固定组件＋批量生图裁剪＋完整长页（2026-10-13）
 
 版本标签：`v0.2.0-preview.1`。当前用户认可的演示保存在 [experiments/store-decoration](experiments/store-decoration/README.md)。克隆仓库后，直接打开其中的 [完整长页预览](experiments/store-decoration/a13-complete-store/完整长页-批量素材预览.html)，无需 API Key 或启动服务。
