@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 本地自检（不调用任何模型、不产生任何费用）。
  * 覆盖三件最容易出错的事：模块目录是否与组件库一致、素材画布排版是否合法、计划校验是否真能拦住错误计划。
  */
@@ -135,6 +135,59 @@ const signboardFix = normalizePlan({ design: { title: 't' }, modules: [
 const sbContent = signboardFix.modules[0].content;
 if (sbContent.background !== 'm1.img1' || sbContent.shop.avatar !== 'm1.img2' || sbContent.shop.newCount !== '0') bad('招牌内容补全失败', JSON.stringify(sbContent));
 else ok('招牌内容补全', 'background/avatar/newCount 均已补齐');
+
+// ---- 4c. 生图提示词：同质化防线 ----
+console.log('\n生图提示词（防同质化）');
+{
+  const { layoutSheet, buildSheetPrompt, panelsFromSheet, splitIntoSpanningSheets } = await import('./src/assets.mjs');
+  const slotsById = new Map([
+    ['m01.img1', { slotRatio: 483 / 258, slotWidth: 483, slotHeight: 258, role: 'banner', source: 'generated-scene', subject: '店铺主视觉横幅' }],
+    ['m01.img2', { slotRatio: 1, slotWidth: 48, slotHeight: 48, role: 'avatar', source: 'generated-scene', subject: '店铺头像' }],
+    ['m03.img1', { slotRatio: 1, slotWidth: 71.27, slotHeight: 71.27, role: 'nav-icon', source: 'generated-nav-icon', subject: '护肤图标' }],
+    ['m03.img2', { slotRatio: 1, slotWidth: 71.27, slotHeight: 71.27, role: 'nav-icon', source: 'generated-nav-icon', subject: '彩妆图标' }],
+    ['m05.img1', { slotRatio: 1, slotWidth: 241, slotHeight: 241, role: 'poster', source: 'generated-poster', subject: '护肤精华水主题海报' }],
+    ['m05.img2', { slotRatio: 1, slotWidth: 241, slotHeight: 241, role: 'poster', source: 'generated-poster', subject: '彩妆眼影主题海报' }],
+  ]);
+  const sheet = { id: 'sheet1', purpose: '测试', slots: [...slotsById.keys()].map(k => ({ slotId: k, source: slotsById.get(k).source, subject: slotsById.get(k).subject })) };
+  const parts = splitIntoSpanningSheets(sheet, slotsById);
+  const design = {
+    title: '轻奢美妆陈列', styleKeywords: ['轻奢', '干净', '精致'],
+    palette: { background: '#FFFFFF', accent: '#1A1A1A' },
+    imagePlan: { constraints: ['统一暖白背景', '不出现任何文字'], images: [] },
+  };
+  const shop = { category: '美妆', designReading: { tone: '轻奢专业' }, visibleProducts: [{ name: '护肤精华水' }] };
+  const prompts = parts.map(p => buildSheetPrompt({ sheet, layout: layoutSheet(p.panels), design, shop }));
+  const all = prompts.join('\n');
+
+  const required = [
+    ['声明每格必须不同', /visually DIFFERENT|Never repeat the same photograph/],
+    ['禁止统一影棚白底', /NOT plain white|not a plain white seamless/],
+    ['图标格明确要求扁平图形', /flat vector-style category icon/],
+    ['图标格禁止像照片', /must NOT look like a photograph/],
+    ['海报格要求非纯白背景', /tinted or textured backdrop/],
+    ['保留共享艺术方向', /SHARED ART DIRECTION|ONE shop/],
+    ['约束只作为调性而非统一背景', /NOT instructions to repeat one background/],
+    ['明确背景与构图必须逐格不同', /must differ from panel to panel/],
+    ['禁止文字', /ABSOLUTELY NO text/],
+    ['品红分隔要求', /MAGENTA #FF00FF/],
+  ];
+  for (const [label, pattern] of required) {
+    if (pattern.test(all)) ok(`提示词包含：${label}`);
+    else bad(`提示词缺少：${label}`);
+  }
+  // 不同角色的处理必须真的不一样
+  const bannerBlock = prompts.find(p => p.includes('m01.img1'));
+  const iconBlock = prompts.find(p => p.includes('m03.img1'));
+  if (bannerBlock === iconBlock) bad('宽幅招牌与方格被放进同一张画布，处理会趋同');
+  else ok('宽幅招牌与方格已分到不同画布', `${parts.map(p => p.id).join(' + ')}`);
+  if (/flat 2D graphic/.test(iconBlock || '') && /wide establishing shot/.test(bannerBlock || '')) ok('各角色的镜头处理确实不同');
+  else bad('各角色的镜头处理没有区分开');
+  // 不应再出现"统一光线与表面"这类逼同质化的句子
+  if (/consistent light direction and surface across all panels/.test(all)) bad('仍保留了要求全部格子同表面的句子');
+  else ok('已移除"全部格子统一表面/光线"的要求');
+  const iconCount = (all.match(/flat vector-style category icon/g) || []).length;
+  if (iconCount >= 2) ok('每个图标格都单独给出了扁平图形要求', `${iconCount} 个`);
+}
 
 // ---- 5. 渲染：用占位图跑通整页（不调用模型） ----
 console.log('\n渲染');

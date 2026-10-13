@@ -235,27 +235,120 @@ const ratioText = r => {
   return r >= 1 ? `${round2(r)}:1` : `1:${round2(1 / r)}`;
 };
 
-/** 拼装生图提示词：结构、分隔色、坐标、禁止项全部由程序写死。 */
-export function buildSheetPrompt({ sheet, layout, design, shop }) {
-  const lines = [];
-  const widest = Math.max(...layout.rows.map(r => r.length));
-  lines.push('Use case: product-mockup.');
-  lines.push(`Create ONE raster photographic asset sheet containing EXACTLY ${layout.panels.length} separate complete e-commerce photographs, arranged in ${layout.rowCount} row(s) of up to ${widest} panel(s), with straight rectangular edges.`);
-  lines.push(`Canvas must be exactly ${layout.width} x ${layout.height} pixels.`);
-  lines.push('This is a sheet of source photographs, not a website, not a shop screenshot and not a UI design.');
-  lines.push('');
-  lines.push('Panel content, left to right then top to bottom:');
-  lines.push('IMPORTANT: panels in the same row have the SAME pixel height. Follow the given panel pixel sizes; do not force every panel to be square.');
+/**
+ * 每个格子的创意处理：由它的角色决定，不由模型自由发挥。
+ *
+ * 之前所有格子共用一套笼统描述（"product-focused photograph"），加上要求"统一光线与表面"，
+ * 结果 8 个格子画出来几乎是同一张影棚白底图——这是提示词层面的同质化。
+ * 现在按角色分配各不相同的镜头、背景、场景规模与构图，风格则通过共享的"艺术方向"锁住。
+ */
+const PANEL_TREATMENT = {
+  banner: {
+    kind: 'a wide atmospheric lifestyle photograph used as the shop banner',
+    camera: 'wide establishing shot, camera at a slight angle, generous negative space on one side',
+    scene: 'a styled set with depth — a surface in the foreground, mid-ground props, and a soft blurred background',
+    background: 'a styled environment with real depth, not a plain white seamless',
+    composition: 'hero composition: one clear focal product, a supporting group, and visible scene depth',
+  },
+  poster: {
+    kind: 'an editorial lifestyle photograph for a category poster',
+    camera: 'closer three-quarter or eye-level view with a deliberate crop',
+    scene: 'a styled scene with one dominant prop and a hint of the surrounding environment',
+    background: 'a tinted or textured backdrop that matches the shop palette but is NOT plain white',
+    composition: 'magazine-style layout with clear foreground and background separation',
+  },
+  'nav-icon': {
+    kind: 'a simple flat vector-style category icon on a flat solid background',
+    camera: 'flat 2D graphic, perfectly front-facing, centered, no perspective',
+    scene: 'a single clean silhouette with slightly rounded corners and generous padding',
+    background: 'one flat solid light background colour; no gradients, no shadows, no props, no scene',
+    composition: 'icon only — it must NOT look like a photograph, a 3D render, or a product shot',
+  },
+  avatar: {
+    kind: 'a simple square brand image used as the shop avatar',
+    camera: 'centered, minimal, readable when scaled down to 48 px',
+    scene: 'one or two objects only, nothing busy',
+    background: 'a clean flat background in the shop palette',
+    composition: 'a simple mark-like composition that still reads at very small size',
+  },
+  product: {
+    kind: 'a clean product photograph',
+    camera: 'straight-on or slight three-quarter view',
+    scene: 'the product alone with minimal props',
+    background: 'a soft neutral background',
+    composition: 'centered product with even margins',
+  },
+};
 
+const PANEL_VARIETY = [
+  'Every panel must be visually DIFFERENT from the others in camera angle, background treatment and composition.',
+  'Never repeat the same photograph with a different crop. Each panel is its own shot.',
+  'Vary the scene across panels: some closer, some wider; some with props, some minimal; some stylised, some plain.',
+  'Keep one shared art direction across the sheet — the same broad palette, materials and light quality — so the panels still belong to one shop.',
+];
+
+const looksLikePhoto = source => source === 'generated-scene' || source === 'generated-poster';
+const lookOf = subject => {
+  const text = String(subject || '');
+  const cues = [];
+  if (/人物|模特|上身|手持|试穿|使用|涂抹/.test(text)) cues.push('include a person (hands or a model) only if the subject says so');
+  if (/水|湿|滴|清透|透明|气泡/.test(text)) cues.push('use water, droplets or glass reflections as a material cue');
+  if (/丝绒|哑光|粉质|眼影|散粉/.test(text)) cues.push('use powder or velvet textures as a material cue');
+  if (/自然|植物|叶|木|石/.test(text)) cues.push('use natural materials such as leaves, wood or stone as props');
+  if (/金属|金|银|轻奢|高端|大牌/.test(text)) cues.push('use metallic or marble accents for a premium feel');
+  if (/礼品|礼盒|套装|节日|限定/.test(text)) cues.push('hint at gifting with ribbon or packaging');
+  return cues;
+};
+
+/**
+ * 拼装生图提示词。
+ * 结构、分隔色、坐标、每格创意处理全部由程序写死；AI 只提供每格画什么内容与整体约束。
+ */
+export function buildSheetPrompt({ sheet, layout, design, shop }) {
+  const palette = design?.palette || {};
+  const constraints = (design?.imagePlan?.constraints || []).filter(Boolean);
+
+  const lines = [];
+  lines.push('Use case: product-mockup.');
+  lines.push(`Create ONE raster photographic asset sheet containing EXACTLY ${layout.panels.length} separate e-commerce images, arranged in ${layout.rowCount} row(s) of up to ${Math.max(...layout.rows.map(r => r.length))} panel(s), with straight rectangular edges.`);
+  lines.push(`Canvas must be exactly ${layout.width} x ${layout.height} pixels.`);
+  lines.push('This is a sheet of separate source images for one shop, not a website, not a shop screenshot and not a UI design.');
+
+  // 共享的艺术方向：锁住风格，但不要求每格长得一样
+  lines.push('');
+  lines.push('SHARED ART DIRECTION for the whole sheet (this is what makes the sheet look like ONE shop):');
+  lines.push(`- Overall character: ${design?.title || 'clean commercial styling'}${design?.styleKeywords?.length ? `; keywords ${design.styleKeywords.join(', ')}` : ''}${shop?.designReading?.tone ? `; shop tone ${shop.designReading.tone}` : ''}.`);
+  if (palette.background || palette.accent) {
+    lines.push(`- Colour: keep the palette family consistent — background tones near ${palette.background || 'light neutral'} and accents near ${palette.accent || 'a warm highlight'}. Product colours must stay true and never be tinted by this palette.`);
+  }
+  if (constraints.length) {
+    lines.push(`- Shop art direction (colour, material and mood only — these are NOT instructions to repeat one background or one lighting setup): ${constraints.join('；')}`);
+  }
+  lines.push('- Same light QUALITY and same material world throughout. That is the ONLY thing that repeats; the actual background colour, surface and camera setup must differ from panel to panel.');
+
+  lines.push('');
+  lines.push('DIFFERENTIATION — read this as a hard requirement:');
+  for (const rule of PANEL_VARIETY) lines.push(`- ${rule}`);
+
+  lines.push('');
+  lines.push(`PANELS — ${layout.rowCount} row(s), left to right then top to bottom. Panels in the same row share the same pixel height; follow the given panel sizes and do NOT force every panel to be square:`);
   for (const [r, row] of layout.rows.entries()) {
     lines.push(`ROW ${r + 1} — ${row.length} panel(s):`);
     for (const panel of row) {
-      const kind = panel.source === 'generated-nav-icon'
-        ? 'a simple flat category icon on a clean solid background (icon subject only, no text)'
-        : panel.source === 'generated-scene'
-          ? 'a wide atmospheric scene photograph usable as a shop banner'
-          : 'a product-focused photograph';
-      lines.push(`  - ${panel.id}: ${kind} — ${panel.subject || '与店铺品类一致的商品'} (slot aspect ${ratioText(panel.ratio)}, panel ${panel.panelRect.width}x${panel.panelRect.height}px)`);
+      const treatment = PANEL_TREATMENT[panel.role] || PANEL_TREATMENT.product;
+      const subject = panel.subject || (shop?.category ? `${shop.category} 相关商品` : 'a product matching this shop');
+      lines.push(`  ${panel.id} — ${subject}`);
+      lines.push(`      type: ${treatment.kind}`);
+      lines.push(`      camera: ${treatment.camera}`);
+      lines.push(`      scene: ${treatment.scene}`);
+      lines.push(`      background: ${treatment.background}`);
+      lines.push(`      composition: ${treatment.composition}`);
+      if (treatment !== PANEL_TREATMENT['nav-icon']) {
+        const cues = [...lookOf(subject), ...(shop?.visibleProducts || []).slice(0, 3).map(p => p.name).filter(n => subject.includes(n))].slice(0, 2);
+        if (cues.length) lines.push(`      content cues: ${cues.join('; ')}`);
+      }
+      lines.push(`      size: ${panel.panelRect.width}x${panel.panelRect.height} px (slot aspect ${ratioText(panel.ratio)})`);
+      if (treatment === PANEL_TREATMENT['nav-icon']) lines.push('      NOTE: this panel is a graphic icon, NOT a photograph — it must not look like a product shot.');
     }
   }
 
@@ -264,23 +357,16 @@ export function buildSheetPrompt({ sheet, layout, design, shop }) {
   for (const panel of layout.panels) {
     lines.push(`  ${panel.id}: x=${panel.percent.x}% y=${panel.percent.y}% w=${panel.percent.w}% h=${panel.percent.h}%`);
   }
+
   lines.push('');
   lines.push('Hard requirements:');
-  lines.push('1. ALL outer margins and ALL gutters between panels must be perfectly flat solid bright MAGENTA #FF00FF with sharp straight boundaries. Magenta is ONLY an outside separator for automatic cropping. It must never appear inside a photograph, be reflected in a product, or be cast as light.');
-  lines.push('2. No object, shadow or decoration may cross a panel boundary or enter a gutter. Every panel is filled by its own photograph with its own opaque background.');
+  lines.push('1. ALL outer margins and ALL gutters between panels must be perfectly flat solid bright MAGENTA #FF00FF with sharp straight boundaries. Magenta is ONLY an outside separator for automatic cropping. It must never appear inside an image, be reflected in a product, or be cast as light.');
+  lines.push('2. No object, shadow or decoration may cross a panel boundary or enter a gutter. Every panel is filled by its own image with its own opaque background.');
   lines.push('3. ABSOLUTELY NO text anywhere: no letters, numbers, prices, titles, labels, watermarks, logos, badges, panel numbers, UI elements or decorative borders.');
-  lines.push('4. Do not draw a shop interface, navigation bar, buttons, product cards or price tags. Photographs only.');
+  lines.push('4. Do not draw a shop interface, navigation bar, buttons, product cards or price tags.');
   lines.push('5. Keep each subject complete inside its own panel with at least 6% safe space from that panel edges.');
-  lines.push('6. Do not add extra panels, merge panels, or overlap photographs. Render exactly the panels listed.');
-  lines.push('7. Realistic, soft and even commercial product lighting; consistent light direction and surface across all panels of this sheet.');
-  const constraints = (design?.imagePlan?.constraints || []).filter(Boolean);
-  if (constraints.length) lines.push(`8. Additional art direction for this shop: ${constraints.join('；')}`);
-  const styleBits = [];
-  if (design?.styleKeywords?.length) styleBits.push(`风格关键词 ${design.styleKeywords.join('、')}`);
-  if (shop?.designReading?.tone) styleBits.push(`店铺调性 ${shop.designReading.tone}`);
-  if (shop?.category) styleBits.push(`主营品类 ${shop.category}`);
-  if (design?.palette) styleBits.push(`主色参考 背景 ${design.palette.background} / 点缀 ${design.palette.accent}`);
-  if (styleBits.length) lines.push(`9. ${styleBits.join('；')}。商品自身的真实颜色不得被配色改写。`);
+  lines.push('6. Do not add extra panels, merge panels, or overlap images. Render exactly the panels listed.');
+  lines.push('7. Photographic panels must look like real commercial photography, not 3D renders or AI illustrations; icon panels must be flat graphics.');
   return lines.join('\n');
 }
 
