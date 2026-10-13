@@ -29,8 +29,28 @@ async function cropBatch(bytes, input, batchId, folder) {
   const prepared = [];
   for (const panel of panels) {
     const asset = plan.assets.find(a => a.id === panel.id), ratio = aspectRatios[asset.aspect], box = panel.rect;
-    const cropWidth = Math.min(box.width, Math.floor(box.height * ratio)), cropHeight = Math.min(box.height, Math.floor(box.width / ratio));
-    const rect = { left: box.left + Math.floor((box.width - cropWidth) / 2), top: box.top + Math.floor((box.height - cropHeight) / 2), width: cropWidth, height: cropHeight };
+    // Generated separators can end a pixel or two unevenly. Trim only contaminated
+    // outer edges within a small limit; interior separator pixels still fail below.
+    const clean = { ...box }, boundaryTrim = { left: 0, top: 0, right: 0, bottom: 0 };
+    const edgeLimit = Math.max(2, Math.min(8, Math.ceil(Math.min(box.width, box.height) * .01)));
+    for (let pass = 0; pass < edgeLimit; pass++) {
+      const dirty = { left: false, top: false, right: false, bottom: false };
+      for (let x = clean.left; x < clean.left + clean.width; x++) {
+        dirty.top ||= magenta(x, clean.top);
+        dirty.bottom ||= magenta(x, clean.top + clean.height - 1);
+      }
+      for (let y = clean.top; y < clean.top + clean.height; y++) {
+        dirty.left ||= magenta(clean.left, y);
+        dirty.right ||= magenta(clean.left + clean.width - 1, y);
+      }
+      if (!Object.values(dirty).some(Boolean)) break;
+      if (dirty.left) { clean.left++; clean.width--; boundaryTrim.left++; }
+      if (dirty.right) { clean.width--; boundaryTrim.right++; }
+      if (dirty.top) { clean.top++; clean.height--; boundaryTrim.top++; }
+      if (dirty.bottom) { clean.height--; boundaryTrim.bottom++; }
+    }
+    const cropWidth = Math.min(clean.width, Math.floor(clean.height * ratio)), cropHeight = Math.min(clean.height, Math.floor(clean.width / ratio));
+    const rect = { left: clean.left + Math.floor((clean.width - cropWidth) / 2), top: clean.top + Math.floor((clean.height - cropHeight) / 2), width: cropWidth, height: cropHeight };
     if (Math.min(cropWidth, cropHeight) < 100) throw new Error(`${panel.id} 裁剪后短边不足100像素，请提高总图尺寸或减少同图画面数。`);
     const removed = 1 - cropWidth * cropHeight / (box.width * box.height);
     if (removed > .3) throw new Error(`${panel.id} 比例偏差导致裁剪超过30%，本批次暂不填入。`);
@@ -38,12 +58,12 @@ async function cropBatch(bytes, input, batchId, folder) {
     for (let y = rect.top; y < rect.top + rect.height; y++) for (let x = rect.left; x < rect.left + rect.width; x++) if (magenta(x, y)) separators++;
     if (separators) throw new Error(`${panel.id} 内仍有分隔色，未写入素材。`);
     const buffer = await sharp(normalized).extract(rect).png().toBuffer();
-    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, cropRect: rect, aspect: asset.aspect, removedAreaPercent: +(removed * 100).toFixed(2), upscaled: false } });
+    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: rect, aspect: asset.aspect, removedAreaPercent: +(removed * 100).toFixed(2), upscaled: false } });
   }
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
   for (const item of prepared) fs.writeFileSync(path.join(folder, 'assets', `${item.report.assetId}.png`), item.buffer);
   fs.writeFileSync(path.join(folder, `${batchId}-source.png`), normalized);
-  const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, then center crop; no resizing or stretching' };
+  const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop; no resizing or stretching' };
   fs.writeFileSync(path.join(folder, `${batchId}-crop-report.json`), JSON.stringify(report, null, 2));
   return report;
 }

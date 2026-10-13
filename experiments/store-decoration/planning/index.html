@@ -21,7 +21,7 @@ function show(state){
  if(state.status==='planning'){lock(true);status('正在理解截图并安排模块与素材，请稍候。只发起一次规划请求。');poll=setTimeout(()=>refresh(state.id),1800);return;}
  lock(false);
  if(state.status==='failed'){status(state.error,true);return;}
- status(state.source==='saved-example'?'已载入保存的素材。这次没有调用AI。':'方案已就绪。黑色区域等待批量素材填入。');
+ status(state.source==='saved-example'?'已载入保存的素材。这次没有调用AI。':state.filledAssets.length===state.plan.assets.length?'素材已全部填入，可以查看完整店铺参考。':'方案已就绪。黑色区域等待批量素材填入。');
  const p=state.plan,s=reveal('summary');s.append(el('span',state.source==='saved-example'?'已有素材演示':'装修方案','badge'),el('h2',p.shop.name),el('p',p.summary));
  const stats=el('div',undefined,'stats');for(const [number,label]of [[state.metrics.modules,'模块'],[state.metrics.imageSlots,'图片槽位'],[state.metrics.uniqueAssets,'独立素材'],[state.metrics.generationCalls,'计划生图批次']]){const n=el('div',undefined,'stat');n.append(el('b',String(number)),el('span',label));stats.append(n);}s.append(stats);
  const palette=el('div',undefined,'palette');for(const color of p.style.palette){const n=el('span',undefined,'swatch');n.style.backgroundColor=color;n.title=color;palette.append(n);}s.append(palette,el('p',p.style.background+'；'+p.style.lighting+'；'+p.style.photography));
@@ -53,5 +53,6 @@ $('example').onclick=async()=>{lock(true);try{show(await api('/api/example',{met
 $('import-button').onclick=async()=>{lock(true);try{const value=JSON.parse($('import').value);show(await api('/api/import-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)}));}catch(e){status(e.message,true);lock(false);}};
 $('prompt').onclick=async()=>{try{$('instructions').textContent=(await api('/api/planner-prompt')).prompt;$('instructions').classList.remove('hidden');}catch(e){status(e.message,true);}};
 api('/api/config').then(c=>{$('config').textContent=c.plannerConfigured?'支持PNG/JPG/WebP，最多30MB。':'截图规划模型未配置；可先看示例，或导入其他AI的方案。';}).catch(e=>status(e.message,true));
-const previous=localStorage.getItem('store-planning-run');if(previous){current={id:previous};refresh(previous);}
+const linkedRun=new URLSearchParams(location.search).get('run');
+const previous=linkedRun&&/^[a-f0-9-]{36}$/.test(linkedRun)?linkedRun:localStorage.getItem('store-planning-run');if(previous){current={id:previous};refresh(previous);}
 </script></body></html>
