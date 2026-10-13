@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 店铺装修设计 · 上传截图，得到方案和素材</title>
+<style>
+  :root{
+    --bg:#f5f4f1; --surface:#fff; --line:#e5e2dc; --text:#1e1c1a; --muted:#7d786f;
+    --accent:#b4553c; --accent-soft:#fbf0ec; --ok:#2f7d5d; --ok-soft:#eaf5ef; --warn:#95661a; --warn-soft:#fdf4e4;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 90px}
+  header.top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  h1{font-size:24px;margin:0}
+  .sub{color:var(--muted);font-size:14px;margin:8px 0 22px;max-width:900px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px}
+  .card h2{font-size:17px;margin:0 0 4px}
+  .card .hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .drop{border:1.5px dashed #cdc8bf;border-radius:12px;padding:34px 20px;text-align:center;cursor:pointer;background:#fbfaf8;transition:.15s}
+  .drop:hover,.drop.drag{border-color:var(--accent);background:var(--accent-soft)}
+  .drop strong{display:block;font-size:16px;margin-bottom:4px}
+  .drop span{color:var(--muted);font-size:13px}
+  .shot{max-width:100%;max-height:320px;border-radius:10px;border:1px solid var(--line);display:block;margin:14px auto 0}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;color:var(--muted);font-size:13px;margin-top:12px}
+  .meta b{color:var(--text)}
+  button,a.btn{font:inherit;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-block}
+  button:hover:not(:disabled),a.btn:hover{border-color:#c8c2b8;background:#faf9f7}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;padding:12px 26px}
+  button.primary:hover:not(:disabled){background:#9d4a34}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
+  .steps{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:8px}
+  .steps li{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px}
+  .steps li .dot{width:18px;height:18px;border-radius:50%;border:2px solid #d6d2c9;flex:none;display:grid;place-items:center;font-size:11px}
+  .steps li.done{color:var(--text)} .steps li.done .dot{border-color:var(--ok);background:var(--ok);color:#fff}
+  .steps li.active{color:var(--accent);font-weight:600}
+  .steps li.active .dot{border-color:var(--accent);border-top-color:transparent;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.partial{background:var(--warn-soft);color:var(--warn)}
+  .pill.failed{background:#fdeceb;color:#b3261e} .pill.info{background:#eef0f4;color:#4a566b}
+  .warnlist{margin:10px 0 0;padding-left:20px;color:var(--warn);font-size:13.5px}
+  .grid{display:grid;grid-template-columns:minmax(0,483px) minmax(0,1fr);gap:20px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .frame{width:483px;max-width:100%;height:640px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:auto}
+  .frame iframe{width:483px;border:0;display:block;transform-origin:top left}
+  .decision{border-left:3px solid var(--accent);padding:2px 0 2px 12px;margin-bottom:12px}
+  .decision b{display:block;font-size:13.5px}
+  .decision span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12.5px;background:#faf9f7;font-weight:600}
+  .assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px;margin-top:10px}
+  .asset{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .asset img{width:100%;height:108px;object-fit:contain;background:#f7f6f3;display:block}
+  .asset .cap{padding:8px 9px;font-size:11.5px;color:var(--muted);line-height:1.5}
+  .asset .cap b{color:var(--text);display:block;font-size:12px;word-break:break-all}
+  .err{background:#fdeceb;border:1px solid #f6c9c4;color:#8f1f18;padding:12px 14px;border-radius:10px;font-size:14px;margin-top:12px}
+  .note{color:var(--muted);font-size:13px}
+  .confirm{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:13.5px;background:var(--warn-soft);border:1px solid #f0e0c0;border-radius:10px;padding:11px 13px}
+  .confirm input{margin-top:3px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:12px;padding:3px 9px;border-radius:999px;background:#f2f0ec;color:#4a463f}
+  .chip.gen{background:var(--accent-soft);color:var(--accent)} .chip.src{background:var(--ok-soft);color:var(--ok)}
+  .mods{display:grid;gap:8px;margin-top:8px}
+  .mod{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .mod b{font-size:14px} .mod .r{color:var(--muted);font-size:12.5px}
+  .recent{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .recent .item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;cursor:pointer;font-size:12.5px}
+  .recent .item:hover{border-color:#c8c2b8}
+  code{background:#f2f0ec;padding:1px 6px;border-radius:6px;font-size:12.5px}
+  footer{color:var(--muted);font-size:12.5px;margin-top:26px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>AI 店铺装修设计</h1>
+    <div id="statusPill"></div>
+  </header>
+  <p class="sub">上传一张店铺截图，AI 替你做装修决策（调性、放哪些模块、什么顺序、每张图画什么），程序用固定模块渲染出完整页面，并交付可以照着上传的独立素材。你不需要懂设计，也不需要填提示词。</p>
+
+  <section class="card">
+    <h2>1 · 上传店铺截图</h2>
+    <p class="hint">支持 PNG / JPG / WebP，单张最大 <span id="maxMB">80</span> MB。截图里的商品会被用于理解店铺，裁切后作为真实商品素材；<b>生成图是装修示意图，不保证精准还原你的真实商品</b>。</p>
+    <div class="drop" id="drop"><strong>点击选择截图，或拖到这里</strong><span>原图只保存在本机 output/ 目录</span></div>
+    <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden>
+    <img id="shot" class="shot" hidden alt="截图预览">
+    <div class="meta" id="shotMeta" hidden></div>
+    <div class="confirm">
+      <input type="checkbox" id="confirm">
+      <label for="confirm">我确认本次会真实调用模型：识别 1 次 + 设计决策 1 次 + 生图 1 次起（按服务商规则计费）。</label>
+    </div>
+    <div class="row">
+      <button class="primary" id="generate" disabled>开始做装修方案</button>
+      <button id="reset" hidden>重新选择</button>
+      <span class="note" id="uploadNote"></span>
+    </div>
+    <div id="uploadError"></div>
+  </section>
+
+  <section class="card" id="progressCard" hidden>
+    <h2>2 · 进度</h2>
+    <p class="hint" id="progressStage">准备中…</p>
+    <ul class="steps" id="steps"></ul>
+    <div class="meta"><span>已用时 <b id="elapsed">0s</b></span><span class="note" id="callInfo"></span></div>
+  </section>
+
+  <section class="card" id="resultCard" hidden>
+    <h2>3 · AI 的装修方案</h2>
+    <p class="hint" id="resultStage"></p>
+    <div id="designBody"></div>
+  </section>
+
+  <section class="card" id="previewCard" hidden>
+    <h2>4 · 完整装修预览</h2>
+    <p class="hint">页面按真实店铺宽度 483px 渲染，模块顺序、间距、图片槽位都来自平台实测的固定样式。右侧可滚动查看整页。</p>
+    <div class="row">
+      <a class="btn" id="openPreview" target="_blank" rel="noopener">在新窗口打开整页</a>
+      <a class="btn" id="downloadManifest">下载装修清单 JSON</a>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="frame" id="frame"><iframe id="previewFrame" title="装修预览"></iframe></div>
+      <div id="moduleList"></div>
+    </div>
+  </section>
+
+  <section class="card" id="assetCard" hidden>
+    <h2>5 · 你的素材（可下载）</h2>
+    <p class="hint">每个文件都对应页面上一个确定的图片位，下方标注了它属于哪个模块。按装修清单的顺序在微购后台添加模块，再逐个上传即可。</p>
+    <div id="assetBody"></div>
+    <div class="assets" id="assets"></div>
+  </section>
+
+  <section class="card">
+    <h2>最近生成</h2>
+    <p class="hint">记录保存在本机 <code>output/runs/</code>。</p>
+    <div class="recent" id="recent"></div>
+  </section>
+
+  <footer>本页只在本机 127.0.0.1 上运行。预览是装修效果参考，不是微购原生页面的像素级复刻。</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentId = null, timer = null, selectedFile = null;
+let steps = [];
+
+const pill = s => s === 'complete' ? '<span class="pill ok">方案完成</span>'
+  : s === 'partial' ? '<span class="pill partial">完成（有降级项）</span>'
+  : s === 'failed' ? '<span class="pill failed">未完成</span>' : '<span class="pill info">进行中</span>';
+const bytes = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB';
+const srcLabel = s => ({ 'product-photo': '截图裁切', 'generated-scene': 'AI 生成场景', 'generated-nav-icon': 'AI 生成图标', 'generated-poster': 'AI 生成海报' }[s] || s);
+
+async function boot() {
+  const s = await fetch('/api/status').then(r => r.json());
+  $('maxMB').textContent = s.maxUploadMB;
+  $('statusPill').innerHTML = s.configured
+    ? `<span class="pill ok">模型就绪 · 可选模块 ${s.catalog.modules} 种</span>`
+    : '<span class="pill failed">模型配置不完整</span>';
+  if (!s.configured) $('uploadError').innerHTML = '<div class="err">模型配置不完整，无法生成。需要 ARK_API_KEY、ARK_RESPONSES_ENDPOINT、ARK_VISION_MODEL、ARK_IMAGE_ENDPOINT、ARK_IMAGE_MODEL。</div>';
+  if (!s.allowGenerate) $('uploadError').innerHTML = '<div class="err">当前服务以只读方式启动（ALLOW_GENERATE=0），不会调用模型。</div>';
+  await loadRecent();
+}
+
+function pick(file) {
+  $('uploadError').innerHTML = '';
+  if (!file) return;
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+    $('uploadError').innerHTML = `<div class="err">不支持的文件类型（${file.type || '未知'}）。请上传 PNG、JPG 或 WebP。</div>`; return;
+  }
+  if (file.size > Number($('maxMB').textContent) * 1048576) {
+    $('uploadError').innerHTML = `<div class="err">这张图 ${bytes(file.size)}，超过上限。</div>`; return;
+  }
+  selectedFile = file;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    $('shot').src = url; $('shot').hidden = false;
+    $('shotMeta').hidden = false;
+    $('shotMeta').innerHTML = `<span>尺寸 <b>${img.naturalWidth}×${img.naturalHeight}</b></span><span>体积 <b>${bytes(file.size)}</b></span>`;
+    $('reset').hidden = false;
+    syncGenerate();
+  };
+  img.onerror = () => { $('uploadError').innerHTML = '<div class="err">这个文件无法作为图片读取。</div>'; };
+  img.src = url;
+}
+
+function syncGenerate() {
+  const ok = selectedFile && $('confirm').checked && !$('uploadError').innerHTML;
+  $('generate').disabled = !ok;
+  $('uploadNote').textContent = selectedFile && !$('confirm').checked ? '勾选上面的确认后即可开始。' : '';
+}
+
+$('drop').addEventListener('click', () => $('file').click());
+$('file').addEventListener('change', e => pick(e.target.files[0]));
+$('confirm').addEventListener('change', syncGenerate);
+['dragenter', 'dragover'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.remove('drag'); }));
+$('drop').addEventListener('drop', e => { if (e.dataTransfer.files.length) pick(e.dataTransfer.files[0]); });
+$('reset').addEventListener('click', () => {
+  selectedFile = null; $('file').value = ''; $('shot').hidden = true; $('shotMeta').hidden = true;
+  $('reset').hidden = true; $('uploadError').innerHTML = ''; syncGenerate();
+});
+
+$('generate').addEventListener('click', async () => {
+  if (!selectedFile) return;
+  $('generate').disabled = true; $('reset').disabled = true;
+  $('resultCard').hidden = true; $('previewCard').hidden = true; $('assetCard').hidden = true;
+  $('progressCard').hidden = false;
+  $('progressStage').textContent = '正在上传截图…';
+  steps = ['读取并规范化截图', 'AI 看懂这家店', 'AI 做装修决策', '生成组合素材并裁切', '用固定模块渲染完整页面', '打包素材与装修清单'];
+  renderSteps(1, 'running');
+  const t0 = Date.now();
+  timer = setInterval(() => { $('elapsed').textContent = Math.round((Date.now() - t0) / 1000) + 's'; }, 500);
+
+  const form = new FormData();
+  form.append('screenshot', selectedFile, selectedFile.name || 'store.png');
+  let res;
+  try { res = await fetch('/api/generate?confirm=1', { method: 'POST', body: form }); }
+  catch (e) { stop(); $('uploadError').innerHTML = `<div class="err">上传失败：${e.message}</div>`; return done(); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    stop(); $('progressStage').textContent = '未开始';
+    $('uploadError').innerHTML = `<div class="err">${data.error || '提交失败'}${data.hint ? '<br><span class="note">' + data.hint + '</span>' : ''}</div>`;
+    return done();
+  }
+  currentId = data.id;
+  if (Array.isArray(data.steps)) steps = data.steps;
+  poll();
+});
+
+const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+const done = () => { $('generate').disabled = false; $('reset').disabled = false; syncGenerate(); };
+
+function renderSteps(active, status) {
+  $('steps').innerHTML = steps.map((label, i) => {
+    const n = i + 1;
+    const cls = status === 'running' && n === active ? 'active' : (active > n || (status !== 'running' && status !== 'failed' && active >= n) ? 'done' : '');
+    return `<li class="${cls}"><span class="dot">${cls === 'done' ? '✓' : n}</span><span>${label}</span></li>`;
+  }).join('');
+}
+
+async function poll() {
+  if (!currentId) return;
+  let state = null;
+  try {
+    const r = await fetch(`/runs/${currentId}/run.json`, { cache: 'no-store' });
+    if (r.ok) state = await r.json();
+  } catch { /* 稍后重试 */ }
+  if (state) {
+    $('progressStage').textContent = state.stage || '处理中…';
+    renderSteps(state.step || 1, state.status);
+    const calls = state.calls || [];
+    $('callInfo').textContent = calls.length ? `已调用 ${calls.length} 次：${calls.map(c => c.kind).join(' · ')}` : '';
+    if (state.status !== 'running') {
+      stop(); showResult(state); done(); loadRecent(); return;
+    }
+  }
+  setTimeout(poll, 1500);
+}
+
+async function showResult(state) {
+  $('progressCard').hidden = true;
+  $('resultCard').hidden = false;
+  const id = state.id;
+  $('resultStage').innerHTML = pill(state.status) + ' ' + (state.stage || '');
+
+  if (state.status === 'failed') {
+    $('designBody').innerHTML = `<div class="err">${state.error || '本次未完成'}${state.errorHint ? '<br><span class="note">' + state.errorHint + '</span>' : ''}</div>
+      <p class="note">失败发生在「${state.errorStage || '未知'}」这一步。上面是真实原因，本次没有产出预览，也没有用旧结果顶替。</p>`;
+    $('previewCard').hidden = true; $('assetCard').hidden = true;
+    return;
+  }
+
+  const shop = state.shop || {}, design = state.design || {};
+  const parts = [];
+  parts.push(`<div class="chips">
+    <span class="chip">店铺：${shop.shopName || '未识别'}</span>
+    <span class="chip">品类：${shop.category || '未识别'}</span>
+    ${(shop.contentSignals?.styleKeywords || []).map(k => `<span class="chip">${k}</span>`).join('')}
+  </div>`);
+  parts.push(`<p style="margin:14px 0 4px"><b>${design.title || ''}</b></p><p class="note" style="margin:0 0 14px">${design.summary || ''}</p>`);
+  if ((design.decisions || []).length) {
+    parts.push('<p class="note" style="margin:0 0 8px">AI 的决策与理由：</p>');
+    parts.push(design.decisions.map(d => `<div class="decision"><b>${d.topic} · ${d.choice}</b><span>${d.reason}</span></div>`).join(''));
+  } else {
+    parts.push('<p class="note">AI 没有给出决策理由，本次选型理由无法核对。</p>');
+  }
+  if (shop.designReading?.reason) parts.push(`<p class="note">它为什么这么判断：${shop.designReading.reason}</p>`);
+  if ((state.warnings || []).length) {
+    parts.push('<p class="note" style="margin-top:12px">本次的真实说明：</p><ul class="warnlist">' + state.warnings.map(w => `<li>${w}</li>`).join('') + '</ul>');
+  }
+  const v = state.validation;
+  if (v) {
+    parts.push(`<p class="note" style="margin-top:12px">计划校验：${v.slotCount} 个图片位 · 生成图 ${v.generatedSlotCount} 张 · 截图裁切 ${v.productSlotCount} 张 · 生图 ${v.sheets} 次</p>`);
+  }
+  $('designBody').innerHTML = parts.join('');
+
+  // 预览
+  $('previewCard').hidden = false;
+  const frame = $('previewFrame');
+  frame.src = `/runs/${id}/preview.html?v=${Date.now()}`;
+  frame.onload = () => { try { frame.style.height = (frame.contentDocument.body.scrollHeight + 20) + 'px'; } catch { frame.style.height = '1800px'; } };
+  $('openPreview').href = `/runs/${id}/preview.html`;
+  $('downloadManifest').href = `/runs/${id}/manifest.json`;
+
+  const manifest = await fetch(`/runs/${id}/manifest.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
+  const modules = manifest?.modules || (state.plan?.modules || []).map((m, i) => ({ order: i + 1, id: m.id, type: m.type, label: m.label, reason: m.reason, photoCount: 0, slots: [] }));
+  $('moduleList').innerHTML = `<p class="note" style="margin:0 0 6px">模块顺序与图片位对应（照着在微购后台添加）：</p>
+    <div class="mods">${modules.map(m => `<div class="mod">
+      <b>${m.order}. ${m.label || m.type}</b> <span class="r">${m.type}</span>
+      <div class="r">${m.reason || ''}</div>
+      ${m.slots?.length ? `<div class="chips">${m.slots.map(s => `<span class="chip ${s.source === 'product-photo' ? 'src' : 'gen'}">${s.file.split('/').pop()} · ${srcLabel(s.source)}</span>`).join('')}</div>` : ''}
+    </div>`).join('')}</div>`;
+
+  // 素材
+  const assets = state.assets || [];
+  $('assetCard').hidden = assets.length === 0;
+  if (assets.length) {
+    $('assetBody').innerHTML = `<p class="note">共 ${assets.length} 张。${manifest?.assetFiles?.some(a => a.upscaled) ? '其中部分素材由较小像素放大到槽位尺寸，大屏下会偏软（已逐张标注）。' : '全部按槽位原生尺寸的 2 倍输出。'}</p>
+      <div class="row"><a class="btn" href="/runs/${id}/manifest.json" download>下载装修清单 JSON</a></div>`;
+    $('assets').innerHTML = assets.map(a => `<div class="asset">
+      <img src="/runs/${id}/${a.file}" alt="${a.slotId}" loading="lazy">
+      <div class="cap"><b>${a.file.split('/').pop()}</b>${a.slotId}<br>${srcLabel(a.source)}<br>${a.deliveredPixels.join('×')}px${a.upscaled ? ' · 放大' : ''}</div>
+    </div>`).join('');
+  }
+}
+
+async function loadRecent() {
+  let items = [];
+  try { items = await fetch('/api/recent').then(r => r.json()); } catch { return; }
+  if (!items.length) { $('recent').innerHTML = '<p class="note">还没有生成记录。</p>'; return; }
+  $('recent').innerHTML = items.map(it => `<div class="item" data-id="${it.id}">
+    ${pill(it.status)}<br><b>${it.shopName || '未识别'}</b><br>
+    <span class="note">${it.designTitle || it.stage || ''}<br>${it.moduleCount} 个模块 · ${it.assetCount} 张素材<br>${new Date(it.startedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+  </div>`).join('');
+  document.querySelectorAll('.item').forEach(el => el.addEventListener('click', async () => {
+    const state = await fetch(`/runs/${el.dataset.id}/run.json`, { cache: 'no-store' }).then(r => r.json());
+    currentId = state.id; showResult(state);
+    window.scrollTo({ top: $('resultCard').offsetTop - 20, behavior: 'smooth' });
+  }));
+}
+
+boot();
+</script>
+</body>
+</html>

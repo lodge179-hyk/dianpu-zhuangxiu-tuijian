@@ -1,0 +1,67 @@
+{
+  "createdAt": "2026-10-13T02:19:05.555Z",
+  "imageGenerationCalls": 0,
+  "businessCodeChanged": false,
+  "files": [
+    {
+      "path": "01-共同需求与最新约束.md",
+      "bytes": 6430,
+      "sha256": "c236a8660a0d56d611e46071c07b6737ae2c4f294dba3cedd95ebb458b19ae75"
+    },
+    {
+      "path": "02-路线A-低成本生图验证.md",
+      "bytes": 4177,
+      "sha256": "eecfb84f0c5646a2b1c56941ee7a607830c42835a305c93f7f20588b7e79ffc3"
+    },
+    {
+      "path": "03-路线B-程序复刻任务.md",
+      "bytes": 6560,
+      "sha256": "f19c47a743c067f2bc301c09c7323fb8349ee48502bd4acf29af095ba2fc588a"
+    },
+    {
+      "path": "data/comparison-case.json",
+      "bytes": 4537,
+      "sha256": "7a1b31409ab52f1ed3cbd210bd7df29e231f67ca6e3cdb3fc08e14f3a73fa784"
+    },
+    {
+      "path": "data/evidence/03-editor-module-labels.txt",
+      "bytes": 2733,
+      "sha256": "de84d5d2dc34ca30a34f17068a0c1637ffc6ece10ca74e8dcba1f2ace9c915b0"
+    },
+    {
+      "path": "data/evidence/04-editor-module-labels.txt",
+      "bytes": 783,
+      "sha256": "e16188f1d026b0e16c37ea375a9277153a2ab3dd19319e655e1e9d76faf5e8f3"
+    },
+    {
+      "path": "data/evidence/05-editor-module-labels.txt",
+      "bytes": 789,
+      "sha256": "d77e6e436f912e6e8b6aa2597a18ad3601568a5cfa211f1ef821cc97160fae1e"
+    },
+    {
+      "path": "data/evidence/采集覆盖清单.txt",
+      "bytes": 2235,
+      "sha256": "21b6d02bae57978d9214dce7ff620b65cb1a6e51b0d2a38997f148861dd74c73"
+    },
+    {
+      "path": "data/README.md",
+      "bytes": 2941,
+      "sha256": "c2df239b05531a2182ca7f63168c25ffc3177bae97620a8c1e6a72beb65b1a45"
+    },
+    {
+      "path": "data/ui-component-registry.json",
+      "bytes": 2283406,
+      "sha256": "c4883e2919c8afcf276cb72efd6302f5712887d0bd62b833e81a411c5a80f0be"
+    },
+    {
+      "path": "data/upload-format-index.json",
+      "bytes": 17465,
+      "sha256": "fa89644afc7b134ad747907be8160bb753ae057e1e547ce1afa3c338fe74700a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3771,
+      "sha256": "82bc8769e9fe92af9bdcf446fb2ed7bed092e020ba5ad498b8ab43477072d75f"
+    }
+  ]
+}

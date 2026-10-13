@@ -1,0 +1,18 @@
+{
+  "name": "dianpu-ai-design",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AI 为商家做装修设计决策，用固定 HTML 模块稳定呈现，再交付可用的图片素材。",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local server.mjs",
+    "catalog": "node tools/build-catalog.mjs"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "sharp": "^0.35.4"
+  }
+}

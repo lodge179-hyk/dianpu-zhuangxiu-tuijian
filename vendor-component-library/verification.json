@@ -1,0 +1,24 @@
+{
+  "baseline": "../a8-long-html-store/完整店铺长图.png",
+  "browserVersion": "155.0.8059.39",
+  "dimensions": [
+    966,
+    12340
+  ],
+  "logicalDimensions": [
+    483,
+    6169.84375
+  ],
+  "namedElements": 174,
+  "missing": [],
+  "unexpected": [],
+  "maxGeometryDelta": 0,
+  "sameDimensions": true,
+  "changedPixels": 0,
+  "allImagesLoaded": true,
+  "browserErrors": [],
+  "externalRequests": [],
+  "newImageGenerationCalls": 0,
+  "applicationModified": false,
+  "passed": true
+}

@@ -1,0 +1,23 @@
+{
+  "scope": "Internal encapsulation only; no AI selection catalogue or new preview UI",
+  "sourceRegistrySha256": "c4883e2919c8afcf276cb72efd6302f5712887d0bd62b833e81a411c5a80f0be",
+  "baselineHtmlSha256": "97d9f65f152c4a838d76d75d0a0d7dcc9a5ea15155399956d70d18d69dca7efb",
+  "baselinePngSha256": "f5950d4476e3cb1929afa25e86f2265266899b44926e9759397e25ab1f58139a",
+  "capturedInstances": 24,
+  "componentTypes": 23,
+  "duplicateCaptureExcluded": "showcase.three-repeat",
+  "acceptedBaseline": "../a8-long-html-store/完整店铺长图.png",
+  "deferred": [
+    "AI component selection catalogue",
+    "style planning",
+    "image generation",
+    "new preview interface",
+    "app integration"
+  ],
+  "limitations": [
+    "Frozen captured geometry; not an assertion of pixel identity to the live platform",
+    "Full-screen and minimal signboards were captured at width 577; scaled as a whole when used at other widths",
+    "Preserves the existing approximate share icon and static carousel state",
+    "Multiline notice retains the accepted five-line fixture behavior without expansion control"
+  ]
+}
