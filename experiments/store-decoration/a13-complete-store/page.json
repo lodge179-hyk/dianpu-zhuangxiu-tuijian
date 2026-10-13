@@ -1,0 +1,414 @@
+{
+  "width": 483,
+  "title": "完整店铺长页 · 批量生图与裁剪示例",
+  "modules": [
+    {
+      "id": "m01",
+      "type": "signboard.default",
+      "label": "默认招牌",
+      "content": {
+        "background": "assets/signboard.png",
+        "shop": {
+          "name": "可达鸭",
+          "avatar": "assets/avatar.jpg",
+          "vip": true,
+          "newCount": "30989",
+          "totalCount": "43279"
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "m02",
+      "type": "navigation.four",
+      "label": "四列圆图导航",
+      "content": {
+        "images": [
+          {
+            "src": "assets/nav-sweater.png"
+          },
+          {
+            "src": "assets/nav-shoes.png"
+          },
+          {
+            "src": "assets/nav-bag.png"
+          },
+          {
+            "src": "assets/nav-knit.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m03",
+      "type": "text.single",
+      "label": "单行公告 · 上新",
+      "content": {
+        "text": "秋日上新 · 把舒适穿进日常"
+      },
+      "options": {}
+    },
+    {
+      "id": "m04",
+      "type": "poster.three",
+      "label": "三列海报",
+      "content": {
+        "images": [
+          {
+            "src": "assets/02-sweatshirt.png"
+          },
+          {
+            "src": "assets/04-shoes.png"
+          },
+          {
+            "src": "assets/03-tote.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m05",
+      "type": "carousel.medium",
+      "label": "中图轮播 · 4:3",
+      "content": {
+        "images": [
+          {
+            "src": "assets/medium.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m06",
+      "type": "showcase.three",
+      "label": "三列橱窗 · 9 件",
+      "content": {
+        "items": [
+          {
+            "image": "assets/02-sweatshirt.png",
+            "title": "经典圆领卫衣\n柔软棉感 · 炭灰色",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "assets/04-shoes.png",
+            "title": "轻盈日常运动鞋\n舒适百搭 · 白蓝色",
+            "price": "35.16",
+            "currency": "$"
+          },
+          {
+            "image": "assets/nav-knit.png",
+            "title": "柔软针织开衫\n自然肌理 · 米白色",
+            "price": "32.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/03-tote.png",
+            "title": "简约通勤托特包\n大容量 · 浅咖色",
+            "price": "38.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/coat-square.png",
+            "title": "轻量通勤外套\n舒适叠穿 · 燕麦色",
+            "price": "48.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/outfit-lower.png",
+            "title": "针织长裤搭配\n炭灰色 · 换季组合",
+            "price": "68.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/04-shoes.png",
+            "title": "浅色日常运动鞋\n轻盈搭配 · 灰白色",
+            "price": "36.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/nav-knit.png",
+            "title": "柔软针织开衫\n米白色 · 日常叠穿",
+            "price": "32.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/outfit-square.png",
+            "title": "针织长裤搭配\n米白与炭灰组合",
+            "price": "68.00",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "m07",
+      "type": "text.single",
+      "label": "单行公告 · 针织",
+      "content": {
+        "text": "松弛日常 · 针织与通勤搭配"
+      },
+      "options": {}
+    },
+    {
+      "id": "m08",
+      "type": "poster.combo3",
+      "label": "三图组合 · 上大下小",
+      "content": {
+        "images": [
+          {
+            "src": "assets/outfit-square.png"
+          },
+          {
+            "src": "assets/nav-knit.png"
+          },
+          {
+            "src": "assets/04-shoes.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m09",
+      "type": "poster.single",
+      "label": "单列海报 · 1 张",
+      "content": {
+        "images": [
+          {
+            "src": "assets/medium-square.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m10",
+      "type": "showcase.single",
+      "label": "单列大图橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "assets/03-tote.png",
+            "title": "简约通勤托特包\n大容量 · 浅咖色",
+            "price": "38.00",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "m11",
+      "type": "text.single",
+      "label": "单行公告 · 鞋包",
+      "content": {
+        "text": "通勤鞋包 · 轻松出门"
+      },
+      "options": {}
+    },
+    {
+      "id": "m12",
+      "type": "poster.combo1",
+      "label": "三图组合 · 左大右小",
+      "content": {
+        "images": [
+          {
+            "src": "assets/03-tote.png"
+          },
+          {
+            "src": "assets/04-shoes.png"
+          },
+          {
+            "src": "assets/nav-knit.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m13",
+      "type": "poster.combo2",
+      "label": "三图组合 · 右大左小",
+      "content": {
+        "images": [
+          {
+            "src": "assets/coat-square.png"
+          },
+          {
+            "src": "assets/coat-square.png"
+          },
+          {
+            "src": "assets/outfit-lower.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m14",
+      "type": "poster.sliding",
+      "label": "横向滑动海报",
+      "content": {
+        "images": [
+          {
+            "src": "assets/04-shoes.png"
+          },
+          {
+            "src": "assets/03-tote.png"
+          },
+          {
+            "src": "assets/nav-knit.png"
+          },
+          {
+            "src": "assets/coat-square.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m15",
+      "type": "carousel.small",
+      "label": "小图轮播 · 3:1",
+      "content": {
+        "images": [
+          {
+            "src": "assets/01-banner.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m16",
+      "type": "showcase.sliding",
+      "label": "横向商品橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "assets/04-shoes.png",
+            "title": "浅色日常运动鞋\n轻盈搭配 · 灰白色",
+            "price": "36.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/03-tote.png",
+            "title": "简约通勤托特包\n大容量 · 浅咖色",
+            "price": "38.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/coat-square.png",
+            "title": "轻量通勤外套\n舒适叠穿 · 燕麦色",
+            "price": "48.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/outfit-lower.png",
+            "title": "针织长裤搭配\n炭灰色 · 换季组合",
+            "price": "68.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/nav-knit.png",
+            "title": "柔软针织开衫\n米白色 · 日常叠穿",
+            "price": "32.00",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "m17",
+      "type": "text.single",
+      "label": "单行公告 · 换季",
+      "content": {
+        "text": "本周精选 · 换季衣橱"
+      },
+      "options": {}
+    },
+    {
+      "id": "m18",
+      "type": "carousel.large",
+      "label": "大图轮播 · 3:4",
+      "content": {
+        "images": [
+          {
+            "src": "assets/05-coat.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m19",
+      "type": "poster.two",
+      "label": "双列海报",
+      "content": {
+        "images": [
+          {
+            "src": "assets/coat-square.png"
+          },
+          {
+            "src": "assets/outfit-lower.png"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "m20",
+      "type": "showcase.two",
+      "label": "双列商品橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "assets/coat-square.png",
+            "title": "轻量通勤外套",
+            "price": "48.00",
+            "currency": "$"
+          },
+          {
+            "image": "assets/outfit-lower.png",
+            "title": "针织长裤搭配\n炭灰色 · 换季组合",
+            "price": "68.00",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": true
+      }
+    },
+    {
+      "id": "m21",
+      "type": "text.multiline",
+      "label": "多行公告",
+      "content": {
+        "text": "这一季，把舒适穿进日常。\n从柔软针织到轻量外套，\n用自然色调搭配日常鞋包。\n通勤、散步或周末出游，\n找到属于自己的轻松穿搭。"
+      },
+      "options": {}
+    },
+    {
+      "id": "m22",
+      "type": "text.link",
+      "label": "文字链接",
+      "content": {
+        "text": "查看更多搭配"
+      },
+      "options": {}
+    }
+  ]
+}

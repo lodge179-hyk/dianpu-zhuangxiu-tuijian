@@ -1,0 +1,33 @@
+{
+  "status": "Ready for user review",
+  "logicalDimensions": [
+    483,
+    6169.84375
+  ],
+  "pngDimensions": [
+    966,
+    12340
+  ],
+  "moduleInstances": 22,
+  "uniqueModuleFormats": 19,
+  "moduleFamilies": 6,
+  "photoSlots": 44,
+  "namedComponents": 174,
+  "allImagesLoaded": true,
+  "maxGeometryDeviationFromAcceptedA8": 0,
+  "missingComponents": [],
+  "browserErrors": [],
+  "externalRequests": [],
+  "newGenerationCalls": 1,
+  "totalSourceGenerationCalls": 2,
+  "applicationCodeModified": false,
+  "styleApproved": false,
+  "userAccepted": false,
+  "slices": [
+    "长页分段-1.png",
+    "长页分段-2.png",
+    "长页分段-3.png",
+    "长页分段-4.png"
+  ],
+  "inputDecision": "Screenshot product images are not required usable source assets; generated example goods are used here"
+}

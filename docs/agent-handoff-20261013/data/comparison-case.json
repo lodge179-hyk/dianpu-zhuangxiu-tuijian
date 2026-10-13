@@ -1,0 +1,156 @@
+{
+  "id": "measured-module-subset-v1",
+  "status": "prepared-not-rendered-or-generated",
+  "purpose": "Shared small experiment for A image generation and B program UI reconstruction. This is an explicit subset of measured modules, not a new production UI requirement.",
+  "unit": "CSS px",
+  "width": 483,
+  "height": 1121.265625,
+  "modules": [
+    {
+      "id": "signboard.default",
+      "format": "招牌-默认",
+      "sourceFile": "01-home.json",
+      "sourceRootNodeId": 36,
+      "sourceViewport": {
+        "height": 775,
+        "scrollLeft": 0,
+        "scrollTop": 0,
+        "width": 483
+      },
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "selection": {
+        "kind": "all-captured-components"
+      }
+    },
+    {
+      "id": "navigation.four",
+      "format": "导航-每行4个",
+      "sourceFile": "01-home.json",
+      "sourceRootNodeId": 50,
+      "sourceViewport": {
+        "height": 775,
+        "scrollLeft": 0,
+        "scrollTop": 0,
+        "width": 483
+      },
+      "rect": [
+        0,
+        258,
+        483,
+        103.265625
+      ],
+      "selection": {
+        "kind": "all-captured-components"
+      }
+    },
+    {
+      "id": "poster.three",
+      "format": "海报-三列",
+      "sourceFile": "01-home.json",
+      "sourceRootNodeId": 134,
+      "sourceViewport": {
+        "height": 775,
+        "scrollLeft": 0,
+        "scrollTop": 0,
+        "width": 483
+      },
+      "rect": [
+        0,
+        361.265625,
+        483,
+        161.328125
+      ],
+      "selection": {
+        "kind": "all-captured-components"
+      }
+    },
+    {
+      "id": "carousel.medium",
+      "format": "轮播图-中图",
+      "sourceFile": "01-home.json",
+      "sourceRootNodeId": 154,
+      "sourceViewport": {
+        "height": 775,
+        "scrollLeft": 0,
+        "scrollTop": 0,
+        "width": 483
+      },
+      "rect": [
+        0,
+        522.59375,
+        483,
+        362.25
+      ],
+      "selection": {
+        "kind": "all-captured-components"
+      }
+    },
+    {
+      "id": "showcase.three",
+      "format": "商品橱窗-三列",
+      "sourceFile": "01-home.json",
+      "sourceRootNodeId": 166,
+      "sourceViewport": {
+        "height": 775,
+        "scrollLeft": 0,
+        "scrollTop": 0,
+        "width": 483
+      },
+      "rect": [
+        0,
+        884.84375,
+        483,
+        236.421875
+      ],
+      "selection": {
+        "kind": "first-row",
+        "cardNames": [
+          "showcase.three.CommodityItem_CommodityItem.1",
+          "showcase.three.CommodityItem_CommodityItem.2",
+          "showcase.three.CommodityItem_CommodityItem.3"
+        ],
+        "cardCount": 3,
+        "includeDescendants": true,
+        "heightDerivation": "max(first three card local y + card height) + captured module padding-bottom",
+        "note": "Derived single-row example; original capture contains nine products and three rows."
+      }
+    }
+  ],
+  "scopeNotes": [
+    "Relative order follows round-1 observed modules after removing unselected repeats.",
+    "Four-icon navigation sample has no labels; do not infer all navigation variants lack labels.",
+    "Three-column poster slots are square in this captured sample.",
+    "Carousel indicator dots forbidden by latest user instruction.",
+    "Page wrappers and floating platform controls are outside this module-only comparison; this does not authorize deleting them from the existing demo.",
+    "No benefits row was measured in this sample; do not invent it.",
+    "Existing module images or clearly labelled fixtures may be used. Product fidelity and text facts must not be claimed when using fixtures.",
+    "Outside first-row showcase height and vertical concatenation, use registry component geometry/styles as measured."
+  ],
+  "evaluation": {
+    "mustHave": [
+      "Exactly five selected modules in stated order",
+      "Four circular navigation images",
+      "Three square poster slots",
+      "4:3 medium carousel without dots",
+      "Three showcase product cards with square photos and separate information areas"
+    ],
+    "reportSeparately": [
+      "Geometry and visible component differences",
+      "Text errors",
+      "Image source and per-slot native pixels",
+      "Model calls, output images and elapsed time",
+      "Unknown costs must be labelled unknown"
+    ],
+    "notEstablished": [
+      "Repeated generation stability",
+      "Production-quality product fidelity",
+      "Native mini-program parity",
+      "Complete responsive rules"
+    ]
+  }
+}

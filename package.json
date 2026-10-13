@@ -14,6 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "dev:service": "node --env-file-if-exists=.env.local --import tsx server/index.ts",
     "dev:mvp": "node scripts/dev-mvp.mjs",
+    "dev:assisted": "node --env-file-if-exists=.env.local scripts/decoration-assisted/server.mjs",
+    "test:assisted": "node --test tests/decoration-assisted.test.mjs",
     "test:mvp": "node --import tsx --test tests/mvp-contract.test.ts tests/task-store.test.ts tests/model-pipeline.test.ts tests/asset-image.test.ts tests/task-audit.test.ts tests/safe-crop.test.ts tests/model-request.test.ts tests/queue-reliability.test.ts tests/stability-contract.test.ts tests/batch-runner.test.ts tests/restore-asset.test.ts",
     "validate:batch": "node --env-file-if-exists=.env.local --import tsx scripts/run-validation-batch.mjs"
   },

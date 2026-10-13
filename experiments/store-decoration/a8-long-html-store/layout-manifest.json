@@ -1,0 +1,4284 @@
+{
+  "width": 483,
+  "height": 6169.84375,
+  "displayWidth": 375,
+  "displayHeight": 4790.251358695652,
+  "moduleCount": 22,
+  "uniqueFormats": [
+    "signboard.default",
+    "navigation.four",
+    "text.single",
+    "poster.three",
+    "carousel.medium",
+    "showcase.three",
+    "poster.combo3",
+    "poster.single",
+    "showcase.single",
+    "poster.combo1",
+    "poster.combo2",
+    "poster.sliding",
+    "carousel.small",
+    "showcase.sliding",
+    "carousel.large",
+    "poster.two",
+    "showcase.two",
+    "text.multiline",
+    "text.link"
+  ],
+  "families": [
+    "招牌",
+    "导航",
+    "公告",
+    "海报",
+    "轮播图",
+    "商品橱窗"
+  ],
+  "modules": [
+    {
+      "key": "signboard.default",
+      "family": "招牌",
+      "label": "默认招牌",
+      "assetIds": [
+        "signboard"
+      ],
+      "id": "m01",
+      "top": 0,
+      "height": 258,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 36,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "navigation.four",
+      "family": "导航",
+      "label": "四列圆图导航",
+      "assetIds": [
+        "nav-sweater",
+        "nav-shoes",
+        "nav-bag",
+        "nav-top"
+      ],
+      "id": "m02",
+      "top": 258,
+      "height": 103.265625,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 50,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "text.single",
+      "family": "公告",
+      "label": "单行公告 · 上新",
+      "copy": "秋日上新 · 把舒适穿进日常",
+      "id": "m03",
+      "top": 361.265625,
+      "height": 58.390625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 312,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.three",
+      "family": "海报",
+      "label": "三列海报",
+      "assetIds": [
+        "sweater-detail",
+        "blue-shoes",
+        "bag-detail"
+      ],
+      "id": "m04",
+      "top": 419.65625,
+      "height": 161.328125,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 134,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "carousel.medium",
+      "family": "轮播图",
+      "label": "中图轮播 · 4:3",
+      "assetIds": [
+        "casual-outfit"
+      ],
+      "id": "m05",
+      "top": 580.984375,
+      "height": 362.25,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 154,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "showcase.three",
+      "family": "商品橱窗",
+      "label": "三列橱窗 · 9 件",
+      "products": [
+        "sweater",
+        "shoes",
+        "knit",
+        "tote",
+        "coat",
+        "trousers",
+        "pale",
+        "belt",
+        "outfit"
+      ],
+      "id": "m06",
+      "top": 943.234375,
+      "height": 701.265625,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 166,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "text.single",
+      "family": "公告",
+      "label": "单行公告 · 针织",
+      "copy": "松弛日常 · 针织与通勤搭配",
+      "id": "m07",
+      "top": 1644.5,
+      "height": 58.390625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 312,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.combo3",
+      "family": "海报",
+      "label": "三图组合 · 上大下小",
+      "assetIds": [
+        "knit-outfit",
+        "knit-detail",
+        "white-shoes"
+      ],
+      "id": "m08",
+      "top": 1702.890625,
+      "height": 726,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 126,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.single",
+      "family": "海报",
+      "label": "单列海报 · 1 张",
+      "assetIds": [
+        "casual-outfit"
+      ],
+      "photoLimit": 1,
+      "height": 484,
+      "configured": "One image configured using captured 483px square cell plus 0.5px top/bottom and 1px row spacing; original capture contained three cells",
+      "id": "m09",
+      "top": 2428.890625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 50,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "showcase.single",
+      "family": "商品橱窗",
+      "label": "单列大图橱窗",
+      "products": [
+        "tote"
+      ],
+      "id": "m10",
+      "top": 2912.890625,
+      "height": 547.765625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 210,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "text.single",
+      "family": "公告",
+      "label": "单行公告 · 鞋包",
+      "copy": "通勤鞋包 · 轻松出门",
+      "id": "m11",
+      "top": 3460.65625,
+      "height": 58.390625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 312,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.combo1",
+      "family": "海报",
+      "label": "三图组合 · 左大右小",
+      "assetIds": [
+        "tote",
+        "pale-shoes",
+        "belt"
+      ],
+      "id": "m12",
+      "top": 3519.046875,
+      "height": 322.65625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 84,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.combo2",
+      "family": "海报",
+      "label": "三图组合 · 右大左小",
+      "assetIds": [
+        "coat",
+        "coat-detail",
+        "trouser-detail"
+      ],
+      "id": "m13",
+      "top": 3841.703125,
+      "height": 322.65625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 105,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.sliding",
+      "family": "海报",
+      "label": "横向滑动海报",
+      "assetIds": [
+        "blue-shoes",
+        "tote",
+        "knit-detail",
+        "coat-detail"
+      ],
+      "id": "m14",
+      "top": 4164.359375,
+      "height": 194.1875,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 147,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "carousel.small",
+      "family": "轮播图",
+      "label": "小图轮播 · 3:1",
+      "assetIds": [
+        "signboard"
+      ],
+      "id": "m15",
+      "top": 4358.546875,
+      "height": 160.984375,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 186,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "showcase.sliding",
+      "family": "商品橱窗",
+      "label": "横向商品橱窗",
+      "products": [
+        "pale",
+        "tote",
+        "coat",
+        "trousers",
+        "belt"
+      ],
+      "id": "m16",
+      "top": 4519.53125,
+      "height": 204.515625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 226,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "text.single",
+      "family": "公告",
+      "label": "单行公告 · 换季",
+      "copy": "本周精选 · 换季衣橱",
+      "id": "m17",
+      "top": 4724.046875,
+      "height": 58.390625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 312,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "carousel.large",
+      "family": "轮播图",
+      "label": "大图轮播 · 3:4",
+      "assetIds": [
+        "coat-outfit"
+      ],
+      "id": "m18",
+      "top": 4782.4375,
+      "height": 643.984375,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 198,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "poster.two",
+      "family": "海报",
+      "label": "双列海报",
+      "assetIds": [
+        "coat-detail",
+        "trouser-detail"
+      ],
+      "id": "m19",
+      "top": 5426.421875,
+      "height": 242,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 70,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "showcase.two",
+      "family": "商品橱窗",
+      "label": "双列商品橱窗",
+      "products": [
+        "coat",
+        "trousers"
+      ],
+      "oneLine": true,
+      "id": "m20",
+      "top": 5668.421875,
+      "height": 295.078125,
+      "source": {
+        "file": "01-home.json",
+        "nodeId": 422,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:20:16.253Z",
+        "labelEvidence": "Backend module list read in conversation before round 2; widths/classes checked against saved DOM"
+      }
+    },
+    {
+      "key": "text.multiline",
+      "family": "公告",
+      "label": "多行公告",
+      "copy": "这一季，把舒适穿进日常。\n从柔软针织到轻量外套，\n用自然色调搭配日常鞋包。\n通勤、散步或周末出游，\n找到属于自己的轻松穿搭。",
+      "id": "m21",
+      "top": 5963.5,
+      "height": 147.953125,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 320,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    },
+    {
+      "key": "text.link",
+      "family": "公告",
+      "label": "文字链接",
+      "copy": "查看更多搭配",
+      "id": "m22",
+      "top": 6111.453125,
+      "height": 58.390625,
+      "source": {
+        "file": "03-updated-home.json",
+        "nodeId": 326,
+        "url": "https://a202607151326402112002023.szwego.com/weshop/store/A202607151326402112002023?overseas=0",
+        "viewport": {
+          "height": 775,
+          "scrollLeft": 0,
+          "scrollTop": 0,
+          "width": 483
+        },
+        "capturedAt": "2026-10-13T01:42:01.992Z",
+        "labelEvidence": "03-editor-module-labels.txt: editor order matched to storefront module order"
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "m01.banner.photo",
+      "moduleId": "m01",
+      "role": "photo",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        258
+      ]
+    },
+    {
+      "id": "m01.banner.shade",
+      "moduleId": "m01",
+      "role": "fixed-overlay",
+      "rect": [
+        0,
+        170,
+        483,
+        88
+      ],
+      "localRect": [
+        0,
+        170,
+        483,
+        88
+      ]
+    },
+    {
+      "id": "m01.SignboardInfo_icon.1",
+      "moduleId": "m01",
+      "role": "fixed-icon",
+      "rect": [
+        16,
+        190,
+        48,
+        48
+      ],
+      "localRect": [
+        16,
+        190,
+        48,
+        48
+      ]
+    },
+    {
+      "id": "m01.SignboardInfo_iconSVip.1",
+      "moduleId": "m01",
+      "role": "fixed-icon",
+      "rect": [
+        130,
+        193.203125,
+        29,
+        16
+      ],
+      "localRect": [
+        130,
+        193.203125,
+        29,
+        16
+      ]
+    },
+    {
+      "id": "m01.SignboardInfo_name.1",
+      "moduleId": "m01",
+      "role": "fixed-text",
+      "rect": [
+        72,
+        188.703125,
+        54,
+        25
+      ],
+      "localRect": [
+        72,
+        188.703125,
+        54,
+        25
+      ]
+    },
+    {
+      "id": "m01.SignboardInfo_item.1",
+      "moduleId": "m01",
+      "role": "fixed-text",
+      "rect": [
+        72,
+        221.703125,
+        64.71875,
+        12
+      ],
+      "localRect": [
+        72,
+        221.703125,
+        64.71875,
+        12
+      ]
+    },
+    {
+      "id": "m01.span.1",
+      "moduleId": "m01",
+      "role": "fixed-text",
+      "rect": [
+        99.34375,
+        220.703125,
+        33.375,
+        14
+      ],
+      "localRect": [
+        99.34375,
+        220.703125,
+        33.375,
+        14
+      ]
+    },
+    {
+      "id": "m01.SignboardInfo_item.2",
+      "moduleId": "m01",
+      "role": "fixed-text",
+      "rect": [
+        136.71875,
+        221.703125,
+        69.71875,
+        12
+      ],
+      "localRect": [
+        136.71875,
+        221.703125,
+        69.71875,
+        12
+      ]
+    },
+    {
+      "id": "m01.span.2",
+      "moduleId": "m01",
+      "role": "fixed-text",
+      "rect": [
+        169.0625,
+        220.703125,
+        33.375,
+        14
+      ],
+      "localRect": [
+        169.0625,
+        220.703125,
+        33.375,
+        14
+      ]
+    },
+    {
+      "id": "m01",
+      "role": "module",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ]
+    },
+    {
+      "id": "m02.image1",
+      "moduleId": "m02",
+      "role": "photo",
+      "rect": [
+        30.734375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        30.734375,
+        16,
+        71.265625,
+        71.265625
+      ]
+    },
+    {
+      "id": "m02.image2",
+      "moduleId": "m02",
+      "role": "photo",
+      "rect": [
+        147.484375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        147.484375,
+        16,
+        71.265625,
+        71.265625
+      ]
+    },
+    {
+      "id": "m02.image3",
+      "moduleId": "m02",
+      "role": "photo",
+      "rect": [
+        264.234375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        264.234375,
+        16,
+        71.265625,
+        71.265625
+      ]
+    },
+    {
+      "id": "m02.image4",
+      "moduleId": "m02",
+      "role": "photo",
+      "rect": [
+        380.984375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        380.984375,
+        16,
+        71.265625,
+        71.265625
+      ]
+    },
+    {
+      "id": "m02",
+      "role": "module",
+      "rect": [
+        0,
+        258,
+        483,
+        103.265625
+      ]
+    },
+    {
+      "id": "m03.notice.background",
+      "moduleId": "m03",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        373.265625,
+        459,
+        34.390625
+      ],
+      "localRect": [
+        12,
+        12,
+        459,
+        34.390625
+      ]
+    },
+    {
+      "id": "m03.notice.icon",
+      "moduleId": "m03",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        380.453125,
+        20,
+        20
+      ],
+      "localRect": [
+        20,
+        19.1875,
+        20,
+        20
+      ]
+    },
+    {
+      "id": "m03.notice.text",
+      "moduleId": "m03",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        379.265625,
+        427,
+        22.390625
+      ],
+      "localRect": [
+        44,
+        18,
+        427,
+        22.390625
+      ]
+    },
+    {
+      "id": "m03",
+      "role": "module",
+      "rect": [
+        0,
+        361.265625,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m04.image1",
+      "moduleId": "m04",
+      "role": "photo",
+      "rect": [
+        0,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0,
+        0.5,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m04.image2",
+      "moduleId": "m04",
+      "role": "photo",
+      "rect": [
+        161.328125,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        161.328125,
+        0.5,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m04.image3",
+      "moduleId": "m04",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        0.5,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m04",
+      "role": "module",
+      "rect": [
+        0,
+        419.65625,
+        483,
+        161.328125
+      ]
+    },
+    {
+      "id": "m05.image1",
+      "moduleId": "m05",
+      "role": "photo",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        362.25
+      ]
+    },
+    {
+      "id": "m05",
+      "role": "module",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ]
+    },
+    {
+      "id": "m06.card1.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        12,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        8,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card1.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        12,
+        155.65625,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card1.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        213.03125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card1.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        209.03125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card1.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1144.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        131.65625,
+        201.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card1.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        951.234375,
+        32,
+        32
+      ],
+      "localRect": [
+        127.65625,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card2.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        8,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card2.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        167.65625,
+        155.65625,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card2.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        167.65625,
+        213.03125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card2.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        173.21875,
+        209.03125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card2.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1144.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        287.3125,
+        201.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card2.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        951.234375,
+        32,
+        32
+      ],
+      "localRect": [
+        283.3125,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card3.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        8,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card3.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        323.3125,
+        155.65625,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card3.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        323.3125,
+        213.03125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card3.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        328.875,
+        209.03125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card3.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1144.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        442.96875,
+        201.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card3.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        951.234375,
+        32,
+        32
+      ],
+      "localRect": [
+        438.96875,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card4.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        12,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        240.421875,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card4.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        12,
+        388.078125,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card4.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        445.453125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card4.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        441.453125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card4.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1377.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        131.65625,
+        433.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card4.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        1183.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        127.65625,
+        240.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card5.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        240.421875,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card5.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        167.65625,
+        388.078125,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card5.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        167.65625,
+        445.453125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card5.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        173.21875,
+        441.453125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card5.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1377.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        287.3125,
+        433.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card5.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        1183.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        283.3125,
+        240.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card6.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        240.421875,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card6.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        323.3125,
+        388.078125,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card6.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        323.3125,
+        445.453125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card6.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        328.875,
+        441.453125,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card6.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1377.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        442.96875,
+        433.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card6.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        1183.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        438.96875,
+        240.421875,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card7.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        12,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        472.84375,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card7.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        12,
+        620.5,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card7.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        677.875,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card7.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        673.875,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card7.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1609.5,
+        32,
+        32
+      ],
+      "localRect": [
+        131.65625,
+        666.265625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card7.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        1416.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        127.65625,
+        472.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card8.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        472.84375,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card8.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        167.65625,
+        620.5,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card8.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        167.65625,
+        677.875,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card8.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        173.21875,
+        673.875,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card8.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1609.5,
+        32,
+        32
+      ],
+      "localRect": [
+        287.3125,
+        666.265625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card8.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        1416.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        283.3125,
+        472.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card9.photo",
+      "moduleId": "m06",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        472.84375,
+        147.65625,
+        147.65625
+      ]
+    },
+    {
+      "id": "m06.card9.title",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "localRect": [
+        323.3125,
+        620.5,
+        147.65625,
+        46.375
+      ]
+    },
+    {
+      "id": "m06.card9.currency",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        323.3125,
+        677.875,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m06.card9.price",
+      "moduleId": "m06",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "localRect": [
+        328.875,
+        673.875,
+        35.046875,
+        16
+      ]
+    },
+    {
+      "id": "m06.card9.cart",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1609.5,
+        32,
+        32
+      ],
+      "localRect": [
+        442.96875,
+        666.265625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06.card9.share",
+      "moduleId": "m06",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        1416.078125,
+        32,
+        32
+      ],
+      "localRect": [
+        438.96875,
+        472.84375,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m06",
+      "role": "module",
+      "rect": [
+        0,
+        943.234375,
+        483,
+        701.265625
+      ]
+    },
+    {
+      "id": "m07.notice.background",
+      "moduleId": "m07",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        1656.5,
+        459,
+        34.390625
+      ],
+      "localRect": [
+        12,
+        12,
+        459,
+        34.390625
+      ]
+    },
+    {
+      "id": "m07.notice.icon",
+      "moduleId": "m07",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        1663.6875,
+        20,
+        20
+      ],
+      "localRect": [
+        20,
+        19.1875,
+        20,
+        20
+      ]
+    },
+    {
+      "id": "m07.notice.text",
+      "moduleId": "m07",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        1662.5,
+        427,
+        22.390625
+      ],
+      "localRect": [
+        44,
+        18,
+        427,
+        22.390625
+      ]
+    },
+    {
+      "id": "m07",
+      "role": "module",
+      "rect": [
+        0,
+        1644.5,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m08.image1",
+      "moduleId": "m08",
+      "role": "photo",
+      "rect": [
+        0,
+        1703.390625,
+        483,
+        483
+      ],
+      "localRect": [
+        0,
+        0.5,
+        483,
+        483
+      ]
+    },
+    {
+      "id": "m08.image2",
+      "moduleId": "m08",
+      "role": "photo",
+      "rect": [
+        0,
+        2187.390625,
+        241,
+        241
+      ],
+      "localRect": [
+        0,
+        484.5,
+        241,
+        241
+      ]
+    },
+    {
+      "id": "m08.image3",
+      "moduleId": "m08",
+      "role": "photo",
+      "rect": [
+        242,
+        2187.390625,
+        241,
+        241
+      ],
+      "localRect": [
+        242,
+        484.5,
+        241,
+        241
+      ]
+    },
+    {
+      "id": "m08",
+      "role": "module",
+      "rect": [
+        0,
+        1702.890625,
+        483,
+        726
+      ]
+    },
+    {
+      "id": "m09.image1",
+      "moduleId": "m09",
+      "role": "photo",
+      "rect": [
+        0,
+        2429.390625,
+        483,
+        483
+      ],
+      "localRect": [
+        0,
+        0.5,
+        483,
+        483
+      ]
+    },
+    {
+      "id": "m09",
+      "role": "module",
+      "rect": [
+        0,
+        2428.890625,
+        483,
+        484
+      ]
+    },
+    {
+      "id": "m10.card1.photo",
+      "moduleId": "m10",
+      "role": "photo",
+      "rect": [
+        12,
+        2920.890625,
+        459,
+        459
+      ],
+      "localRect": [
+        12,
+        8,
+        459,
+        459
+      ]
+    },
+    {
+      "id": "m10.card1.title",
+      "moduleId": "m10",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        3379.890625,
+        459,
+        46.375
+      ],
+      "localRect": [
+        12,
+        467,
+        459,
+        46.375
+      ]
+    },
+    {
+      "id": "m10.card1.currency",
+      "moduleId": "m10",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        3437.265625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        524.375,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m10.card1.price",
+      "moduleId": "m10",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        3433.265625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        520.375,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m10.card1.cart",
+      "moduleId": "m10",
+      "role": "fixed-icon",
+      "rect": [
+        443,
+        3425.65625,
+        32,
+        32
+      ],
+      "localRect": [
+        443,
+        512.765625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m10.card1.share",
+      "moduleId": "m10",
+      "role": "fixed-icon",
+      "rect": [
+        439,
+        2920.890625,
+        32,
+        32
+      ],
+      "localRect": [
+        439,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m10",
+      "role": "module",
+      "rect": [
+        0,
+        2912.890625,
+        483,
+        547.765625
+      ]
+    },
+    {
+      "id": "m11.notice.background",
+      "moduleId": "m11",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        3472.65625,
+        459,
+        34.390625
+      ],
+      "localRect": [
+        12,
+        12,
+        459,
+        34.390625
+      ]
+    },
+    {
+      "id": "m11.notice.icon",
+      "moduleId": "m11",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        3479.84375,
+        20,
+        20
+      ],
+      "localRect": [
+        20,
+        19.1875,
+        20,
+        20
+      ]
+    },
+    {
+      "id": "m11.notice.text",
+      "moduleId": "m11",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        3478.65625,
+        427,
+        22.390625
+      ],
+      "localRect": [
+        44,
+        18,
+        427,
+        22.390625
+      ]
+    },
+    {
+      "id": "m11",
+      "role": "module",
+      "rect": [
+        0,
+        3460.65625,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m12.image1",
+      "moduleId": "m12",
+      "role": "photo",
+      "rect": [
+        0,
+        3519.546875,
+        321.65625,
+        321.65625
+      ],
+      "localRect": [
+        0,
+        0.5,
+        321.65625,
+        321.65625
+      ]
+    },
+    {
+      "id": "m12.image2",
+      "moduleId": "m12",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        3519.546875,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        0.5,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m12.image3",
+      "moduleId": "m12",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        3680.875,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        161.828125,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m12",
+      "role": "module",
+      "rect": [
+        0,
+        3519.046875,
+        483,
+        322.65625
+      ]
+    },
+    {
+      "id": "m13.image1",
+      "moduleId": "m13",
+      "role": "photo",
+      "rect": [
+        161.34375,
+        3842.203125,
+        321.65625,
+        321.65625
+      ],
+      "localRect": [
+        161.34375,
+        0.5,
+        321.65625,
+        321.65625
+      ]
+    },
+    {
+      "id": "m13.image2",
+      "moduleId": "m13",
+      "role": "photo",
+      "rect": [
+        0.015625,
+        3842.203125,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0.015625,
+        0.5,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m13.image3",
+      "moduleId": "m13",
+      "role": "photo",
+      "rect": [
+        0.015625,
+        4003.53125,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0.015625,
+        161.828125,
+        160.328125,
+        160.328125
+      ]
+    },
+    {
+      "id": "m13",
+      "role": "module",
+      "rect": [
+        0,
+        3841.703125,
+        483,
+        322.65625
+      ]
+    },
+    {
+      "id": "m14.image1",
+      "moduleId": "m14",
+      "role": "photo",
+      "rect": [
+        0,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        0,
+        0.5,
+        193.1875,
+        193.1875
+      ]
+    },
+    {
+      "id": "m14.image2",
+      "moduleId": "m14",
+      "role": "photo",
+      "rect": [
+        194.1875,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        194.1875,
+        0.5,
+        193.1875,
+        193.1875
+      ]
+    },
+    {
+      "id": "m14.image3",
+      "moduleId": "m14",
+      "role": "photo",
+      "rect": [
+        388.375,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        388.375,
+        0.5,
+        193.1875,
+        193.1875
+      ]
+    },
+    {
+      "id": "m14.image4",
+      "moduleId": "m14",
+      "role": "photo",
+      "rect": [
+        582.5625,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        582.5625,
+        0.5,
+        193.1875,
+        193.1875
+      ]
+    },
+    {
+      "id": "m14",
+      "role": "module",
+      "rect": [
+        0,
+        4164.359375,
+        483,
+        194.1875
+      ]
+    },
+    {
+      "id": "m15.image1",
+      "moduleId": "m15",
+      "role": "photo",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        160.984375
+      ]
+    },
+    {
+      "id": "m15",
+      "role": "module",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ]
+    },
+    {
+      "id": "m16.card1.photo",
+      "moduleId": "m16",
+      "role": "photo",
+      "rect": [
+        12,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        12,
+        8,
+        114.75,
+        114.75
+      ]
+    },
+    {
+      "id": "m16.card1.title",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "localRect": [
+        12,
+        122.75,
+        114.75,
+        46.375
+      ]
+    },
+    {
+      "id": "m16.card1.currency",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        180.125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m16.card1.price",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        176.125,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m16.card1.cart",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        98.75,
+        4688.046875,
+        32,
+        32
+      ],
+      "localRect": [
+        98.75,
+        168.515625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card1.share",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        94.75,
+        4527.53125,
+        32,
+        32
+      ],
+      "localRect": [
+        94.75,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card2.photo",
+      "moduleId": "m16",
+      "role": "photo",
+      "rect": [
+        134.75,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        134.75,
+        8,
+        114.75,
+        114.75
+      ]
+    },
+    {
+      "id": "m16.card2.title",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        134.75,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "localRect": [
+        134.75,
+        122.75,
+        114.75,
+        46.375
+      ]
+    },
+    {
+      "id": "m16.card2.currency",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        134.75,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        134.75,
+        180.125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m16.card2.price",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        140.3125,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        140.3125,
+        176.125,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m16.card2.cart",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        221.5,
+        4688.046875,
+        32,
+        32
+      ],
+      "localRect": [
+        221.5,
+        168.515625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card2.share",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        217.5,
+        4527.53125,
+        32,
+        32
+      ],
+      "localRect": [
+        217.5,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card3.photo",
+      "moduleId": "m16",
+      "role": "photo",
+      "rect": [
+        257.5,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        257.5,
+        8,
+        114.75,
+        114.75
+      ]
+    },
+    {
+      "id": "m16.card3.title",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        257.5,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "localRect": [
+        257.5,
+        122.75,
+        114.75,
+        46.375
+      ]
+    },
+    {
+      "id": "m16.card3.currency",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        257.5,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        257.5,
+        180.125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m16.card3.price",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        263.0625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        263.0625,
+        176.125,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m16.card3.cart",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        344.25,
+        4688.046875,
+        32,
+        32
+      ],
+      "localRect": [
+        344.25,
+        168.515625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card3.share",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        340.25,
+        4527.53125,
+        32,
+        32
+      ],
+      "localRect": [
+        340.25,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card4.photo",
+      "moduleId": "m16",
+      "role": "photo",
+      "rect": [
+        380.25,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        380.25,
+        8,
+        114.75,
+        114.75
+      ]
+    },
+    {
+      "id": "m16.card4.title",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        380.25,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "localRect": [
+        380.25,
+        122.75,
+        114.75,
+        46.375
+      ]
+    },
+    {
+      "id": "m16.card4.currency",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        380.25,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        380.25,
+        180.125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m16.card4.price",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        385.8125,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        385.8125,
+        176.125,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m16.card4.cart",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        467,
+        4688.046875,
+        32,
+        32
+      ],
+      "localRect": [
+        467,
+        168.515625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card4.share",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        463,
+        4527.53125,
+        32,
+        32
+      ],
+      "localRect": [
+        463,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card5.photo",
+      "moduleId": "m16",
+      "role": "photo",
+      "rect": [
+        503,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        503,
+        8,
+        114.75,
+        114.75
+      ]
+    },
+    {
+      "id": "m16.card5.title",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        503,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "localRect": [
+        503,
+        122.75,
+        114.75,
+        46.375
+      ]
+    },
+    {
+      "id": "m16.card5.currency",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        503,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        503,
+        180.125,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m16.card5.price",
+      "moduleId": "m16",
+      "role": "fixed-text",
+      "rect": [
+        508.5625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "localRect": [
+        508.5625,
+        176.125,
+        42.828125,
+        16
+      ]
+    },
+    {
+      "id": "m16.card5.cart",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        589.75,
+        4688.046875,
+        32,
+        32
+      ],
+      "localRect": [
+        589.75,
+        168.515625,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16.card5.share",
+      "moduleId": "m16",
+      "role": "fixed-icon",
+      "rect": [
+        585.75,
+        4527.53125,
+        32,
+        32
+      ],
+      "localRect": [
+        585.75,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m16",
+      "role": "module",
+      "rect": [
+        0,
+        4519.53125,
+        483,
+        204.515625
+      ]
+    },
+    {
+      "id": "m17.notice.background",
+      "moduleId": "m17",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        4736.046875,
+        459,
+        34.390625
+      ],
+      "localRect": [
+        12,
+        12,
+        459,
+        34.390625
+      ]
+    },
+    {
+      "id": "m17.notice.icon",
+      "moduleId": "m17",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        4743.234375,
+        20,
+        20
+      ],
+      "localRect": [
+        20,
+        19.1875,
+        20,
+        20
+      ]
+    },
+    {
+      "id": "m17.notice.text",
+      "moduleId": "m17",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        4742.046875,
+        427,
+        22.390625
+      ],
+      "localRect": [
+        44,
+        18,
+        427,
+        22.390625
+      ]
+    },
+    {
+      "id": "m17",
+      "role": "module",
+      "rect": [
+        0,
+        4724.046875,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m18.image1",
+      "moduleId": "m18",
+      "role": "photo",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        643.984375
+      ]
+    },
+    {
+      "id": "m18",
+      "role": "module",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ]
+    },
+    {
+      "id": "m19.image1",
+      "moduleId": "m19",
+      "role": "photo",
+      "rect": [
+        0,
+        5426.921875,
+        241,
+        241
+      ],
+      "localRect": [
+        0,
+        0.5,
+        241,
+        241
+      ]
+    },
+    {
+      "id": "m19.image2",
+      "moduleId": "m19",
+      "role": "photo",
+      "rect": [
+        242,
+        5426.921875,
+        241,
+        241
+      ],
+      "localRect": [
+        242,
+        0.5,
+        241,
+        241
+      ]
+    },
+    {
+      "id": "m19",
+      "role": "module",
+      "rect": [
+        0,
+        5426.421875,
+        483,
+        242
+      ]
+    },
+    {
+      "id": "m20.card1.photo",
+      "moduleId": "m20",
+      "role": "photo",
+      "rect": [
+        12,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "localRect": [
+        12,
+        8,
+        225.5,
+        225.5
+      ]
+    },
+    {
+      "id": "m20.card1.title",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        5901.921875,
+        225.5,
+        27.1875
+      ],
+      "localRect": [
+        12,
+        233.5,
+        225.5,
+        27.1875
+      ]
+    },
+    {
+      "id": "m20.card1.currency",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        5940.109375,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        12,
+        271.6875,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m20.card1.price",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        5936.109375,
+        27.25,
+        16
+      ],
+      "localRect": [
+        17.5625,
+        267.6875,
+        27.25,
+        16
+      ]
+    },
+    {
+      "id": "m20.card1.cart",
+      "moduleId": "m20",
+      "role": "fixed-icon",
+      "rect": [
+        209.5,
+        5928.5,
+        32,
+        32
+      ],
+      "localRect": [
+        209.5,
+        260.078125,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m20.card1.share",
+      "moduleId": "m20",
+      "role": "fixed-icon",
+      "rect": [
+        205.5,
+        5676.421875,
+        32,
+        32
+      ],
+      "localRect": [
+        205.5,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m20.card2.photo",
+      "moduleId": "m20",
+      "role": "photo",
+      "rect": [
+        245.5,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "localRect": [
+        245.5,
+        8,
+        225.5,
+        225.5
+      ]
+    },
+    {
+      "id": "m20.card2.title",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        245.5,
+        5901.921875,
+        225.5,
+        27.1875
+      ],
+      "localRect": [
+        245.5,
+        233.5,
+        225.5,
+        27.1875
+      ]
+    },
+    {
+      "id": "m20.card2.currency",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        245.5,
+        5940.109375,
+        5.5625,
+        11
+      ],
+      "localRect": [
+        245.5,
+        271.6875,
+        5.5625,
+        11
+      ]
+    },
+    {
+      "id": "m20.card2.price",
+      "moduleId": "m20",
+      "role": "fixed-text",
+      "rect": [
+        251.0625,
+        5936.109375,
+        27.25,
+        16
+      ],
+      "localRect": [
+        251.0625,
+        267.6875,
+        27.25,
+        16
+      ]
+    },
+    {
+      "id": "m20.card2.cart",
+      "moduleId": "m20",
+      "role": "fixed-icon",
+      "rect": [
+        443,
+        5928.5,
+        32,
+        32
+      ],
+      "localRect": [
+        443,
+        260.078125,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m20.card2.share",
+      "moduleId": "m20",
+      "role": "fixed-icon",
+      "rect": [
+        439,
+        5676.421875,
+        32,
+        32
+      ],
+      "localRect": [
+        439,
+        8,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "m20",
+      "role": "module",
+      "rect": [
+        0,
+        5668.421875,
+        483,
+        295.078125
+      ]
+    },
+    {
+      "id": "m21.notice.background",
+      "moduleId": "m21",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        5975.5,
+        459,
+        123.953125
+      ],
+      "localRect": [
+        12,
+        12,
+        459,
+        123.953125
+      ]
+    },
+    {
+      "id": "m21.notice.text",
+      "moduleId": "m21",
+      "role": "fixed-text",
+      "rect": [
+        24,
+        5981.5,
+        435,
+        111.953125
+      ],
+      "localRect": [
+        24,
+        18,
+        435,
+        111.953125
+      ]
+    },
+    {
+      "id": "m21",
+      "role": "module",
+      "rect": [
+        0,
+        5963.5,
+        483,
+        147.953125
+      ]
+    },
+    {
+      "id": "m22.link.text",
+      "moduleId": "m22",
+      "role": "fixed-text",
+      "rect": [
+        18,
+        6129.453125,
+        224,
+        22.390625
+      ],
+      "localRect": [
+        18,
+        18,
+        224,
+        22.390625
+      ]
+    },
+    {
+      "id": "m22",
+      "role": "module",
+      "rect": [
+        0,
+        6111.453125,
+        483,
+        58.390625
+      ]
+    }
+  ],
+  "photos": [
+    {
+      "id": "m01.banner.photo",
+      "moduleId": "m01",
+      "assetId": "signboard",
+      "file": "assets/signboard.png",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m02.image1",
+      "moduleId": "m02",
+      "assetId": "nav-sweater",
+      "file": "assets/nav-sweater.png",
+      "rect": [
+        30.734375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        30.734375,
+        16,
+        71.265625,
+        71.265625
+      ],
+      "shape": "circle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m02.image2",
+      "moduleId": "m02",
+      "assetId": "nav-shoes",
+      "file": "assets/nav-shoes.png",
+      "rect": [
+        147.484375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        147.484375,
+        16,
+        71.265625,
+        71.265625
+      ],
+      "shape": "circle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m02.image3",
+      "moduleId": "m02",
+      "assetId": "nav-bag",
+      "file": "assets/nav-bag.png",
+      "rect": [
+        264.234375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        264.234375,
+        16,
+        71.265625,
+        71.265625
+      ],
+      "shape": "circle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m02.image4",
+      "moduleId": "m02",
+      "assetId": "nav-top",
+      "file": "assets/nav-top.png",
+      "rect": [
+        380.984375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "localRect": [
+        380.984375,
+        16,
+        71.265625,
+        71.265625
+      ],
+      "shape": "circle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m04.image1",
+      "moduleId": "m04",
+      "assetId": "sweater-detail",
+      "file": "assets/sweater-detail.png",
+      "rect": [
+        0,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0,
+        0.5,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m04.image2",
+      "moduleId": "m04",
+      "assetId": "blue-shoes",
+      "file": "assets/blue-shoes.png",
+      "rect": [
+        161.328125,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        161.328125,
+        0.5,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m04.image3",
+      "moduleId": "m04",
+      "assetId": "bag-detail",
+      "file": "assets/bag-detail.png",
+      "rect": [
+        322.65625,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        0.5,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m05.image1",
+      "moduleId": "m05",
+      "assetId": "casual-outfit",
+      "file": "assets/casual-outfit.png",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        362.25
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card1.photo",
+      "moduleId": "m06",
+      "assetId": "sweater-detail",
+      "file": "assets/sweater-detail.png",
+      "rect": [
+        12,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        8,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card2.photo",
+      "moduleId": "m06",
+      "assetId": "blue-shoes",
+      "file": "assets/blue-shoes.png",
+      "rect": [
+        167.65625,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        8,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card3.photo",
+      "moduleId": "m06",
+      "assetId": "knit-detail",
+      "file": "assets/knit-detail.png",
+      "rect": [
+        323.3125,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        8,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card4.photo",
+      "moduleId": "m06",
+      "assetId": "tote",
+      "file": "assets/tote.png",
+      "rect": [
+        12,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        240.421875,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card5.photo",
+      "moduleId": "m06",
+      "assetId": "coat",
+      "file": "assets/coat.png",
+      "rect": [
+        167.65625,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        240.421875,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card6.photo",
+      "moduleId": "m06",
+      "assetId": "trousers",
+      "file": "assets/trousers.png",
+      "rect": [
+        323.3125,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        240.421875,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card7.photo",
+      "moduleId": "m06",
+      "assetId": "pale-shoes",
+      "file": "assets/pale-shoes.png",
+      "rect": [
+        12,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        12,
+        472.84375,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card8.photo",
+      "moduleId": "m06",
+      "assetId": "belt",
+      "file": "assets/belt.png",
+      "rect": [
+        167.65625,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        167.65625,
+        472.84375,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m06.card9.photo",
+      "moduleId": "m06",
+      "assetId": "knit-outfit",
+      "file": "assets/knit-outfit.png",
+      "rect": [
+        323.3125,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "localRect": [
+        323.3125,
+        472.84375,
+        147.65625,
+        147.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m08.image1",
+      "moduleId": "m08",
+      "assetId": "knit-outfit",
+      "file": "assets/knit-outfit.png",
+      "rect": [
+        0,
+        1703.390625,
+        483,
+        483
+      ],
+      "localRect": [
+        0,
+        0.5,
+        483,
+        483
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m08.image2",
+      "moduleId": "m08",
+      "assetId": "knit-detail",
+      "file": "assets/knit-detail.png",
+      "rect": [
+        0,
+        2187.390625,
+        241,
+        241
+      ],
+      "localRect": [
+        0,
+        484.5,
+        241,
+        241
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m08.image3",
+      "moduleId": "m08",
+      "assetId": "white-shoes",
+      "file": "assets/white-shoes.png",
+      "rect": [
+        242,
+        2187.390625,
+        241,
+        241
+      ],
+      "localRect": [
+        242,
+        484.5,
+        241,
+        241
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m09.image1",
+      "moduleId": "m09",
+      "assetId": "casual-outfit",
+      "file": "assets/casual-outfit.png",
+      "rect": [
+        0,
+        2429.390625,
+        483,
+        483
+      ],
+      "localRect": [
+        0,
+        0.5,
+        483,
+        483
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m10.card1.photo",
+      "moduleId": "m10",
+      "assetId": "tote",
+      "file": "assets/tote.png",
+      "rect": [
+        12,
+        2920.890625,
+        459,
+        459
+      ],
+      "localRect": [
+        12,
+        8,
+        459,
+        459
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m12.image1",
+      "moduleId": "m12",
+      "assetId": "tote",
+      "file": "assets/tote.png",
+      "rect": [
+        0,
+        3519.546875,
+        321.65625,
+        321.65625
+      ],
+      "localRect": [
+        0,
+        0.5,
+        321.65625,
+        321.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m12.image2",
+      "moduleId": "m12",
+      "assetId": "pale-shoes",
+      "file": "assets/pale-shoes.png",
+      "rect": [
+        322.65625,
+        3519.546875,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        0.5,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m12.image3",
+      "moduleId": "m12",
+      "assetId": "belt",
+      "file": "assets/belt.png",
+      "rect": [
+        322.65625,
+        3680.875,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        322.65625,
+        161.828125,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m13.image1",
+      "moduleId": "m13",
+      "assetId": "coat",
+      "file": "assets/coat.png",
+      "rect": [
+        161.34375,
+        3842.203125,
+        321.65625,
+        321.65625
+      ],
+      "localRect": [
+        161.34375,
+        0.5,
+        321.65625,
+        321.65625
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m13.image2",
+      "moduleId": "m13",
+      "assetId": "coat-detail",
+      "file": "assets/coat-detail.png",
+      "rect": [
+        0.015625,
+        3842.203125,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0.015625,
+        0.5,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m13.image3",
+      "moduleId": "m13",
+      "assetId": "trouser-detail",
+      "file": "assets/trouser-detail.png",
+      "rect": [
+        0.015625,
+        4003.53125,
+        160.328125,
+        160.328125
+      ],
+      "localRect": [
+        0.015625,
+        161.828125,
+        160.328125,
+        160.328125
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m14.image1",
+      "moduleId": "m14",
+      "assetId": "blue-shoes",
+      "file": "assets/blue-shoes.png",
+      "rect": [
+        0,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        0,
+        0.5,
+        193.1875,
+        193.1875
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m14.image2",
+      "moduleId": "m14",
+      "assetId": "tote",
+      "file": "assets/tote.png",
+      "rect": [
+        194.1875,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        194.1875,
+        0.5,
+        193.1875,
+        193.1875
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m14.image3",
+      "moduleId": "m14",
+      "assetId": "knit-detail",
+      "file": "assets/knit-detail.png",
+      "rect": [
+        388.375,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        388.375,
+        0.5,
+        193.1875,
+        193.1875
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m14.image4",
+      "moduleId": "m14",
+      "assetId": "coat-detail",
+      "file": "assets/coat-detail.png",
+      "rect": [
+        582.5625,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "localRect": [
+        582.5625,
+        0.5,
+        193.1875,
+        193.1875
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": false
+    },
+    {
+      "id": "m15.image1",
+      "moduleId": "m15",
+      "assetId": "signboard",
+      "file": "assets/signboard.png",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        160.984375
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m16.card1.photo",
+      "moduleId": "m16",
+      "assetId": "pale-shoes",
+      "file": "assets/pale-shoes.png",
+      "rect": [
+        12,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        12,
+        8,
+        114.75,
+        114.75
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m16.card2.photo",
+      "moduleId": "m16",
+      "assetId": "tote",
+      "file": "assets/tote.png",
+      "rect": [
+        134.75,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        134.75,
+        8,
+        114.75,
+        114.75
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m16.card3.photo",
+      "moduleId": "m16",
+      "assetId": "coat",
+      "file": "assets/coat.png",
+      "rect": [
+        257.5,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        257.5,
+        8,
+        114.75,
+        114.75
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m16.card4.photo",
+      "moduleId": "m16",
+      "assetId": "trousers",
+      "file": "assets/trousers.png",
+      "rect": [
+        380.25,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        380.25,
+        8,
+        114.75,
+        114.75
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m16.card5.photo",
+      "moduleId": "m16",
+      "assetId": "belt",
+      "file": "assets/belt.png",
+      "rect": [
+        503,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "localRect": [
+        503,
+        8,
+        114.75,
+        114.75
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": false
+    },
+    {
+      "id": "m18.image1",
+      "moduleId": "m18",
+      "assetId": "coat-outfit",
+      "file": "assets/coat-outfit.png",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ],
+      "localRect": [
+        0,
+        0,
+        483,
+        643.984375
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m19.image1",
+      "moduleId": "m19",
+      "assetId": "coat-detail",
+      "file": "assets/coat-detail.png",
+      "rect": [
+        0,
+        5426.921875,
+        241,
+        241
+      ],
+      "localRect": [
+        0,
+        0.5,
+        241,
+        241
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m19.image2",
+      "moduleId": "m19",
+      "assetId": "trouser-detail",
+      "file": "assets/trouser-detail.png",
+      "rect": [
+        242,
+        5426.921875,
+        241,
+        241
+      ],
+      "localRect": [
+        242,
+        0.5,
+        241,
+        241
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m20.card1.photo",
+      "moduleId": "m20",
+      "assetId": "coat",
+      "file": "assets/coat.png",
+      "rect": [
+        12,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "localRect": [
+        12,
+        8,
+        225.5,
+        225.5
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    },
+    {
+      "id": "m20.card2.photo",
+      "moduleId": "m20",
+      "assetId": "trousers",
+      "file": "assets/trousers.png",
+      "rect": [
+        245.5,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "localRect": [
+        245.5,
+        8,
+        225.5,
+        225.5
+      ],
+      "shape": "rectangle",
+      "visibleInScreenshot": true
+    }
+  ],
+  "registrySha256": "c4883e2919c8afcf276cb72efd6302f5712887d0bd62b833e81a411c5a80f0be",
+  "htmlSha256": "97d9f65f152c4a838d76d75d0a0d7dcc9a5ea15155399956d70d18d69dca7efb",
+  "newGenerationCalls": 0,
+  "limitations": [
+    "This is an experiment built from captured UI data, not a verified pixel-identical live-store screenshot",
+    "Carousel and horizontal-slide formats show their first visible state without carousel dots",
+    "Single-column poster is configured with one captured image cell; other module root heights come from the registry",
+    "Share glyph is a frozen approximation; multiline notice expansion control is omitted for this fully visible five-line fixture",
+    "Titles/prices/layout order are sample content; original shop name and historical counts are preserved",
+    "Some photographs repeat and A6 product-image side padding is preserved"
+  ]
+}

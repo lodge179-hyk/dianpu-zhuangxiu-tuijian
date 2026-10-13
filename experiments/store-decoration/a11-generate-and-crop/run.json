@@ -1,0 +1,47 @@
+{
+  "scope": "Generate one six-panel source sheet and crop independent photographs only",
+  "maxGenerationCalls": 1,
+  "actualGenerationCalls": 1,
+  "status": "generation-and-cropping-complete",
+  "expectedPanels": 6,
+  "expectedAspectRatios": [
+    "3:1",
+    "1:1",
+    "1:1",
+    "1:1",
+    "3:4",
+    "3:4"
+  ],
+  "subjects": "Example clothing, footwear and bags; no claim of reproducing real customer products",
+  "excluded": [
+    "Style approval",
+    "HTML module integration",
+    "Download feature",
+    "Business app code changes"
+  ],
+  "method": "One built-in image generation call, then deterministic local boundary detection and cropping",
+  "successCriteria": [
+    "Six independent photos; partial product framing is acceptable per user clarification",
+    "No adjacent-panel fragments or visible separator strips",
+    "Record actual dimensions and ratio errors without hidden stretching"
+  ],
+  "promptFile": "prompt.txt",
+  "sourceDimensions": [
+    1086,
+    1448
+  ],
+  "tool": "built-in image_gen.imagegen",
+  "modelId": null,
+  "cost": null,
+  "generationSeconds": 40.4,
+  "originalSource": "C:/Users/Administrator/.codex/generated_images/01a0a28a-4429-76f0-b3b4-32effdfcbca9/exec-721eacc7-2838-4537-a51a-718e2436b745.png",
+  "croppedAssets": 6,
+  "visuallyCompleteSubjects": 5,
+  "sourceFramingIssues": 0,
+  "report": "crop-report.json",
+  "preview": "裁剪结果总览.png",
+  "htmlIntegrated": false,
+  "downloadFeatureImplemented": false,
+  "styleApproved": false,
+  "acceptedPartialCompositions": 1
+}

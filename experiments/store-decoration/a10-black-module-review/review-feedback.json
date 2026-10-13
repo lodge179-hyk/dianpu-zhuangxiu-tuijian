@@ -1,0 +1,17 @@
+{
+  "source": "User feedback in this conversation on 2026-10-13",
+  "userComment": "每行五个应该展示一行；单列海报应该是一张；其他的看了没问题。",
+  "acceptedUnchangedStyles": 21,
+  "correctedStyles": [
+    {"type":"navigation.five","rule":"One row, five image slots with their labels","status":"Updated; awaiting user inspection of the correction"},
+    {"type":"poster.single","rule":"One poster image per module","status":"Updated; awaiting user inspection of the correction"}
+  ],
+  "signboardBackgroundRule": {
+    "source": "User clarification: 极简招牌是不能自定义背景图的，其他的招牌都可以。",
+    "signboard.minimal": "Fixed background; custom background image rejected; avatar remains replaceable",
+    "signboard.default": "Custom background image supported",
+    "signboard.classic": "Custom background image supported",
+    "signboard.fullscreen": "Custom background image supported"
+  },
+  "scope": "Static black-placeholder appearance. No claim of live interaction or all content states being accepted."
+}

@@ -1,0 +1,420 @@
+{
+  "sourceDate": "2026-09-15",
+  "warning": "Editor illustration rectangles are not storefront display geometry. Only displayLabel supplies historical upload recommendations. Video and full product list entries are excluded from this handoff.",
+  "formats": [
+    {
+      "format": "公告和文本-单行",
+      "pageTitle": "公告和文本",
+      "displayLabel": "单行",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=text&templateId=undefined&index=0&action=new",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/text/img_text_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 79.078125,
+        "width": 280,
+        "height": 41.8125
+      },
+      "evidence": {
+        "json": "formats/公告和文本-单行.json",
+        "screenshot": "formats/公告和文本-单行.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "公告和文本-多行",
+      "pageTitle": "公告和文本",
+      "displayLabel": "多行",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=text&templateId=undefined&index=0&action=new",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/text/img_text_2.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 71.625,
+        "width": 280,
+        "height": 56.734375
+      },
+      "evidence": {
+        "json": "formats/公告和文本-多行.json",
+        "screenshot": "formats/公告和文本-多行.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "公告和文本-文字链接",
+      "pageTitle": "公告和文本",
+      "displayLabel": "文字链接",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=text&templateId=undefined&index=0&action=new",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/text/img_text_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 79.078125,
+        "width": 280,
+        "height": 41.8125
+      },
+      "evidence": {
+        "json": "formats/公告和文本-文字链接.json",
+        "screenshot": "formats/公告和文本-文字链接.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "商品橱窗-三列",
+      "pageTitle": "商品橱窗",
+      "displayLabel": "三列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=commodity&templateId=3&index=5&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/commodity/img_goods_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 72.71875,
+        "width": 280,
+        "height": 154.546875
+      },
+      "evidence": {
+        "json": "formats/商品橱窗-三列.json",
+        "screenshot": "formats/商品橱窗-三列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "商品橱窗-单列",
+      "pageTitle": "商品橱窗",
+      "displayLabel": "单列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=commodity&templateId=3&index=5&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/commodity/img_goods_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 24,
+        "width": 280,
+        "height": 251.984375
+      },
+      "evidence": {
+        "json": "formats/商品橱窗-单列.json",
+        "screenshot": "formats/商品橱窗-单列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "商品橱窗-双列",
+      "pageTitle": "商品橱窗",
+      "displayLabel": "双列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=commodity&templateId=3&index=5&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/commodity/img_goods_2.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 50.3125,
+        "width": 280,
+        "height": 199.359375
+      },
+      "evidence": {
+        "json": "formats/商品橱窗-双列.json",
+        "screenshot": "formats/商品橱窗-双列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "商品橱窗-滑动",
+      "pageTitle": "商品橱窗",
+      "displayLabel": "滑动（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=commodity&templateId=3&index=5&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/commodity/img_goods_4.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 76.8125,
+        "width": 280,
+        "height": 146.34375
+      },
+      "evidence": {
+        "json": "formats/商品橱窗-滑动.json",
+        "screenshot": "formats/商品橱窗-滑动.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "导航-每行4个",
+      "pageTitle": "导航",
+      "displayLabel": "每行4个（建议尺寸168x168）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=navigate&templateId=1&index=1&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/nav/img_nav_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 59.3125,
+        "width": 280,
+        "height": 81.375
+      },
+      "evidence": {
+        "json": "formats/导航-每行4个.json",
+        "screenshot": "formats/导航-每行4个.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "导航-每行5个",
+      "pageTitle": "导航",
+      "displayLabel": "每行5个（建议尺寸168x168）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=navigate&templateId=1&index=1&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/nav/img_nav_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 59.3125,
+        "width": 280,
+        "height": 81.375
+      },
+      "evidence": {
+        "json": "formats/导航-每行5个.json",
+        "screenshot": "formats/导航-每行5个.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "招牌-全屏轮播",
+      "pageTitle": "店铺招牌",
+      "displayLabel": "全屏轮播（建议尺寸1080x2340）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=information&templateId=1&index=0&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/info/img_info_4.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 24,
+        "width": 280,
+        "height": 252
+      },
+      "evidence": {
+        "json": "formats/招牌-全屏轮播.json",
+        "screenshot": "formats/招牌-全屏轮播.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "招牌-极简",
+      "pageTitle": "店铺招牌",
+      "displayLabel": "极简",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=information&templateId=1&index=0&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/info/img_info_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 82.796875,
+        "width": 280,
+        "height": 134.390625
+      },
+      "evidence": {
+        "json": "formats/招牌-极简.json",
+        "screenshot": "formats/招牌-极简.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "招牌-经典",
+      "pageTitle": "店铺招牌",
+      "displayLabel": "经典（建议尺寸1080x576）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=information&templateId=1&index=0&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/info/img_info_2.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 66.375,
+        "width": 280,
+        "height": 167.25
+      },
+      "evidence": {
+        "json": "formats/招牌-经典.json",
+        "screenshot": "formats/招牌-经典.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "招牌-默认",
+      "pageTitle": "店铺招牌",
+      "displayLabel": "默认（建议尺寸1080x720）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=information&templateId=1&index=0&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/info/img_info_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 50.6875,
+        "width": 280,
+        "height": 198.609375
+      },
+      "evidence": {
+        "json": "formats/招牌-默认.json",
+        "screenshot": "formats/招牌-默认.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-三列",
+      "pageTitle": "海报",
+      "displayLabel": "三列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 99.59375,
+        "width": 280,
+        "height": 100.796875
+      },
+      "evidence": {
+        "json": "formats/海报-三列.json",
+        "screenshot": "formats/海报-三列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-三图组合1",
+      "pageTitle": "海报",
+      "displayLabel": "三图组合1（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_5.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 54.796875,
+        "width": 280,
+        "height": 190.390625
+      },
+      "evidence": {
+        "json": "formats/海报-三图组合1.json",
+        "screenshot": "formats/海报-三图组合1.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-三图组合2",
+      "pageTitle": "海报",
+      "displayLabel": "三图组合2（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_6.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 54.796875,
+        "width": 280,
+        "height": 190.390625
+      },
+      "evidence": {
+        "json": "formats/海报-三图组合2.json",
+        "screenshot": "formats/海报-三图组合2.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-三图组合3",
+      "pageTitle": "海报",
+      "displayLabel": "三图组合3（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_7.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 24,
+        "width": 280,
+        "height": 251.984375
+      },
+      "evidence": {
+        "json": "formats/海报-三图组合3.json",
+        "screenshot": "formats/海报-三图组合3.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-单列",
+      "pageTitle": "海报",
+      "displayLabel": "单列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 24,
+        "width": 280,
+        "height": 252
+      },
+      "evidence": {
+        "json": "formats/海报-单列.json",
+        "screenshot": "formats/海报-单列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-双列",
+      "pageTitle": "海报",
+      "displayLabel": "双列（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_2.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 77.203125,
+        "width": 280,
+        "height": 145.59375
+      },
+      "evidence": {
+        "json": "formats/海报-双列.json",
+        "screenshot": "formats/海报-双列.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "海报-多图滑动",
+      "pageTitle": "海报",
+      "displayLabel": "多图滑动（建议尺寸1080x1080）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=image&templateId=3&index=3&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/poster/img_poster_4.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 82.796875,
+        "width": 280,
+        "height": 134.390625
+      },
+      "evidence": {
+        "json": "formats/海报-多图滑动.json",
+        "screenshot": "formats/海报-多图滑动.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "轮播图-中图",
+      "pageTitle": "轮播图",
+      "displayLabel": "中图（建议尺寸1080x810）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=slide&templateId=3&index=4&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/slide/img_slide_3.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 42.46875,
+        "width": 280,
+        "height": 215.03125
+      },
+      "evidence": {
+        "json": "formats/轮播图-中图.json",
+        "screenshot": "formats/轮播图-中图.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "轮播图-大图",
+      "pageTitle": "轮播图",
+      "displayLabel": "大图（建议尺寸1080x1440）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=slide&templateId=3&index=4&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/slide/img_slide_2.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 24,
+        "width": 280,
+        "height": 251.984375
+      },
+      "evidence": {
+        "json": "formats/轮播图-大图.json",
+        "screenshot": "formats/轮播图-大图.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    },
+    {
+      "format": "轮播图-小图",
+      "pageTitle": "轮播图",
+      "displayLabel": "小图（建议尺寸1080x360）",
+      "sourceUrl": "https://www.szwego.com/static/index.html?t=1789434066550#/album/decorate/decorate_template_edit?componentId=slide&templateId=3&index=4&action=edit",
+      "illustrationUrl": "https://xcimg.szwego.com/decoration/slide/img_slide_1.png",
+      "illustrationRect": {
+        "x": 324.5,
+        "y": 96.984375,
+        "width": 280,
+        "height": 106.015625
+      },
+      "evidence": {
+        "json": "formats/轮播图-小图.json",
+        "screenshot": "formats/轮播图-小图.png"
+      },
+      "note": "矩形是PC编辑页示意图尺寸，不是店铺前台模块尺寸。"
+    }
+  ]
+}

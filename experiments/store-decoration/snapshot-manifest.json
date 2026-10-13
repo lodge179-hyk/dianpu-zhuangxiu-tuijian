@@ -1,0 +1,257 @@
+{
+  "version": "0.2.0-preview.1",
+  "date": "2026-10-13",
+  "source": "output/ui-image-generation-20261013",
+  "sourceFilesUnmodified": true,
+  "files": [
+    {
+      "file": "a9-component-library/lib/core.cjs",
+      "sha256": "4e89e6c519cadd7c5e883a6a6789caed28a36ade723e1953e7bf86fec3163a3f"
+    },
+    {
+      "file": "a9-component-library/lib/icons.json",
+      "sha256": "1f5518543c84985b68f87f944f11a52119d9a5d68dfd57247a8e5b93d4316dd6"
+    },
+    {
+      "file": "a9-component-library/lib/index.cjs",
+      "sha256": "4ddab217c9f454e540bcc491139a25e34d783f93d11c652cc81db88e225207de"
+    },
+    {
+      "file": "a9-component-library/lib/layout.css",
+      "sha256": "ccb18c9f4ebfad9ff4ebe42e20d171c8bc3c7d1c13b5aa3767b337ec302b0711"
+    },
+    {
+      "file": "a9-component-library/lib/modules/media.cjs",
+      "sha256": "8f7263368a5cf9f8cdc09621ed5b78a602e8632e0d9fb9ead8ac3595c3b1d180"
+    },
+    {
+      "file": "a9-component-library/lib/modules/showcase.cjs",
+      "sha256": "218f657f4d498db9446e8a23a91276564fbc7f29edd7f340523db27c6b01fd6b"
+    },
+    {
+      "file": "a9-component-library/lib/modules/signboard.cjs",
+      "sha256": "b97dbdbff4da307c8b533e347ed3df52f340845eb1c34bfa41ead118b04aa786"
+    },
+    {
+      "file": "a9-component-library/lib/modules/text.cjs",
+      "sha256": "f64f44f91a0ec9aa32dfa013d433cf85a9338ed3d0f750e34123fd4b7f422da2"
+    },
+    {
+      "file": "a9-component-library/lib/styles.snapshot.json",
+      "sha256": "2ed5d2cbc56deab908cb588010c3153c70809abf979b60e73f2c1d374d0f3845"
+    },
+    {
+      "file": "a9-component-library/provenance.json",
+      "sha256": "f227e0039d7c5237ddcd150d6f13c38c0e7ea4ac4f131316d6ef33ae8d0c312b"
+    },
+    {
+      "file": "a9-component-library/verification.json",
+      "sha256": "95b80ab4be24816c0168407ca03e1240cf692d4aebbd3b60b397716f67f6f184"
+    },
+    {
+      "file": "a9-component-library/additional-variants-check.json",
+      "sha256": "9f19f485e60da4d07e75a4afe565ae56e5a3c385a95850ce7da8f5206ca48c53"
+    },
+    {
+      "file": "a9-component-library/使用说明.txt",
+      "sha256": "fcc153ffa0745fc99c49b00458001248a16dfc559154891f2a58924a9e1177fb"
+    },
+    {
+      "file": "a9-component-library/example/page.json",
+      "sha256": "ea2c0a21611b85556c4c80a16c1d4023cf6489d5c68d222af54c3a0428aef658"
+    },
+    {
+      "file": "a9-component-library/example/assets/ui-0.jpg",
+      "sha256": "2295eec81213c1dbac7b02d80b8b05a732eb078577df1851019a739f58fff18d"
+    },
+    {
+      "file": "a8-long-html-store/layout-manifest.json",
+      "sha256": "758582fb3a97ec3bfb23e238de7ece5fbf0b7163581ce86f4a9ac4b33debedfe"
+    },
+    {
+      "file": "a10-black-module-review/page-data.json",
+      "sha256": "fa91c97b8199d4ddbe327105e41a9b0deb5b897edb31e7c53b43dc5b6d24d34b"
+    },
+    {
+      "file": "a10-black-module-review/black.png",
+      "sha256": "fd8c679d04c2f33eae265e221eb5d359677c1bd31213e11f68c4d70afb906620"
+    },
+    {
+      "file": "a10-black-module-review/review-feedback.json",
+      "sha256": "6f7b8f082c71f76394bd3ae9e97a24899264d5fb98b924a811cfd902c2887db5"
+    },
+    {
+      "file": "a11-generate-and-crop/source-sheet.png",
+      "sha256": "6be10a3e5ac71c3f12624dafe05235648b148216d964bcf5378e4a7afb8b938b"
+    },
+    {
+      "file": "a11-generate-and-crop/prompt.txt",
+      "sha256": "0c2998b14ab4a66a4d7e8730be8ee9bd680ed155148ece8864ac399a2c8509ec"
+    },
+    {
+      "file": "a11-generate-and-crop/crop.cjs",
+      "sha256": "bf90b58991e0f2773d968da8e87b5e45a90211c99c8b9260c33694646f32ad13"
+    },
+    {
+      "file": "a11-generate-and-crop/crop-report.json",
+      "sha256": "0b0bc33525f9cbb8841b424327db04449c0d5ed1c41215d86e7ff59b2042a505"
+    },
+    {
+      "file": "a11-generate-and-crop/run.json",
+      "sha256": "9650a9581c7adfa2d986ddeb76250153343178de7b5731a6bde2e4cb8295efc5"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/01-banner.png",
+      "sha256": "3f0ad0d37d91b140741b6c27731e395d6c909a7e8567fb780a71806cab91d3cb"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/02-sweatshirt.png",
+      "sha256": "00925e37d17f09e42fd24e314bfdfb522e06bc10f3fbfd45671493d6a4102fd9"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/03-tote.png",
+      "sha256": "ee22facd1b0a4f9e8363a2643b18fd2a69c926284b1a3e37ebc2034a2b5b18eb"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/04-shoes.png",
+      "sha256": "ed2c4e91e2f3e81952a09a27b20f75d5dd41d16a44438a1cb944107aeb822558"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/05-coat.png",
+      "sha256": "8cb94c1d68379adfcefdc5d87b63d83c1aecbe9ea5c81e2a460ddee32c561a21"
+    },
+    {
+      "file": "a11-generate-and-crop/crops/06-outfit.png",
+      "sha256": "e9af7df76556d943f87c20654f9ec3ec3ed0b57a2605e23f8ab19d4af0bada99"
+    },
+    {
+      "file": "a12-crops-in-modules/user-feedback.json",
+      "sha256": "bd4e1ace64063fbc677c292e7249e512f39e792e1047aa30c5d53dac1f2ddfa7"
+    },
+    {
+      "file": "a13-complete-store/assets/01-banner.png",
+      "sha256": "3f0ad0d37d91b140741b6c27731e395d6c909a7e8567fb780a71806cab91d3cb"
+    },
+    {
+      "file": "a13-complete-store/assets/02-sweatshirt.png",
+      "sha256": "00925e37d17f09e42fd24e314bfdfb522e06bc10f3fbfd45671493d6a4102fd9"
+    },
+    {
+      "file": "a13-complete-store/assets/03-tote.png",
+      "sha256": "ee22facd1b0a4f9e8363a2643b18fd2a69c926284b1a3e37ebc2034a2b5b18eb"
+    },
+    {
+      "file": "a13-complete-store/assets/04-shoes.png",
+      "sha256": "ed2c4e91e2f3e81952a09a27b20f75d5dd41d16a44438a1cb944107aeb822558"
+    },
+    {
+      "file": "a13-complete-store/assets/05-coat.png",
+      "sha256": "8cb94c1d68379adfcefdc5d87b63d83c1aecbe9ea5c81e2a460ddee32c561a21"
+    },
+    {
+      "file": "a13-complete-store/assets/06-outfit.png",
+      "sha256": "e9af7df76556d943f87c20654f9ec3ec3ed0b57a2605e23f8ab19d4af0bada99"
+    },
+    {
+      "file": "a13-complete-store/assets/avatar.jpg",
+      "sha256": "2295eec81213c1dbac7b02d80b8b05a732eb078577df1851019a739f58fff18d"
+    },
+    {
+      "file": "a13-complete-store/assets/coat-square.png",
+      "sha256": "a992272220822b25d11c75c7f64f4579e98451b477ae364bc23d7a9392fe36d6"
+    },
+    {
+      "file": "a13-complete-store/assets/medium-square.png",
+      "sha256": "dd30af951e42d623edeab22029ec82305165f0a51e5776a3a39fbe8839b58b51"
+    },
+    {
+      "file": "a13-complete-store/assets/medium.png",
+      "sha256": "fda181c42b1a8377a3d36a7e4aebf60aa349069ba2a8f0cde26f68258e4a6890"
+    },
+    {
+      "file": "a13-complete-store/assets/nav-bag.png",
+      "sha256": "b0ac077b3439aac6af7fa93c4dff5e465b7b084c73fa5ad72f6b95d9f47ba3b4"
+    },
+    {
+      "file": "a13-complete-store/assets/nav-knit.png",
+      "sha256": "66dca37b7ec73430b8e821a30edad8a8b2a114c09b3729c6e347db993c0f1933"
+    },
+    {
+      "file": "a13-complete-store/assets/nav-shoes.png",
+      "sha256": "31efb2f36bc4d3d720880567a0ccf1542a0b170946fe6f2bf931430d7364cc5d"
+    },
+    {
+      "file": "a13-complete-store/assets/nav-sweater.png",
+      "sha256": "fb4e702d37befa2961d189ffdf058ec2c26086ae29ca1b787db79e6916342436"
+    },
+    {
+      "file": "a13-complete-store/assets/outfit-lower.png",
+      "sha256": "5b36142c04517dd211b35c77e51b4cbb026d1403d55400c6b1817d097dc8a208"
+    },
+    {
+      "file": "a13-complete-store/assets/outfit-square.png",
+      "sha256": "6ec3e9d9d2053ffceb58b5ba172ac37bff8ce6eb707b8939130d3607f4e0a3c5"
+    },
+    {
+      "file": "a13-complete-store/assets/signboard.png",
+      "sha256": "63d3641a7b73b357d186262aecb186c6944c8ea6becbb82cdb1e15b5f5f88504"
+    },
+    {
+      "file": "a13-complete-store/page.json",
+      "sha256": "795af888508fc3160cb2382dce703c73983e543b0271863540d1ca1bb7f00117"
+    },
+    {
+      "file": "a13-complete-store/layout.json",
+      "sha256": "7786c9f8a3ee1ac40bf74ec20349e6543a600f7734afff55945cf600453a4690"
+    },
+    {
+      "file": "a13-complete-store/shop.html",
+      "sha256": "4bf2c2a706a8bf3261c060f1742b98caafd70679049e7c69a18a1085f9de8b02"
+    },
+    {
+      "file": "a13-complete-store/完整长页-批量素材预览.html",
+      "sha256": "2e70670148da380762f9e5e492ad5e6888f0b0c7c4625c38b85fcddcf15d54c6"
+    },
+    {
+      "file": "a13-complete-store/完整长页.png",
+      "sha256": "d69075aed23e5d8fb09ce70efbce0c9c5a509cbc275f229f94d918c66f29d699"
+    },
+    {
+      "file": "a13-complete-store/完整长页-分段总览.png",
+      "sha256": "0f255d9f216d7eb9c0bd98ccd50851189d0918751318c9f3d9bd0be75c037746"
+    },
+    {
+      "file": "a13-complete-store/supplement-sheet.png",
+      "sha256": "ce39c4bb3c93b5012872d5f94fb5d63ce0b1850e308a56c1ebe42ce60c820a85"
+    },
+    {
+      "file": "a13-complete-store/prepare-assets.cjs",
+      "sha256": "c423c26ee3095a0de416ada7bd5377f87d769da346222424b8b4833e6e729b7e"
+    },
+    {
+      "file": "a13-complete-store/build.cjs",
+      "sha256": "5d48d5cbf720dfffad17decaf7f9d5f1a64301310582910e9e6c508858c59d49"
+    },
+    {
+      "file": "a13-complete-store/prompt.txt",
+      "sha256": "565bbe050f9c9a618d17117cb9235f888901bec8d92d95d1e431f6a94c5b39b3"
+    },
+    {
+      "file": "a13-complete-store/run.json",
+      "sha256": "09814bee7f7922945fb34a4264c84a340301e7880129807d22a5b9221cbdb64c"
+    },
+    {
+      "file": "a13-complete-store/asset-manifest.json",
+      "sha256": "13f496d6b1797e7fd5b89f1606266aad374024ae02526d3e29901d3c95d5868e"
+    },
+    {
+      "file": "a13-complete-store/verification.json",
+      "sha256": "f083484dab6b73932938430e4a70056d6838f280555775964c52b2a3a7049c57"
+    }
+  ],
+  "notes": [
+    "Only the current reusable library, crop inputs and outputs, full-store demo, and selected evidence are archived. Earlier failed generation attempts and duplicate page slices are excluded.",
+    "Generation model ID and cost were not returned by the image tool; they remain unknown.",
+    "Historical reports retain their original review state. Read user-feedback.json for the later conversation feedback."
+  ]
+}

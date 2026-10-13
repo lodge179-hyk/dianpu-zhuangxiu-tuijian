@@ -1,0 +1,3063 @@
+{
+  "width": 483,
+  "height": 6169.84375,
+  "moduleCount": 22,
+  "modules": [
+    {
+      "id": "m01",
+      "type": "signboard.default",
+      "label": "默认招牌",
+      "top": 0,
+      "height": 258,
+      "photos": [
+        {
+          "id": "m01.banner.photo",
+          "rect": [
+            0,
+            0,
+            483,
+            258
+          ],
+          "src": "assets/signboard.png",
+          "moduleId": "m01"
+        }
+      ]
+    },
+    {
+      "id": "m02",
+      "type": "navigation.four",
+      "label": "四列圆图导航",
+      "top": 258,
+      "height": 103.265625,
+      "photos": [
+        {
+          "id": "m02.image1",
+          "rect": [
+            30.734375,
+            274,
+            71.265625,
+            71.265625
+          ],
+          "src": "assets/nav-sweater.png",
+          "moduleId": "m02"
+        },
+        {
+          "id": "m02.image2",
+          "rect": [
+            147.484375,
+            274,
+            71.265625,
+            71.265625
+          ],
+          "src": "assets/nav-shoes.png",
+          "moduleId": "m02"
+        },
+        {
+          "id": "m02.image3",
+          "rect": [
+            264.234375,
+            274,
+            71.265625,
+            71.265625
+          ],
+          "src": "assets/nav-bag.png",
+          "moduleId": "m02"
+        },
+        {
+          "id": "m02.image4",
+          "rect": [
+            380.984375,
+            274,
+            71.265625,
+            71.265625
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m02"
+        }
+      ]
+    },
+    {
+      "id": "m03",
+      "type": "text.single",
+      "label": "单行公告 · 上新",
+      "top": 361.265625,
+      "height": 58.390625,
+      "photos": []
+    },
+    {
+      "id": "m04",
+      "type": "poster.three",
+      "label": "三列海报",
+      "top": 419.65625,
+      "height": 161.328125,
+      "photos": [
+        {
+          "id": "m04.image1",
+          "rect": [
+            0,
+            420.15625,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/02-sweatshirt.png",
+          "moduleId": "m04"
+        },
+        {
+          "id": "m04.image2",
+          "rect": [
+            161.328125,
+            420.15625,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m04"
+        },
+        {
+          "id": "m04.image3",
+          "rect": [
+            322.65625,
+            420.15625,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m04"
+        }
+      ]
+    },
+    {
+      "id": "m05",
+      "type": "carousel.medium",
+      "label": "中图轮播 · 4:3",
+      "top": 580.984375,
+      "height": 362.25,
+      "photos": [
+        {
+          "id": "m05.image1",
+          "rect": [
+            0,
+            580.984375,
+            483,
+            362.25
+          ],
+          "src": "assets/medium.png",
+          "moduleId": "m05"
+        }
+      ]
+    },
+    {
+      "id": "m06",
+      "type": "showcase.three",
+      "label": "三列橱窗 · 9 件",
+      "top": 943.234375,
+      "height": 701.265625,
+      "photos": [
+        {
+          "id": "m06.card1.photo",
+          "rect": [
+            12,
+            951.234375,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/02-sweatshirt.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card2.photo",
+          "rect": [
+            167.65625,
+            951.234375,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card3.photo",
+          "rect": [
+            323.3125,
+            951.234375,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card4.photo",
+          "rect": [
+            12,
+            1183.65625,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card5.photo",
+          "rect": [
+            167.65625,
+            1183.65625,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card6.photo",
+          "rect": [
+            323.3125,
+            1183.65625,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/outfit-lower.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card7.photo",
+          "rect": [
+            12,
+            1416.078125,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card8.photo",
+          "rect": [
+            167.65625,
+            1416.078125,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m06"
+        },
+        {
+          "id": "m06.card9.photo",
+          "rect": [
+            323.3125,
+            1416.078125,
+            147.65625,
+            147.65625
+          ],
+          "src": "assets/outfit-square.png",
+          "moduleId": "m06"
+        }
+      ]
+    },
+    {
+      "id": "m07",
+      "type": "text.single",
+      "label": "单行公告 · 针织",
+      "top": 1644.5,
+      "height": 58.390625,
+      "photos": []
+    },
+    {
+      "id": "m08",
+      "type": "poster.combo3",
+      "label": "三图组合 · 上大下小",
+      "top": 1702.890625,
+      "height": 726,
+      "photos": [
+        {
+          "id": "m08.image1",
+          "rect": [
+            0,
+            1703.390625,
+            483,
+            483
+          ],
+          "src": "assets/outfit-square.png",
+          "moduleId": "m08"
+        },
+        {
+          "id": "m08.image2",
+          "rect": [
+            0,
+            2187.390625,
+            241,
+            241
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m08"
+        },
+        {
+          "id": "m08.image3",
+          "rect": [
+            242,
+            2187.390625,
+            241,
+            241
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m08"
+        }
+      ]
+    },
+    {
+      "id": "m09",
+      "type": "poster.single",
+      "label": "单列海报 · 1 张",
+      "top": 2428.890625,
+      "height": 484,
+      "photos": [
+        {
+          "id": "m09.image1",
+          "rect": [
+            0,
+            2429.390625,
+            483,
+            483
+          ],
+          "src": "assets/medium-square.png",
+          "moduleId": "m09"
+        }
+      ]
+    },
+    {
+      "id": "m10",
+      "type": "showcase.single",
+      "label": "单列大图橱窗",
+      "top": 2912.890625,
+      "height": 547.765625,
+      "photos": [
+        {
+          "id": "m10.card1.photo",
+          "rect": [
+            12,
+            2920.890625,
+            459,
+            459
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m10"
+        }
+      ]
+    },
+    {
+      "id": "m11",
+      "type": "text.single",
+      "label": "单行公告 · 鞋包",
+      "top": 3460.65625,
+      "height": 58.390625,
+      "photos": []
+    },
+    {
+      "id": "m12",
+      "type": "poster.combo1",
+      "label": "三图组合 · 左大右小",
+      "top": 3519.046875,
+      "height": 322.65625,
+      "photos": [
+        {
+          "id": "m12.image1",
+          "rect": [
+            0,
+            3519.546875,
+            321.65625,
+            321.65625
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m12"
+        },
+        {
+          "id": "m12.image2",
+          "rect": [
+            322.65625,
+            3519.546875,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m12"
+        },
+        {
+          "id": "m12.image3",
+          "rect": [
+            322.65625,
+            3680.875,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m12"
+        }
+      ]
+    },
+    {
+      "id": "m13",
+      "type": "poster.combo2",
+      "label": "三图组合 · 右大左小",
+      "top": 3841.703125,
+      "height": 322.65625,
+      "photos": [
+        {
+          "id": "m13.image1",
+          "rect": [
+            161.34375,
+            3842.203125,
+            321.65625,
+            321.65625
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m13"
+        },
+        {
+          "id": "m13.image2",
+          "rect": [
+            0.015625,
+            3842.203125,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m13"
+        },
+        {
+          "id": "m13.image3",
+          "rect": [
+            0.015625,
+            4003.53125,
+            160.328125,
+            160.328125
+          ],
+          "src": "assets/outfit-lower.png",
+          "moduleId": "m13"
+        }
+      ]
+    },
+    {
+      "id": "m14",
+      "type": "poster.sliding",
+      "label": "横向滑动海报",
+      "top": 4164.359375,
+      "height": 194.1875,
+      "photos": [
+        {
+          "id": "m14.image1",
+          "rect": [
+            0,
+            4164.859375,
+            193.1875,
+            193.1875
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m14"
+        },
+        {
+          "id": "m14.image2",
+          "rect": [
+            194.1875,
+            4164.859375,
+            193.1875,
+            193.1875
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m14"
+        },
+        {
+          "id": "m14.image3",
+          "rect": [
+            388.375,
+            4164.859375,
+            193.1875,
+            193.1875
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m14"
+        },
+        {
+          "id": "m14.image4",
+          "rect": [
+            582.5625,
+            4164.859375,
+            193.1875,
+            193.1875
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m14"
+        }
+      ]
+    },
+    {
+      "id": "m15",
+      "type": "carousel.small",
+      "label": "小图轮播 · 3:1",
+      "top": 4358.546875,
+      "height": 160.984375,
+      "photos": [
+        {
+          "id": "m15.image1",
+          "rect": [
+            0,
+            4358.546875,
+            483,
+            160.984375
+          ],
+          "src": "assets/01-banner.png",
+          "moduleId": "m15"
+        }
+      ]
+    },
+    {
+      "id": "m16",
+      "type": "showcase.sliding",
+      "label": "横向商品橱窗",
+      "top": 4519.53125,
+      "height": 204.515625,
+      "photos": [
+        {
+          "id": "m16.card1.photo",
+          "rect": [
+            12,
+            4527.53125,
+            114.75,
+            114.75
+          ],
+          "src": "assets/04-shoes.png",
+          "moduleId": "m16"
+        },
+        {
+          "id": "m16.card2.photo",
+          "rect": [
+            134.75,
+            4527.53125,
+            114.75,
+            114.75
+          ],
+          "src": "assets/03-tote.png",
+          "moduleId": "m16"
+        },
+        {
+          "id": "m16.card3.photo",
+          "rect": [
+            257.5,
+            4527.53125,
+            114.75,
+            114.75
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m16"
+        },
+        {
+          "id": "m16.card4.photo",
+          "rect": [
+            380.25,
+            4527.53125,
+            114.75,
+            114.75
+          ],
+          "src": "assets/outfit-lower.png",
+          "moduleId": "m16"
+        },
+        {
+          "id": "m16.card5.photo",
+          "rect": [
+            503,
+            4527.53125,
+            114.75,
+            114.75
+          ],
+          "src": "assets/nav-knit.png",
+          "moduleId": "m16"
+        }
+      ]
+    },
+    {
+      "id": "m17",
+      "type": "text.single",
+      "label": "单行公告 · 换季",
+      "top": 4724.046875,
+      "height": 58.390625,
+      "photos": []
+    },
+    {
+      "id": "m18",
+      "type": "carousel.large",
+      "label": "大图轮播 · 3:4",
+      "top": 4782.4375,
+      "height": 643.984375,
+      "photos": [
+        {
+          "id": "m18.image1",
+          "rect": [
+            0,
+            4782.4375,
+            483,
+            643.984375
+          ],
+          "src": "assets/05-coat.png",
+          "moduleId": "m18"
+        }
+      ]
+    },
+    {
+      "id": "m19",
+      "type": "poster.two",
+      "label": "双列海报",
+      "top": 5426.421875,
+      "height": 242,
+      "photos": [
+        {
+          "id": "m19.image1",
+          "rect": [
+            0,
+            5426.921875,
+            241,
+            241
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m19"
+        },
+        {
+          "id": "m19.image2",
+          "rect": [
+            242,
+            5426.921875,
+            241,
+            241
+          ],
+          "src": "assets/outfit-lower.png",
+          "moduleId": "m19"
+        }
+      ]
+    },
+    {
+      "id": "m20",
+      "type": "showcase.two",
+      "label": "双列商品橱窗",
+      "top": 5668.421875,
+      "height": 295.078125,
+      "photos": [
+        {
+          "id": "m20.card1.photo",
+          "rect": [
+            12,
+            5676.421875,
+            225.5,
+            225.5
+          ],
+          "src": "assets/coat-square.png",
+          "moduleId": "m20"
+        },
+        {
+          "id": "m20.card2.photo",
+          "rect": [
+            245.5,
+            5676.421875,
+            225.5,
+            225.5
+          ],
+          "src": "assets/outfit-lower.png",
+          "moduleId": "m20"
+        }
+      ]
+    },
+    {
+      "id": "m21",
+      "type": "text.multiline",
+      "label": "多行公告",
+      "top": 5963.5,
+      "height": 147.953125,
+      "photos": []
+    },
+    {
+      "id": "m22",
+      "type": "text.link",
+      "label": "文字链接",
+      "top": 6111.453125,
+      "height": 58.390625,
+      "photos": []
+    }
+  ],
+  "components": [
+    {
+      "id": "m01.banner.photo",
+      "role": "photo",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.banner.shade",
+      "role": "fixed-overlay",
+      "rect": [
+        0,
+        170,
+        483,
+        88
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.SignboardInfo_icon.1",
+      "role": "fixed-icon",
+      "rect": [
+        16,
+        190,
+        48,
+        48
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.SignboardInfo_iconSVip.1",
+      "role": "fixed-icon",
+      "rect": [
+        130,
+        193.203125,
+        29,
+        16
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.SignboardInfo_name.1",
+      "role": "fixed-text",
+      "rect": [
+        72,
+        188.703125,
+        54,
+        25
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.SignboardInfo_item.1",
+      "role": "fixed-text",
+      "rect": [
+        72,
+        221.703125,
+        64.71875,
+        12
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.span.1",
+      "role": "fixed-text",
+      "rect": [
+        99.34375,
+        220.703125,
+        33.375,
+        14
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.SignboardInfo_item.2",
+      "role": "fixed-text",
+      "rect": [
+        136.71875,
+        221.703125,
+        69.71875,
+        12
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01.span.2",
+      "role": "fixed-text",
+      "rect": [
+        169.0625,
+        220.703125,
+        33.375,
+        14
+      ],
+      "moduleId": "m01"
+    },
+    {
+      "id": "m01",
+      "role": "module",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ]
+    },
+    {
+      "id": "m02.image1",
+      "role": "photo",
+      "rect": [
+        30.734375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image2",
+      "role": "photo",
+      "rect": [
+        147.484375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image3",
+      "role": "photo",
+      "rect": [
+        264.234375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image4",
+      "role": "photo",
+      "rect": [
+        380.984375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02",
+      "role": "module",
+      "rect": [
+        0,
+        258,
+        483,
+        103.265625
+      ]
+    },
+    {
+      "id": "m03.notice.background",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        373.265625,
+        459,
+        34.390625
+      ],
+      "moduleId": "m03"
+    },
+    {
+      "id": "m03.notice.icon",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        380.453125,
+        20,
+        20
+      ],
+      "moduleId": "m03"
+    },
+    {
+      "id": "m03.notice.text",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        379.265625,
+        427,
+        22.390625
+      ],
+      "moduleId": "m03"
+    },
+    {
+      "id": "m03",
+      "role": "module",
+      "rect": [
+        0,
+        361.265625,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m04.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m04"
+    },
+    {
+      "id": "m04.image2",
+      "role": "photo",
+      "rect": [
+        161.328125,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m04"
+    },
+    {
+      "id": "m04.image3",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m04"
+    },
+    {
+      "id": "m04",
+      "role": "module",
+      "rect": [
+        0,
+        419.65625,
+        483,
+        161.328125
+      ]
+    },
+    {
+      "id": "m05.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ],
+      "moduleId": "m05"
+    },
+    {
+      "id": "m05",
+      "role": "module",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ]
+    },
+    {
+      "id": "m06.card1.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card1.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card1.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card1.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card1.cart",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1144.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card1.share",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        951.234375,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.photo",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.title",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.currency",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.price",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.cart",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1144.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.share",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        951.234375,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.photo",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.title",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1098.890625,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.currency",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1156.265625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.price",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1152.265625,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.cart",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1144.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.share",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        951.234375,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.cart",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1377.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.share",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        1183.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.photo",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.title",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.currency",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.price",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.cart",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1377.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.share",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        1183.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.photo",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.title",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1331.3125,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.currency",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1388.6875,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.price",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1384.6875,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.cart",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1377.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.share",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        1183.65625,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.cart",
+      "role": "fixed-icon",
+      "rect": [
+        131.65625,
+        1609.5,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.share",
+      "role": "fixed-icon",
+      "rect": [
+        127.65625,
+        1416.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.photo",
+      "role": "photo",
+      "rect": [
+        167.65625,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.title",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.currency",
+      "role": "fixed-text",
+      "rect": [
+        167.65625,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.price",
+      "role": "fixed-text",
+      "rect": [
+        173.21875,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.cart",
+      "role": "fixed-icon",
+      "rect": [
+        287.3125,
+        1609.5,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.share",
+      "role": "fixed-icon",
+      "rect": [
+        283.3125,
+        1416.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.photo",
+      "role": "photo",
+      "rect": [
+        323.3125,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.title",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1563.734375,
+        147.65625,
+        46.375
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.currency",
+      "role": "fixed-text",
+      "rect": [
+        323.3125,
+        1621.109375,
+        5.5625,
+        11
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.price",
+      "role": "fixed-text",
+      "rect": [
+        328.875,
+        1617.109375,
+        35.046875,
+        16
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.cart",
+      "role": "fixed-icon",
+      "rect": [
+        442.96875,
+        1609.5,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.share",
+      "role": "fixed-icon",
+      "rect": [
+        438.96875,
+        1416.078125,
+        32,
+        32
+      ],
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06",
+      "role": "module",
+      "rect": [
+        0,
+        943.234375,
+        483,
+        701.265625
+      ]
+    },
+    {
+      "id": "m07.notice.background",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        1656.5,
+        459,
+        34.390625
+      ],
+      "moduleId": "m07"
+    },
+    {
+      "id": "m07.notice.icon",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        1663.6875,
+        20,
+        20
+      ],
+      "moduleId": "m07"
+    },
+    {
+      "id": "m07.notice.text",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        1662.5,
+        427,
+        22.390625
+      ],
+      "moduleId": "m07"
+    },
+    {
+      "id": "m07",
+      "role": "module",
+      "rect": [
+        0,
+        1644.5,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m08.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        1703.390625,
+        483,
+        483
+      ],
+      "moduleId": "m08"
+    },
+    {
+      "id": "m08.image2",
+      "role": "photo",
+      "rect": [
+        0,
+        2187.390625,
+        241,
+        241
+      ],
+      "moduleId": "m08"
+    },
+    {
+      "id": "m08.image3",
+      "role": "photo",
+      "rect": [
+        242,
+        2187.390625,
+        241,
+        241
+      ],
+      "moduleId": "m08"
+    },
+    {
+      "id": "m08",
+      "role": "module",
+      "rect": [
+        0,
+        1702.890625,
+        483,
+        726
+      ]
+    },
+    {
+      "id": "m09.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        2429.390625,
+        483,
+        483
+      ],
+      "moduleId": "m09"
+    },
+    {
+      "id": "m09",
+      "role": "module",
+      "rect": [
+        0,
+        2428.890625,
+        483,
+        484
+      ]
+    },
+    {
+      "id": "m10.card1.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        2920.890625,
+        459,
+        459
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10.card1.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        3379.890625,
+        459,
+        46.375
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10.card1.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        3437.265625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10.card1.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        3433.265625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10.card1.cart",
+      "role": "fixed-icon",
+      "rect": [
+        443,
+        3425.65625,
+        32,
+        32
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10.card1.share",
+      "role": "fixed-icon",
+      "rect": [
+        439,
+        2920.890625,
+        32,
+        32
+      ],
+      "moduleId": "m10"
+    },
+    {
+      "id": "m10",
+      "role": "module",
+      "rect": [
+        0,
+        2912.890625,
+        483,
+        547.765625
+      ]
+    },
+    {
+      "id": "m11.notice.background",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        3472.65625,
+        459,
+        34.390625
+      ],
+      "moduleId": "m11"
+    },
+    {
+      "id": "m11.notice.icon",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        3479.84375,
+        20,
+        20
+      ],
+      "moduleId": "m11"
+    },
+    {
+      "id": "m11.notice.text",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        3478.65625,
+        427,
+        22.390625
+      ],
+      "moduleId": "m11"
+    },
+    {
+      "id": "m11",
+      "role": "module",
+      "rect": [
+        0,
+        3460.65625,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m12.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        3519.546875,
+        321.65625,
+        321.65625
+      ],
+      "moduleId": "m12"
+    },
+    {
+      "id": "m12.image2",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        3519.546875,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m12"
+    },
+    {
+      "id": "m12.image3",
+      "role": "photo",
+      "rect": [
+        322.65625,
+        3680.875,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m12"
+    },
+    {
+      "id": "m12",
+      "role": "module",
+      "rect": [
+        0,
+        3519.046875,
+        483,
+        322.65625
+      ]
+    },
+    {
+      "id": "m13.image1",
+      "role": "photo",
+      "rect": [
+        161.34375,
+        3842.203125,
+        321.65625,
+        321.65625
+      ],
+      "moduleId": "m13"
+    },
+    {
+      "id": "m13.image2",
+      "role": "photo",
+      "rect": [
+        0.015625,
+        3842.203125,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m13"
+    },
+    {
+      "id": "m13.image3",
+      "role": "photo",
+      "rect": [
+        0.015625,
+        4003.53125,
+        160.328125,
+        160.328125
+      ],
+      "moduleId": "m13"
+    },
+    {
+      "id": "m13",
+      "role": "module",
+      "rect": [
+        0,
+        3841.703125,
+        483,
+        322.65625
+      ]
+    },
+    {
+      "id": "m14.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image2",
+      "role": "photo",
+      "rect": [
+        194.1875,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image3",
+      "role": "photo",
+      "rect": [
+        388.375,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image4",
+      "role": "photo",
+      "rect": [
+        582.5625,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14",
+      "role": "module",
+      "rect": [
+        0,
+        4164.359375,
+        483,
+        194.1875
+      ]
+    },
+    {
+      "id": "m15.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ],
+      "moduleId": "m15"
+    },
+    {
+      "id": "m15",
+      "role": "module",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ]
+    },
+    {
+      "id": "m16.card1.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card1.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card1.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card1.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card1.cart",
+      "role": "fixed-icon",
+      "rect": [
+        98.75,
+        4688.046875,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card1.share",
+      "role": "fixed-icon",
+      "rect": [
+        94.75,
+        4527.53125,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.photo",
+      "role": "photo",
+      "rect": [
+        134.75,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.title",
+      "role": "fixed-text",
+      "rect": [
+        134.75,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.currency",
+      "role": "fixed-text",
+      "rect": [
+        134.75,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.price",
+      "role": "fixed-text",
+      "rect": [
+        140.3125,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.cart",
+      "role": "fixed-icon",
+      "rect": [
+        221.5,
+        4688.046875,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.share",
+      "role": "fixed-icon",
+      "rect": [
+        217.5,
+        4527.53125,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.photo",
+      "role": "photo",
+      "rect": [
+        257.5,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.title",
+      "role": "fixed-text",
+      "rect": [
+        257.5,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.currency",
+      "role": "fixed-text",
+      "rect": [
+        257.5,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.price",
+      "role": "fixed-text",
+      "rect": [
+        263.0625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.cart",
+      "role": "fixed-icon",
+      "rect": [
+        344.25,
+        4688.046875,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.share",
+      "role": "fixed-icon",
+      "rect": [
+        340.25,
+        4527.53125,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.photo",
+      "role": "photo",
+      "rect": [
+        380.25,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.title",
+      "role": "fixed-text",
+      "rect": [
+        380.25,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.currency",
+      "role": "fixed-text",
+      "rect": [
+        380.25,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.price",
+      "role": "fixed-text",
+      "rect": [
+        385.8125,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.cart",
+      "role": "fixed-icon",
+      "rect": [
+        467,
+        4688.046875,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.share",
+      "role": "fixed-icon",
+      "rect": [
+        463,
+        4527.53125,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.photo",
+      "role": "photo",
+      "rect": [
+        503,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.title",
+      "role": "fixed-text",
+      "rect": [
+        503,
+        4642.28125,
+        114.75,
+        46.375
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.currency",
+      "role": "fixed-text",
+      "rect": [
+        503,
+        4699.65625,
+        5.5625,
+        11
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.price",
+      "role": "fixed-text",
+      "rect": [
+        508.5625,
+        4695.65625,
+        42.828125,
+        16
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.cart",
+      "role": "fixed-icon",
+      "rect": [
+        589.75,
+        4688.046875,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.share",
+      "role": "fixed-icon",
+      "rect": [
+        585.75,
+        4527.53125,
+        32,
+        32
+      ],
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16",
+      "role": "module",
+      "rect": [
+        0,
+        4519.53125,
+        483,
+        204.515625
+      ]
+    },
+    {
+      "id": "m17.notice.background",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        4736.046875,
+        459,
+        34.390625
+      ],
+      "moduleId": "m17"
+    },
+    {
+      "id": "m17.notice.icon",
+      "role": "fixed-icon",
+      "rect": [
+        20,
+        4743.234375,
+        20,
+        20
+      ],
+      "moduleId": "m17"
+    },
+    {
+      "id": "m17.notice.text",
+      "role": "fixed-text",
+      "rect": [
+        44,
+        4742.046875,
+        427,
+        22.390625
+      ],
+      "moduleId": "m17"
+    },
+    {
+      "id": "m17",
+      "role": "module",
+      "rect": [
+        0,
+        4724.046875,
+        483,
+        58.390625
+      ]
+    },
+    {
+      "id": "m18.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ],
+      "moduleId": "m18"
+    },
+    {
+      "id": "m18",
+      "role": "module",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ]
+    },
+    {
+      "id": "m19.image1",
+      "role": "photo",
+      "rect": [
+        0,
+        5426.921875,
+        241,
+        241
+      ],
+      "moduleId": "m19"
+    },
+    {
+      "id": "m19.image2",
+      "role": "photo",
+      "rect": [
+        242,
+        5426.921875,
+        241,
+        241
+      ],
+      "moduleId": "m19"
+    },
+    {
+      "id": "m19",
+      "role": "module",
+      "rect": [
+        0,
+        5426.421875,
+        483,
+        242
+      ]
+    },
+    {
+      "id": "m20.card1.photo",
+      "role": "photo",
+      "rect": [
+        12,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card1.title",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        5901.921875,
+        225.5,
+        27.1875
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card1.currency",
+      "role": "fixed-text",
+      "rect": [
+        12,
+        5940.109375,
+        5.5625,
+        11
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card1.price",
+      "role": "fixed-text",
+      "rect": [
+        17.5625,
+        5936.109375,
+        27.25,
+        16
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card1.cart",
+      "role": "fixed-icon",
+      "rect": [
+        209.5,
+        5928.5,
+        32,
+        32
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card1.share",
+      "role": "fixed-icon",
+      "rect": [
+        205.5,
+        5676.421875,
+        32,
+        32
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.photo",
+      "role": "photo",
+      "rect": [
+        245.5,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.title",
+      "role": "fixed-text",
+      "rect": [
+        245.5,
+        5901.921875,
+        225.5,
+        27.1875
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.currency",
+      "role": "fixed-text",
+      "rect": [
+        245.5,
+        5940.109375,
+        5.5625,
+        11
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.price",
+      "role": "fixed-text",
+      "rect": [
+        251.0625,
+        5936.109375,
+        27.25,
+        16
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.cart",
+      "role": "fixed-icon",
+      "rect": [
+        443,
+        5928.5,
+        32,
+        32
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.share",
+      "role": "fixed-icon",
+      "rect": [
+        439,
+        5676.421875,
+        32,
+        32
+      ],
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20",
+      "role": "module",
+      "rect": [
+        0,
+        5668.421875,
+        483,
+        295.078125
+      ]
+    },
+    {
+      "id": "m21.notice.background",
+      "role": "fixed-background",
+      "rect": [
+        12,
+        5975.5,
+        459,
+        123.953125
+      ],
+      "moduleId": "m21"
+    },
+    {
+      "id": "m21.notice.text",
+      "role": "fixed-text",
+      "rect": [
+        24,
+        5981.5,
+        435,
+        111.953125
+      ],
+      "moduleId": "m21"
+    },
+    {
+      "id": "m21",
+      "role": "module",
+      "rect": [
+        0,
+        5963.5,
+        483,
+        147.953125
+      ]
+    },
+    {
+      "id": "m22.link.text",
+      "role": "fixed-text",
+      "rect": [
+        18,
+        6129.453125,
+        224,
+        22.390625
+      ],
+      "moduleId": "m22"
+    },
+    {
+      "id": "m22",
+      "role": "module",
+      "rect": [
+        0,
+        6111.453125,
+        483,
+        58.390625
+      ]
+    }
+  ],
+  "photos": [
+    {
+      "id": "m01.banner.photo",
+      "rect": [
+        0,
+        0,
+        483,
+        258
+      ],
+      "src": "assets/signboard.png",
+      "moduleId": "m01"
+    },
+    {
+      "id": "m02.image1",
+      "rect": [
+        30.734375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "src": "assets/nav-sweater.png",
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image2",
+      "rect": [
+        147.484375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "src": "assets/nav-shoes.png",
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image3",
+      "rect": [
+        264.234375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "src": "assets/nav-bag.png",
+      "moduleId": "m02"
+    },
+    {
+      "id": "m02.image4",
+      "rect": [
+        380.984375,
+        274,
+        71.265625,
+        71.265625
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m02"
+    },
+    {
+      "id": "m04.image1",
+      "rect": [
+        0,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/02-sweatshirt.png",
+      "moduleId": "m04"
+    },
+    {
+      "id": "m04.image2",
+      "rect": [
+        161.328125,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m04"
+    },
+    {
+      "id": "m04.image3",
+      "rect": [
+        322.65625,
+        420.15625,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m04"
+    },
+    {
+      "id": "m05.image1",
+      "rect": [
+        0,
+        580.984375,
+        483,
+        362.25
+      ],
+      "src": "assets/medium.png",
+      "moduleId": "m05"
+    },
+    {
+      "id": "m06.card1.photo",
+      "rect": [
+        12,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/02-sweatshirt.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card2.photo",
+      "rect": [
+        167.65625,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card3.photo",
+      "rect": [
+        323.3125,
+        951.234375,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card4.photo",
+      "rect": [
+        12,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card5.photo",
+      "rect": [
+        167.65625,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card6.photo",
+      "rect": [
+        323.3125,
+        1183.65625,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/outfit-lower.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card7.photo",
+      "rect": [
+        12,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card8.photo",
+      "rect": [
+        167.65625,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m06.card9.photo",
+      "rect": [
+        323.3125,
+        1416.078125,
+        147.65625,
+        147.65625
+      ],
+      "src": "assets/outfit-square.png",
+      "moduleId": "m06"
+    },
+    {
+      "id": "m08.image1",
+      "rect": [
+        0,
+        1703.390625,
+        483,
+        483
+      ],
+      "src": "assets/outfit-square.png",
+      "moduleId": "m08"
+    },
+    {
+      "id": "m08.image2",
+      "rect": [
+        0,
+        2187.390625,
+        241,
+        241
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m08"
+    },
+    {
+      "id": "m08.image3",
+      "rect": [
+        242,
+        2187.390625,
+        241,
+        241
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m08"
+    },
+    {
+      "id": "m09.image1",
+      "rect": [
+        0,
+        2429.390625,
+        483,
+        483
+      ],
+      "src": "assets/medium-square.png",
+      "moduleId": "m09"
+    },
+    {
+      "id": "m10.card1.photo",
+      "rect": [
+        12,
+        2920.890625,
+        459,
+        459
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m10"
+    },
+    {
+      "id": "m12.image1",
+      "rect": [
+        0,
+        3519.546875,
+        321.65625,
+        321.65625
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m12"
+    },
+    {
+      "id": "m12.image2",
+      "rect": [
+        322.65625,
+        3519.546875,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m12"
+    },
+    {
+      "id": "m12.image3",
+      "rect": [
+        322.65625,
+        3680.875,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m12"
+    },
+    {
+      "id": "m13.image1",
+      "rect": [
+        161.34375,
+        3842.203125,
+        321.65625,
+        321.65625
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m13"
+    },
+    {
+      "id": "m13.image2",
+      "rect": [
+        0.015625,
+        3842.203125,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m13"
+    },
+    {
+      "id": "m13.image3",
+      "rect": [
+        0.015625,
+        4003.53125,
+        160.328125,
+        160.328125
+      ],
+      "src": "assets/outfit-lower.png",
+      "moduleId": "m13"
+    },
+    {
+      "id": "m14.image1",
+      "rect": [
+        0,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image2",
+      "rect": [
+        194.1875,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image3",
+      "rect": [
+        388.375,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m14"
+    },
+    {
+      "id": "m14.image4",
+      "rect": [
+        582.5625,
+        4164.859375,
+        193.1875,
+        193.1875
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m14"
+    },
+    {
+      "id": "m15.image1",
+      "rect": [
+        0,
+        4358.546875,
+        483,
+        160.984375
+      ],
+      "src": "assets/01-banner.png",
+      "moduleId": "m15"
+    },
+    {
+      "id": "m16.card1.photo",
+      "rect": [
+        12,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "src": "assets/04-shoes.png",
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card2.photo",
+      "rect": [
+        134.75,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "src": "assets/03-tote.png",
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card3.photo",
+      "rect": [
+        257.5,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card4.photo",
+      "rect": [
+        380.25,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "src": "assets/outfit-lower.png",
+      "moduleId": "m16"
+    },
+    {
+      "id": "m16.card5.photo",
+      "rect": [
+        503,
+        4527.53125,
+        114.75,
+        114.75
+      ],
+      "src": "assets/nav-knit.png",
+      "moduleId": "m16"
+    },
+    {
+      "id": "m18.image1",
+      "rect": [
+        0,
+        4782.4375,
+        483,
+        643.984375
+      ],
+      "src": "assets/05-coat.png",
+      "moduleId": "m18"
+    },
+    {
+      "id": "m19.image1",
+      "rect": [
+        0,
+        5426.921875,
+        241,
+        241
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m19"
+    },
+    {
+      "id": "m19.image2",
+      "rect": [
+        242,
+        5426.921875,
+        241,
+        241
+      ],
+      "src": "assets/outfit-lower.png",
+      "moduleId": "m19"
+    },
+    {
+      "id": "m20.card1.photo",
+      "rect": [
+        12,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "src": "assets/coat-square.png",
+      "moduleId": "m20"
+    },
+    {
+      "id": "m20.card2.photo",
+      "rect": [
+        245.5,
+        5676.421875,
+        225.5,
+        225.5
+      ],
+      "src": "assets/outfit-lower.png",
+      "moduleId": "m20"
+    }
+  ]
+}

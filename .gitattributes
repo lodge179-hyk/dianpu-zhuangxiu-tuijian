@@ -1,0 +1,2 @@
+# Preserve byte-identical experiment snapshots and their SHA-256 manifests.
+experiments/store-decoration/** -text

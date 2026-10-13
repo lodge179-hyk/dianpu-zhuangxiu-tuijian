@@ -1,0 +1,309 @@
+{
+  "supplementDimensions": [
+    992,
+    1586
+  ],
+  "newGenerationCalls": 1,
+  "reusedAcceptedCrops": 6,
+  "newSheetPanels": 6,
+  "derivedSquareCrops": 4,
+  "assets": [
+    {
+      "id": "signboard",
+      "file": "assets/signboard.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 24,
+        "top": 23,
+        "width": 944,
+        "height": 550
+      },
+      "sourceRect": {
+        "left": 24,
+        "top": 46,
+        "width": 944,
+        "height": 504
+      },
+      "targetRatio": 1.872093023255814,
+      "dimensions": [
+        944,
+        504
+      ],
+      "areaRemovedPercent": 8.36,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "63d3641a7b73b357d186262aecb186c6944c8ea6becbb82cdb1e15b5f5f88504"
+    },
+    {
+      "id": "medium",
+      "file": "assets/medium.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 24,
+        "top": 596,
+        "width": 944,
+        "height": 629
+      },
+      "sourceRect": {
+        "left": 77,
+        "top": 596,
+        "width": 838,
+        "height": 629
+      },
+      "targetRatio": 1.3333333333333333,
+      "dimensions": [
+        838,
+        629
+      ],
+      "areaRemovedPercent": 11.23,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "fda181c42b1a8377a3d36a7e4aebf60aa349069ba2a8f0cde26f68258e4a6890"
+    },
+    {
+      "id": "nav-sweater",
+      "file": "assets/nav-sweater.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 25,
+        "top": 1249,
+        "width": 221,
+        "height": 272
+      },
+      "sourceRect": {
+        "left": 25,
+        "top": 1274,
+        "width": 221,
+        "height": 221
+      },
+      "targetRatio": 1,
+      "dimensions": [
+        221,
+        221
+      ],
+      "areaRemovedPercent": 18.75,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "fb4e702d37befa2961d189ffdf058ec2c26086ae29ca1b787db79e6916342436"
+    },
+    {
+      "id": "nav-shoes",
+      "file": "assets/nav-shoes.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 266,
+        "top": 1249,
+        "width": 221,
+        "height": 272
+      },
+      "sourceRect": {
+        "left": 266,
+        "top": 1274,
+        "width": 221,
+        "height": 221
+      },
+      "targetRatio": 1,
+      "dimensions": [
+        221,
+        221
+      ],
+      "areaRemovedPercent": 18.75,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "31efb2f36bc4d3d720880567a0ccf1542a0b170946fe6f2bf931430d7364cc5d"
+    },
+    {
+      "id": "nav-bag",
+      "file": "assets/nav-bag.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 507,
+        "top": 1249,
+        "width": 221,
+        "height": 272
+      },
+      "sourceRect": {
+        "left": 507,
+        "top": 1274,
+        "width": 221,
+        "height": 221
+      },
+      "targetRatio": 1,
+      "dimensions": [
+        221,
+        221
+      ],
+      "areaRemovedPercent": 18.75,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "b0ac077b3439aac6af7fa93c4dff5e465b7b084c73fa5ad72f6b95d9f47ba3b4"
+    },
+    {
+      "id": "nav-knit",
+      "file": "assets/nav-knit.png",
+      "source": "supplement-sheet.png",
+      "detectedRect": {
+        "left": 748,
+        "top": 1249,
+        "width": 220,
+        "height": 272
+      },
+      "sourceRect": {
+        "left": 748,
+        "top": 1275,
+        "width": 220,
+        "height": 220
+      },
+      "targetRatio": 1,
+      "dimensions": [
+        220,
+        220
+      ],
+      "areaRemovedPercent": 19.12,
+      "separatorPixels": 0,
+      "method": "Crop at detected boundaries, then center-crop to target ratio; no stretching or upscaling",
+      "sha256": "66dca37b7ec73430b8e821a30edad8a8b2a114c09b3729c6e347db993c0f1933"
+    },
+    {
+      "id": "01-banner",
+      "file": "assets/01-banner.png",
+      "source": "../a11-generate-and-crop/crops/01-banner.png",
+      "dimensions": [
+        1032,
+        344
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "3f0ad0d37d91b140741b6c27731e395d6c909a7e8567fb780a71806cab91d3cb"
+    },
+    {
+      "id": "02-sweatshirt",
+      "file": "assets/02-sweatshirt.png",
+      "source": "../a11-generate-and-crop/crops/02-sweatshirt.png",
+      "dimensions": [
+        338,
+        338
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "00925e37d17f09e42fd24e314bfdfb522e06bc10f3fbfd45671493d6a4102fd9"
+    },
+    {
+      "id": "03-tote",
+      "file": "assets/03-tote.png",
+      "source": "../a11-generate-and-crop/crops/03-tote.png",
+      "dimensions": [
+        325,
+        325
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "ee22facd1b0a4f9e8363a2643b18fd2a69c926284b1a3e37ebc2034a2b5b18eb"
+    },
+    {
+      "id": "04-shoes",
+      "file": "assets/04-shoes.png",
+      "source": "../a11-generate-and-crop/crops/04-shoes.png",
+      "dimensions": [
+        338,
+        338
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "ed2c4e91e2f3e81952a09a27b20f75d5dd41d16a44438a1cb944107aeb822558"
+    },
+    {
+      "id": "05-coat",
+      "file": "assets/05-coat.png",
+      "source": "../a11-generate-and-crop/crops/05-coat.png",
+      "dimensions": [
+        501,
+        668
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "8cb94c1d68379adfcefdc5d87b63d83c1aecbe9ea5c81e2a460ddee32c561a21"
+    },
+    {
+      "id": "06-outfit",
+      "file": "assets/06-outfit.png",
+      "source": "../a11-generate-and-crop/crops/06-outfit.png",
+      "dimensions": [
+        501,
+        668
+      ],
+      "method": "Unchanged copy of the previously accepted crop",
+      "sha256": "e9af7df76556d943f87c20654f9ec3ec3ed0b57a2605e23f8ab19d4af0bada99"
+    },
+    {
+      "id": "outfit-square",
+      "file": "assets/outfit-square.png",
+      "source": "assets/06-outfit.png",
+      "sourceRect": {
+        "left": 0,
+        "top": 83,
+        "width": 501,
+        "height": 501
+      },
+      "dimensions": [
+        501,
+        501
+      ],
+      "method": "Square detail/composition crop, no new generation; partial garment framing is allowed",
+      "sha256": "6ec3e9d9d2053ffceb58b5ba172ac37bff8ce6eb707b8939130d3607f4e0a3c5"
+    },
+    {
+      "id": "coat-square",
+      "file": "assets/coat-square.png",
+      "source": "assets/05-coat.png",
+      "sourceRect": {
+        "left": 0,
+        "top": 83,
+        "width": 501,
+        "height": 501
+      },
+      "dimensions": [
+        501,
+        501
+      ],
+      "method": "Square detail/composition crop, no new generation; partial garment framing is allowed",
+      "sha256": "a992272220822b25d11c75c7f64f4579e98451b477ae364bc23d7a9392fe36d6"
+    },
+    {
+      "id": "outfit-lower",
+      "file": "assets/outfit-lower.png",
+      "source": "assets/06-outfit.png",
+      "sourceRect": {
+        "left": 0,
+        "top": 167,
+        "width": 501,
+        "height": 501
+      },
+      "dimensions": [
+        501,
+        501
+      ],
+      "method": "Square detail/composition crop, no new generation; partial garment framing is allowed",
+      "sha256": "5b36142c04517dd211b35c77e51b4cbb026d1403d55400c6b1817d097dc8a208"
+    },
+    {
+      "id": "medium-square",
+      "file": "assets/medium-square.png",
+      "source": "assets/medium.png",
+      "sourceRect": {
+        "left": 104,
+        "top": 0,
+        "width": 629,
+        "height": 629
+      },
+      "dimensions": [
+        629,
+        629
+      ],
+      "method": "Square detail/composition crop, no new generation; partial garment framing is allowed",
+      "sha256": "dd30af951e42d623edeab22029ec82305165f0a51e5776a3a39fbe8839b58b51"
+    }
+  ],
+  "avatarSource": "Unchanged A8/A9 demo avatar",
+  "customerScreenshotAssetsUsed": false,
+  "limitations": [
+    "Generated example goods, not verified customer products",
+    "The generated panel ratios drifted; actual-boundary crops and ratio adjustments are recorded per asset",
+    "Repeated and detail views deliberately reuse source material"
+  ]
+}

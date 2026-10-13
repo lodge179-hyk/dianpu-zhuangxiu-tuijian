@@ -1,0 +1,33 @@
+- generic: 装修成功
+- generic: 可前往查看装修效果
+- generic: 立即查看
+- generic: 开屏海报
+- generic: 详情装修
+- generic: 隐藏设置
+- generic: 一键换肤
+- generic: 无边框模式
+- generic: 更多
+- generic: 店铺招牌
+- generic: 全屏轮播
+- generic: 
+- generic: 添加新模块
+- generic: 全部商品
+- generic: 列表式
+- generic: 
+- generic: 
+- generic: 
+- generic: 重置
+- generic: 
+- generic: 换风格
+- generic: 
+- generic: 预览
+- text: 保存至
+- generic: 相册APP主页支持装修啦
+- generic: 保存
+- iframe [id="tcaptcha_iframe_dy"] [name="https://turing.captcha.qcloud.com"]:
+  - generic: 安全验证
+  - generic: 返回
+  - option
+  - generic: 拖动下方滑块完成拼图
+  - img "feedback"
+  - img "refresh"

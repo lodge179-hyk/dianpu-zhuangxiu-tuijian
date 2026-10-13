@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#183e32">
+<title>店铺新貌 · 整页自动设计</title>
+<style>
+:root{--ink:#203b32;--muted:#748078;--green:#245644;--line:#e0e7df;--paper:#f5f6f1;--soft:#edf2e9;--red:#a8473f}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;color:var(--ink);background:var(--paper);font:14px/1.65 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}button,input,a{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}button:focus-visible,a:focus-visible,.dropzone:focus-visible{outline:3px solid #b1c6a7;outline-offset:4px}a{color:var(--green)}h1,h2,h3,p{margin:0}header,main,footer{max-width:1240px;margin:auto}header{padding:27px 34px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-size:16px;font-weight:750;display:flex;align-items:center;gap:10px}.brand-mark{width:29px;height:29px;border-radius:9px;background:var(--green);display:grid;place-items:center;color:#e7eed4;font-size:18px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#7d897d}.service{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.service-dot{width:6px;height:6px;border-radius:50%;background:#9ba79c}.service[data-state="ready"] .service-dot{background:#4d8a60}.service[data-state="error"] .service-dot{background:#ba7055}main{padding:42px 34px 16px}.intro{margin-bottom:28px;max-width:720px}.intro h1{font-size:clamp(26px,3.4vw,37px);line-height:1.4;letter-spacing:-1px;font-weight:650;margin:8px 0 12px}.intro p{color:#6a796f;font-size:15px}.workspace{display:grid;grid-template-columns:minmax(300px,370px) minmax(0,1fr);align-items:start;gap:24px}.panel{border:1px solid var(--line);border-radius:20px;background:white;overflow:hidden}.upload-panel{padding:26px}.section-heading{display:flex;align-items:center;gap:10px;margin-bottom:18px}.section-heading h2{font-size:17px;font-weight:650}.step-number{width:23px;height:23px;display:grid;place-items:center;background:var(--soft);color:#6a8169;border-radius:7px;font-size:11px;font-weight:650}.dropzone{min-height:206px;border:1.5px dashed #bdcdbb;border-radius:14px;background:#f8faf6;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px 18px;cursor:pointer;transition:.16s}.dropzone:hover,.dropzone.dragover{border-color:var(--green);background:#edf3e8}.upload-icon{width:44px;height:44px;margin:0 auto 13px;background:white;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;font-size:26px;color:#6b8665}.upload-title{font-weight:600;margin-bottom:5px}.upload-hint{font-size:12px;color:var(--muted)}.source-strip{display:flex;align-items:center;gap:13px;width:100%;text-align:left}.source-strip img{width:62px;height:114px;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:5px;background:white}.source-info{min-width:0;flex:1}.source-name{font-weight:600;overflow-wrap:anywhere;font-size:13px}.source-size{color:var(--muted);font-size:12px;margin:5px 0 10px}.change-image{font-size:12px;color:var(--green);text-decoration:underline;text-underline-offset:3px}.upload-description{color:var(--muted);font-size:12px;margin:13px 0 20px}.primary{border:0;background:var(--green);color:white;border-radius:11px;padding:13px 18px;font-weight:600;width:100%;display:flex;justify-content:center;align-items:center;gap:9px}.primary:hover:not(:disabled){background:#193f31}.primary .arrow{margin-left:auto;font-size:18px}.primary .button-label{margin-right:auto}.form-message{font-size:12px;line-height:1.65;margin-top:11px;color:var(--muted)}.form-message.error{color:var(--red)}.workflow{border-top:1px solid var(--line);margin-top:23px;padding-top:18px;display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}.workflow span+span:before{content:'→';padding-right:9px;color:#a0b09b}.history{margin:24px 0}.history-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 3px}.history-title h2{font-size:13px;font-weight:600}.history-title span{font-size:11px;color:var(--muted)}.history-list{display:grid;gap:7px}.history-empty{font-size:12px;color:var(--muted);padding:4px 3px}.history-item{display:block;width:100%;text-align:left;border:1px solid transparent;border-radius:11px;background:transparent;padding:11px 13px;color:var(--ink)}.history-item:hover{background:#eaf0e6}.history-item[aria-current="true"]{border-color:#cbd9c6;background:#ecf2e7}.history-name{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;gap:6px}.preview-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:21px 25px;border-bottom:1px solid var(--line);flex-wrap:wrap}.preview-header h2{font-size:16px;font-weight:650}.preview-header-left{display:flex;align-items:center;gap:9px}.badge{font-size:10px;color:#7c8c78;background:var(--soft);padding:2px 7px;border-radius:5px}.preview-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.segmented{display:flex;background:#f0f3ed;padding:3px;border-radius:8px}.segmented button{border:0;background:none;color:#7a8879;padding:5px 10px;border-radius:6px;font-size:11px}.segmented button[aria-pressed="true"]{background:white;color:var(--ink);box-shadow:0 1px 4px #24472b10}.download{display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-size:12px;font-weight:600;padding:6px 2px}.empty-state{min-height:532px;display:flex;align-items:center;justify-content:center;text-align:center;padding:44px 24px;background:linear-gradient(150deg,#fafbf8,#f0f4ec)}.empty-state h3{font-size:17px;font-weight:500;margin:22px 0 8px}.empty-state p{max-width:290px;color:var(--muted);font-size:13px}.mini-store{width:142px;height:195px;margin:auto;padding:12px;background:#fff;border:1px solid #d9e2d4;border-radius:13px;box-shadow:8px 10px 0 #e4ebdd;transform:rotate(-5deg)}.mini-top{display:flex;align-items:center;gap:8px;margin-bottom:13px}.mini-circle{width:24px;height:24px;background:#cbd6be;border-radius:50%}.mini-lines{flex:1}.mini-line{height:5px;background:#dce5d4;border-radius:3px;margin:4px 0}.mini-line.short{width:60%}.mini-nav{display:flex;justify-content:space-between;margin:11px 0}.mini-nav i{width:19px;height:19px;background:#eef1e6;border-radius:50%}.mini-banner{height:54px;background:linear-gradient(125deg,#ced8be,#9daa87);border-radius:3px;position:relative;overflow:hidden}.mini-banner:after{content:'';position:absolute;width:51px;height:75px;border-radius:40px;background:#e4e8d9;right:18px;top:14px;transform:rotate(28deg)}.mini-cards{display:flex;gap:6px;margin-top:9px}.mini-cards i{height:29px;background:#edf1e7;flex:1;border-radius:3px}.progress-state{padding:42px 30px;min-height:400px}.progress-state h3{font-size:20px;font-weight:600;margin-bottom:8px}.progress-state>p{font-size:13px;color:var(--muted);line-height:1.8}.progress-list{list-style:none;margin:29px 0 0;padding:0;display:grid;gap:20px}.progress-list li{display:flex;gap:12px;align-items:center;color:#99a396;font-size:13px}.progress-marker{width:24px;height:24px;border:1px solid #dbe2d6;border-radius:50%;display:grid;place-items:center;font-size:11px;background:white;flex-shrink:0}.progress-list li.done{color:#6f826c}.progress-list li.done .progress-marker{background:#eaf1e5;border-color:#eaf1e5;color:#56764f}.progress-list li.current{color:var(--green);font-weight:600}.progress-list li.current .progress-marker{background:var(--green);border-color:var(--green);color:white;box-shadow:0 0 0 4px #edf2e8}.failure-state{padding:65px 30px;min-height:340px}.failure-state h3{font-size:20px;margin-bottom:12px}.failure-state p{color:#737e72;line-height:1.8;font-size:13px;max-width:450px}.secondary{background:white;color:var(--green);border:1px solid #c7d5c0;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:600}.failure-state .secondary{margin-top:22px}.result-info{padding:21px 25px 18px}.design-heading{display:flex;gap:12px;align-items:center;justify-content:space-between}.design-heading h3{font-size:16px;font-weight:600}.result-info p{font-size:12px;color:#73806e;margin-top:7px}.palette{display:flex;gap:4px}.palette i{width:13px;height:13px;border-radius:50%;border:1px solid #0000000c}.partial-note{background:#fff7e9;border-top:1px solid #f1e2c6;border-bottom:1px solid #f1e2c6;padding:14px 25px;font-size:12px;color:#805e2d}.partial-note strong{display:block;margin-bottom:4px}.partial-note .secondary{margin-top:10px;background:#fffdf8;border-color:#e3cfa9;color:#805e2d}.image-stage{padding:25px;background:#e9ede5;text-align:center;min-height:180px}.image-stage img{display:block;width:100%;max-width:440px;height:auto;margin:auto;box-shadow:0 6px 22px #25352716;background:white}.result-caption{font-size:11px;color:var(--muted);padding:10px 24px;text-align:center;border-top:1px solid var(--line)}.warnings{margin:0;padding:15px 25px 15px 41px;color:#857045;font-size:12px;background:#fcfbf7}.active-note{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 16px;margin-bottom:12px;border:1px solid #d5e1cc;background:#ecf2e6;border-radius:11px;font-size:12px;color:#56714c}.active-note button{border:0;padding:0;background:none;color:var(--green);font-size:12px;font-weight:600;white-space:nowrap}.image-error{font-size:12px;color:var(--red);padding:15px 24px}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.design-plan{display:grid;gap:8px;margin-top:15px}.plan-item{padding:10px 12px;border-radius:9px;background:#f5f7f1;font-size:12px}.plan-item strong{display:block;font-size:11px;font-weight:600;color:#7b8974;margin-bottom:3px}.plan-item span{display:block;overflow-wrap:anywhere}.design-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.design-meta span{border:1px solid #e3e9dc;border-radius:6px;padding:3px 7px;font-size:11px;color:#697b60}.download-sections{padding:15px 25px;border-top:1px solid var(--line);background:#fafbf7}.download-sections h3{font-size:12px;font-weight:600;margin-bottom:9px}.download-links{display:flex;gap:8px;flex-wrap:wrap}.download-links a{border:1px solid #d5e0ca;border-radius:7px;background:white;padding:6px 10px;font-size:11px;text-decoration:none}.download-links a:hover{background:var(--soft)}.legacy-note{padding:11px 25px;background:#f8f4e9;border-bottom:1px solid #e8dfc8;color:#84724d;font-size:12px}.elapsed{color:var(--muted);font-size:11px;margin-top:13px}.progress-plan{margin-top:19px;border-top:1px solid var(--line);padding-top:14px;color:#6b7d63;font-size:12px}.progress-plan strong{display:block;margin-bottom:4px;color:var(--ink);font-weight:600}footer{padding:20px 34px 30px;display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px;flex-wrap:wrap}
+@media(max-width:850px){.workspace{grid-template-columns:minmax(265px,320px) minmax(0,1fr);gap:16px}main,header{padding-left:22px;padding-right:22px}.upload-panel{padding:20px}.preview-header{padding:18px}.preview-toolbar{gap:7px}.preview-header-left{width:100%}.image-stage{padding:18px}.intro h1{font-size:29px}}
+@media(max-width:650px){header{padding:20px 20px 0}main{padding:28px 18px 10px}.intro{margin-bottom:22px}.intro h1{font-size:27px;letter-spacing:-.5px}.intro p{font-size:13px}.workspace{display:flex;flex-direction:column;gap:18px}.input-column,.result-column{width:100%}.dropzone{min-height:150px}.upload-panel{padding:22px}.history{margin:18px 0 0}.history-list{grid-template-columns:1fr 1fr}.history-item{padding:9px}.history-meta{font-size:10px}.history-item:nth-child(n+3){display:none}.preview-header-left{width:auto}.empty-state{min-height:355px}.progress-state{min-height:360px;padding:30px 25px}.result-info{padding:18px}.partial-note{padding:14px 18px}.image-stage{padding:16px 12px}.image-stage img{max-width:100%}footer{padding:18px 20px 25px;font-size:10px}.service{font-size:11px}.preview-toolbar{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="brand-mark" aria-hidden="true">↗</span>店铺新貌</div><div class="service" id="service"><span class="service-dot"></span><span id="service-label">正在连接</span></div></header>
+<main>
+<section class="intro"><div class="eyebrow">截图上传 · 整页设计 · 图片下载</div><h1>从你的店铺出发，设计一整页。</h1><p>自动读取店名与商品，在已确认的微购页面布局中设计装修内容，生成完整效果图。</p></section>
+<div class="workspace">
+<div class="input-column">
+<form class="panel upload-panel" id="form">
+<div class="section-heading"><span class="step-number">01</span><h2>上传店铺截图</h2></div>
+<input class="sr-only" id="screenshot" name="screenshot" type="file" accept="image/png,image/jpeg,image/webp" tabindex="-1">
+<div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="选择或拖入店铺截图">
+<div id="upload-empty"><div class="upload-icon" aria-hidden="true">↑</div><div class="upload-title">点击选择，或拖入截图</div><div class="upload-hint">PNG、JPG、WebP · 最大 30 MB</div></div>
+<div class="source-strip" id="source-strip" hidden><img id="source" alt="所选店铺截图"><div class="source-info"><div class="source-name" id="source-name"></div><div class="source-size" id="source-size"></div><span class="change-image">更换截图</span></div></div>
+</div>
+<p class="upload-description">支持店铺长截图。尽量包含清晰的店铺名称和商品，装修内容与风格由应用自动安排，保留已确认的页面结构。</p>
+<button class="primary" id="submit" type="submit" disabled><span class="button-label" id="submit-label">开始整页设计</span><span class="arrow" aria-hidden="true">↗</span></button>
+<p class="form-message" id="form-message" role="status" aria-live="polite">选择一张截图即可开始。</p>
+<div class="workflow" aria-label="自动处理流程"><span>理解店铺</span><span>设计装修内容</span><span>生成效果</span></div>
+</form>
+<section class="history" id="history-section" aria-label="最近生成记录"><div class="history-title"><h2>最近的预览</h2><span>保存在当前电脑</span></div><div class="history-list" id="history"><p class="history-empty">暂无生成记录</p></div></section>
+</div>
+<div class="result-column">
+<div class="active-note" id="active-note" hidden><span>有一份装修预览正在生成</span><button type="button" id="view-active">查看进度 →</button></div>
+<section class="panel" id="result-panel" aria-label="装修结果">
+<div class="preview-header"><div class="preview-header-left"><h2>整页装修预览</h2><span class="badge" id="result-badge">等待截图</span></div><div class="preview-toolbar" id="preview-toolbar" hidden><div class="segmented" aria-label="切换预览"><button id="view-result" type="button" aria-pressed="true">装修效果</button><button id="view-original" type="button" aria-pressed="false">原始截图</button></div><a class="download" id="download" download="店铺装修预览.png">下载完整图 ↓</a></div></div>
+<p class="legacy-note" id="legacy-note" hidden>这是旧版记录，旧版 UI 已停用，仅供历史查看；当前版本保留已确认的微购页面结构。</p>
+<div class="empty-state" id="empty-state"><div><div class="mini-store" aria-hidden="true"><div class="mini-top"><div class="mini-circle"></div><div class="mini-lines"><div class="mini-line"></div><div class="mini-line short"></div></div></div><div class="mini-nav"><i></i><i></i><i></i><i></i></div><div class="mini-banner"></div><div class="mini-cards"><i></i><i></i><i></i></div></div><h3>让你的商品，更有吸引力</h3><p>上传后，完整的装修效果会呈现在这里。无需选择风格，也不用手动拼图。</p></div></div>
+<div class="progress-state" id="progress-state" hidden><h3 id="progress-title">正在为店铺设计</h3><p id="progress-message" role="status" aria-live="polite">请稍候，正在读取店铺截图。</p><div class="elapsed" id="progress-elapsed" hidden></div><ol class="progress-list" id="progress-list"><li><span class="progress-marker">1</span>读取店铺，确定装修风格</li><li><span class="progress-marker">2</span>整理商品与页面素材</li><li><span class="progress-marker">3</span>生成主视觉海报</li><li><span class="progress-marker">4</span>按确认布局组合整页与分区图片</li></ol><div class="progress-plan" id="progress-plan" hidden><strong id="progress-plan-title"></strong><span id="progress-plan-summary"></span></div></div>
+<div class="failure-state" id="failure-state" hidden><h3 id="failure-title">这次生成未完成</h3><p id="failure-message"></p><button class="secondary" id="failure-retry" type="button" hidden>重新生成海报</button><button class="secondary" id="refresh-result" type="button" hidden>重新连接</button></div>
+<div id="result-content" hidden><div class="result-info"><div class="design-heading"><h3 id="design-title">店铺装修方案</h3><div class="palette" id="palette" aria-label="设计配色"></div></div><p id="design-summary"></p><div class="design-meta" id="design-meta" hidden></div><div class="design-plan" id="design-plan" hidden></div></div><div class="partial-note" id="partial-note" hidden><strong>整页已组合，主视觉使用原图替代</strong><span>主海报未生成成功，当前使用截图中的商品素材组合。你可以查看和下载当前版本，也可以单独重新生成主海报。</span><div><button class="secondary" id="partial-retry" type="button" hidden>重新生成主海报</button></div></div><div class="image-stage"><img id="preview" alt="完整店铺装修预览"></div><p class="image-error" id="image-error" hidden>图片未能加载，请稍后重新打开这份预览。</p><p class="result-caption" id="result-caption">装修效果图已生成，可下载保存</p><section class="download-sections" id="download-sections" hidden aria-label="分区图片下载"><h3>分区图片</h3><div class="download-links" id="download-links"></div></section><ul class="warnings" id="warnings" hidden></ul></div>
+</section>
+</div>
+</div>
+</main>
+<footer><span>店铺新貌 · 装修效果预览 Demo</span><span>生成会使用已配置的 AI 服务</span></footer>
+<script>
+const $ = id => document.getElementById(id);
+const MAX_FILE_SIZE = 30 * 1024 * 1024;
+const STORAGE_KEY = 'assisted-run';
+const CURRENT_VERSION = 'demo-4';
+const state = {configured:false, connected:false, busy:false, activeId:'', submitting:false, file:null, sourceURL:'', selectedId:'', selectedRun:null, original:false, selectionVersion:0, serviceVersion:0, jobEpoch:0, pollTimer:null, serviceTimer:null, elapsedTimer:null, controller:null, recent:[], disposed:false};
+const labels = {running:'生成中',complete:'已生成',partial:'主视觉待完成',failed:'未完成'};
+const validId = id => typeof id === 'string' && /^[a-zA-Z0-9_-]+$/.test(id);
+const runUrl = (id, file) => '/runs/'+encodeURIComponent(id)+'/'+file;
+const plainText = value => typeof value==='string'?value.trim():'';
+function elapsedText(run){
+  const start=Date.parse(run?.startedAt),end=run?.status==='running'?Date.now():Date.parse(run?.finishedAt);
+  if(!Number.isFinite(start)||!Number.isFinite(end)||end<start)return '';
+  const seconds=Math.floor((end-start)/1000),minutes=Math.floor(seconds/60);
+  return (run.status==='running'?'已用时 ':run.recomposedFrom?'重排耗时 ':'生成耗时 ')+(minutes?minutes+' 分 ':'')+(seconds%60)+' 秒';
+}
+function renderElapsed(){const text=elapsedText(state.selectedRun);$('progress-elapsed').textContent=text;$('progress-elapsed').hidden=!text;}
+function scheduleElapsed(){clearInterval(state.elapsedTimer);if(!state.disposed)state.elapsedTimer=setInterval(()=>{if(state.selectedRun?.status==='running')renderElapsed();},1000);}
+function remember(id){try{localStorage.setItem(STORAGE_KEY,id);}catch{}}
+function remembered(){try{return localStorage.getItem(STORAGE_KEY)||'';}catch{return '';}}
+async function json(url, options={}){
+  const response = await fetch(url,{cache:'no-store',...options});
+  let value;try{value=await response.json();}catch{throw new Error(response.status===413?'截图超过上传限制，请选择不超过 30 MB 的图片。':'暂时无法连接服务，请稍后再试。');}
+  if(!response.ok) throw new Error(value.error||'请求没有完成，请稍后再试。');
+  return value;
+}
+function message(text, error=false){$('form-message').textContent=text;$('form-message').className='form-message'+(error?' error':'');}
+function updateControls(){
+  const blocked=!state.connected||!state.configured||state.busy||state.submitting;
+  $('submit').disabled=blocked||!state.file;
+  $('submit-label').textContent=state.submitting?'正在提交…':state.busy?'正在生成，请稍候':'开始整页设计';
+  $('partial-retry').disabled=blocked;$('failure-retry').disabled=blocked;
+  $('active-note').hidden=!(state.busy&&state.activeId&&state.activeId!==state.selectedId);
+  $('service').dataset.state=!state.connected||!state.configured?'error':'ready';
+  $('service-label').textContent=!state.connected?'服务未连接':!state.configured?'服务待配置':state.busy?'正在生成':'服务已就绪';
+}
+function chooseFile(file){
+  if(!file)return;
+  const reject=text=>{if(state.sourceURL)URL.revokeObjectURL(state.sourceURL);state.sourceURL='';state.file=null;$('screenshot').value='';$('source').removeAttribute('src');$('source-strip').hidden=true;$('upload-empty').hidden=false;message(text,true);updateControls();};
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)){reject('请选择 PNG、JPG 或 WebP 图片。');return;}
+  if(!file.size){reject('这张图片为空，请换一张截图。');return;}
+  if(file.size>MAX_FILE_SIZE){reject('这张图片为 '+(file.size/1024/1024).toFixed(1)+' MB，超过 30 MB 上传限制。请压缩后再上传。');return;}
+  if(state.sourceURL)URL.revokeObjectURL(state.sourceURL);
+  state.file=file;state.sourceURL=URL.createObjectURL(file);$('source').src=state.sourceURL;
+  $('source-name').textContent=file.name;$('source-size').textContent=(file.size/1024/1024).toFixed(1)+' MB · 已选择';
+  $('source-strip').hidden=false;$('upload-empty').hidden=true;
+  message(state.busy?'截图已选择，当前任务结束后即可开始。':'截图已准备好，应用会在已确认的页面结构内设计装修内容。');updateControls();
+}
+function showState(name){
+  for(const key of ['empty-state','progress-state','failure-state','result-content'])$(key).hidden=key!==name;
+  $('preview-toolbar').hidden=name!=='result-content';
+}
+function renderHistory(){
+  $('history').replaceChildren();
+  if(!state.recent.length){const p=document.createElement('p');p.className='history-empty';p.textContent='暂无生成记录';$('history').append(p);return;}
+  for(const run of state.recent.slice(0,5)){
+    if(!validId(run.id))continue;
+    const button=document.createElement('button');button.type='button';button.className='history-item';button.setAttribute('aria-current',String(run.id===state.selectedId));
+    const title=document.createElement('span');title.className='history-name';title.textContent=(run.shopName||'店铺装修方案')+(run.version===CURRENT_VERSION?'':' · 旧版 · UI已停用');
+    const meta=document.createElement('span');meta.className='history-meta';const date=document.createElement('span');const parsed=new Date(run.startedAt);date.textContent=Number.isNaN(parsed.getTime())?'已保存':parsed.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});const status=document.createElement('span');status.textContent=labels[run.status]||'已保存';meta.append(date,status);button.append(title,meta);button.onclick=()=>selectRun(run.id);$('history').append(button);
+  }
+}
+async function refreshHistory(){try{const items=await json('/api/recent');if(state.disposed)return;state.recent=Array.isArray(items)?items:[];renderHistory();}catch{if(!state.recent.length){$('history').textContent='生成记录暂时无法读取。';}}}
+function renderImage(){
+  if(!state.selectedRun)return;
+  $('view-result').setAttribute('aria-pressed',String(!state.original));$('view-original').setAttribute('aria-pressed',String(state.original));
+  $('preview').alt=state.original?'原始店铺截图':'完整店铺装修预览';$('preview').src=runUrl(state.selectedId,state.original?'screenshot.png':'preview.png');
+  $('result-caption').textContent=state.original?'上传的原始店铺截图':state.selectedRun.recomposedFrom?'已按确认布局重排，复用已有素材，未重新调用生图':state.selectedRun.status==='partial'?'当前主视觉由原始素材组合，可下载完整图或分区图片':'装修效果图已生成，可下载保存';$('image-error').hidden=true;
+}
+function renderDesign(run){
+  const design=run.design||{};
+  $('design-title').textContent=plainText(design.title)||(run.shopName||'店铺')+' · 装修方案';
+  const summary=plainText(design.summary)||plainText(design.direction);
+  $('design-summary').textContent=summary;$('design-summary').hidden=!summary;
+  $('palette').replaceChildren();
+  const colors=Array.isArray(design.palette)?design.palette:Object.values(design.palette||{});
+  for(const entry of colors.slice(0,5)){const color=typeof entry==='string'?entry:entry?.hex;if(typeof color==='string'&&/^#[0-9a-f]{6}$/i.test(color)){const swatch=document.createElement('i');swatch.style.backgroundColor=color;swatch.title=color;$('palette').append(swatch);}}
+  $('palette').hidden=!$('palette').children.length;
+  $('design-meta').replaceChildren();
+  const meta=[];
+  if(run.recomposedFrom)meta.push('复用已生成素材 · 按确认布局重排');
+  if(Number.isInteger(run.productCount)&&run.productCount>0)meta.push('已整理 '+run.productCount+' 件商品');
+  const elapsed=elapsedText(run);if(elapsed)meta.push(elapsed);
+  for(const text of meta){const tag=document.createElement('span');tag.textContent=text;$('design-meta').append(tag);}
+  $('design-meta').hidden=!meta.length;
+  $('design-plan').replaceChildren();
+  const addPlan=(label,text)=>{if(!text)return;const item=document.createElement('div');item.className='plan-item';const title=document.createElement('strong'),body=document.createElement('span');title.textContent=label;body.textContent=text;item.append(title,body);$('design-plan').append(item);};
+  if(run.version===CURRENT_VERSION){
+    const hero=design.hero||{},headline=plainText(hero.headline),subheadline=plainText(hero.subheadline);
+    addPlan('轮播主视觉',[headline,subheadline].filter(Boolean).join(' · '));
+    for(const section of Array.isArray(design.sections)?design.sections:[]){
+      if(!section||!['poster','feature','catalog'].includes(section.kind))continue;
+      const title=plainText(section.title),subtitle=plainText(section.subtitle);
+      addPlan(section.kind==='catalog'?'商品橱窗':'三列海报',[title,subtitle].filter(Boolean).join(' · '));
+    }
+  }
+  $('design-plan').hidden=!$('design-plan').children.length;
+}
+function renderDownloads(run){
+  const files=new Set(['preview.png','hero-panel.png','feature-panel.png','catalog-panel.png']);
+  const artifacts=Array.isArray(run.artifacts)?run.artifacts.filter(item=>item&&files.has(item.file)):[];
+  const full=artifacts.find(item=>item.file==='preview.png');
+  $('download').hidden=!(full||run.hasPreview===true||(run.version!==CURRENT_VERSION&&run.hasPreview!==false));
+  $('download').href=runUrl(run.id,'preview.png');$('download').download=(run.shopName||'店铺')+'-装修预览.png';
+  $('download-links').replaceChildren();const shown=new Set();
+  for(const artifact of artifacts){
+    if(artifact.file==='preview.png'||shown.has(artifact.file))continue;shown.add(artifact.file);
+    const link=document.createElement('a');const fallback=({'hero-panel.png':'轮播主视觉','feature-panel.png':'三列海报','catalog-panel.png':'商品橱窗'})[artifact.file];
+    const label=run.version===CURRENT_VERSION?fallback:(plainText(artifact.label)||fallback);link.textContent=label+' ↓';link.href=runUrl(run.id,artifact.file);link.download=(run.shopName||'店铺')+'-'+label+'.png';$('download-links').append(link);
+  }
+  $('download-sections').hidden=!$('download-links').children.length;
+}
+function renderRun(run){
+  state.selectedRun=run;$('result-badge').textContent=(run.version===CURRENT_VERSION?'':'旧版 · UI已停用 · ')+(labels[run.status]||'处理中');$('legacy-note').hidden=run.version===CURRENT_VERSION;
+  if(run.status==='running'){
+    showState('progress-state');$('progress-title').textContent=run.shopName?'正在为「'+run.shopName+'」设计':'正在为店铺设计';$('progress-message').textContent=run.stage||'正在处理，请稍候。';
+    const step=({0:0,1:0,2:1,3:1,4:2,5:3})[Number(run.step)]??0;
+    [...$('progress-list').children].forEach((li,index)=>{li.className=index<step?'done':index===step?'current':'';li.querySelector('.progress-marker').textContent=index<step?'✓':String(index+1);});
+    renderElapsed();const design=run.design||{};$('progress-plan-title').textContent=plainText(design.title);$('progress-plan-summary').textContent=plainText(design.summary);$('progress-plan').hidden=run.version!==CURRENT_VERSION||!plainText(design.title);
+  }else if(run.status==='failed'||run.hasPreview===false){
+    showState('failure-state');$('failure-title').textContent='这次生成未完成';$('failure-message').textContent=run.error||'没有获得完整预览，请重新提交截图。';$('failure-retry').hidden=!run.canRetry;$('refresh-result').hidden=true;
+    if(run.id===state.activeId)message('这次生成未完成，请查看右侧说明。',true);
+  }else{
+    showState('result-content');renderDesign(run);renderDownloads(run);
+    $('partial-note').hidden=run.status!=='partial';$('partial-retry').hidden=!run.canRetry;
+    let generationError=$('generation-error');
+    if(!generationError){generationError=document.createElement('p');generationError.id='generation-error';$('partial-note').insertBefore(generationError,$('partial-retry').parentElement);}
+    generationError.textContent=plainText(run.generationError);generationError.hidden=!generationError.textContent;
+    $('warnings').replaceChildren();for(const warning of Array.isArray(run.warnings)?run.warnings:[]){const li=document.createElement('li');li.textContent=String(warning);$('warnings').append(li);}$('warnings').hidden=!$('warnings').children.length;
+    renderImage();
+    if(run.id===state.activeId)message(run.status==='partial'?'整页已组合，主视觉使用原图替代，可单独重新生成海报。':'整页预览已生成，可以查看对照并下载。');
+  }
+  updateControls();
+}
+async function selectRun(id){
+  if(!validId(id))return;
+  clearTimeout(state.pollTimer);if(state.controller)state.controller.abort();
+  state.selectedId=id;state.selectedRun=null;state.original=false;state.selectionVersion+=1;remember(id);renderHistory();updateControls();
+  $('preview').removeAttribute('src');$('result-badge').textContent='读取中';$('legacy-note').hidden=true;showState('progress-state');$('progress-title').textContent='正在读取预览';$('progress-message').textContent='请稍候…';$('progress-list').hidden=true;$('progress-elapsed').hidden=true;$('progress-plan').hidden=true;
+  await pollRun(id,state.selectionVersion);
+}
+async function pollRun(id,version){
+  if(state.disposed||version!==state.selectionVersion)return;
+  state.controller=new AbortController();
+  try{
+    const run=await json(runUrl(id,'run.json'),{signal:state.controller.signal});if(version!==state.selectionVersion||state.disposed)return;
+    $('progress-list').hidden=false;renderRun(run);
+    if(run.status==='running'){state.pollTimer=setTimeout(()=>pollRun(id,version),2200);}
+    else{await refreshService(false);await refreshHistory();}
+  }catch(error){
+    if(error.name==='AbortError'||version!==state.selectionVersion||state.disposed)return;
+    showState('failure-state');$('result-badge').textContent='连接中断';$('failure-title').textContent='暂时无法读取预览';$('failure-message').textContent='生成可能仍在后台继续，你可以重新连接查看进度。';$('failure-retry').hidden=true;$('refresh-result').hidden=false;
+  }
+}
+async function restoreRecomposedRecord(){
+  if(state.busy||state.disposed||!state.selectedRun||state.selectedRun.version===CURRENT_VERSION)return;
+  const previousId=state.selectedId;
+  const updated=state.recent.find(run=>run.version===CURRENT_VERSION&&run.recomposedFrom===previousId&&validId(run.id));
+  if(updated&&state.selectedId===previousId)await selectRun(updated.id);
+}
+async function refreshService(restore=false){
+  const version=++state.serviceVersion,epoch=state.jobEpoch;
+  try{
+    const service=await json('/api/status');if(state.disposed||version!==state.serviceVersion||epoch!==state.jobEpoch)return;
+    const previouslyActive=state.activeId;state.connected=true;state.configured=!!service.configured;state.busy=!!service.busy;state.activeId=validId(service.activeId)?service.activeId:'';updateControls();
+    if(!state.configured)message('生成服务尚未配置，请联系应用维护者。',true);
+    if(restore){const id=state.activeId||remembered();if(validId(id))await selectRun(id);}
+    else if(previouslyActive&&!state.busy){refreshHistory();}
+  }catch{if(state.disposed||version!==state.serviceVersion||epoch!==state.jobEpoch)return;state.connected=false;updateControls();if(restore)message('暂时无法连接应用服务，请确认应用已启动。',true);}
+}
+function scheduleService(){clearTimeout(state.serviceTimer);if(state.disposed)return;state.serviceTimer=setTimeout(async()=>{await refreshService(false);scheduleService();},4500);}
+async function startJob(retry=false){
+  if(state.submitting||state.busy||!state.connected||!state.configured)return;
+  if(retry?!state.selectedRun?.canRetry:!state.file)return;
+  state.submitting=true;state.jobEpoch+=1;updateControls();message(retry?'正在重新生成主海报，沿用已整理的店铺素材与页面方案。':'正在上传截图，请稍候…');
+  try{
+    let response;
+    if(retry){response=await json('/api/retry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:state.selectedId})});}
+    else{const body=new FormData();body.append('screenshot',state.file);response=await json('/api/generate',{method:'POST',body});}
+    if(!validId(response.id))throw new Error('没有收到有效的生成任务，请稍后再试。');
+    state.jobEpoch+=1;state.busy=true;state.activeId=response.id;message('已开始生成。你可以在这里查看进度，刷新页面后也会恢复任务。');await selectRun(response.id);await refreshHistory();
+  }catch(error){message(error.message,true);await refreshService(false);}
+  finally{state.submitting=false;updateControls();}
+}
+$('screenshot').addEventListener('change',event=>chooseFile(event.target.files[0]));
+$('dropzone').addEventListener('click',()=>$('screenshot').click());
+$('dropzone').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();$('screenshot').click();}});
+for(const name of ['dragenter','dragover'])$('dropzone').addEventListener(name,event=>{event.preventDefault();$('dropzone').classList.add('dragover');});
+for(const name of ['dragleave','drop'])$('dropzone').addEventListener(name,event=>{event.preventDefault();$('dropzone').classList.remove('dragover');});
+$('dropzone').addEventListener('drop',event=>{const files=event.dataTransfer.files;if(files.length>1){message('每次请选择一张完整的店铺截图。',true);return;}chooseFile(files[0]);});
+window.addEventListener('dragover',event=>event.preventDefault());window.addEventListener('drop',event=>event.preventDefault());
+$('form').addEventListener('submit',event=>{event.preventDefault();startJob();});
+$('view-active').onclick=()=>selectRun(state.activeId);
+$('view-result').onclick=()=>{state.original=false;renderImage();};$('view-original').onclick=()=>{state.original=true;renderImage();};
+$('partial-retry').onclick=()=>startJob(true);$('failure-retry').onclick=()=>startJob(true);$('refresh-result').onclick=()=>selectRun(state.selectedId);
+$('preview').addEventListener('error',()=>{$('image-error').hidden=false;});
+window.addEventListener('pagehide',()=>{state.disposed=true;clearTimeout(state.pollTimer);clearTimeout(state.serviceTimer);clearInterval(state.elapsedTimer);if(state.controller)state.controller.abort();if(state.sourceURL)URL.revokeObjectURL(state.sourceURL);});
+window.addEventListener('pageshow',event=>{if(event.persisted){state.disposed=false;if(state.file){state.sourceURL=URL.createObjectURL(state.file);$('source').src=state.sourceURL;}scheduleElapsed();refreshService(true).finally(scheduleService);}});
+(async()=>{scheduleElapsed();await refreshService(true);await refreshHistory();await restoreRecomposedRecord();scheduleService();})();
+</script>
+</body>
+</html>

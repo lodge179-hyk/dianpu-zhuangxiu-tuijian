@@ -1,0 +1,43 @@
+{
+  "scope": "Complete-store assembly using the accepted A8 module order, six accepted A11 crops, and one supplementary generated sheet",
+  "maxGenerationCalls": 1,
+  "actualGenerationCalls": 1,
+  "status": "Ready for user review",
+  "expectedNewPanels": 6,
+  "expectedNewPanelLayout": [
+    1,
+    1,
+    4
+  ],
+  "expectedModules": 22,
+  "preserve": "A8 module order and fixed component geometry via the A9 component library",
+  "reviewFocus": [
+    "Complete-page assembly",
+    "Correct image-to-module mapping",
+    "Actual clarity and composition"
+  ],
+  "excluded": [
+    "Final style approval",
+    "Customer download feature",
+    "Automatic screenshot analysis",
+    "Business application changes"
+  ],
+  "inputClarification": {
+    "userObservation": "Customer screenshots contain extremely small product photos",
+    "decision": "Do not depend on extracting usable product assets from screenshots; treat reuse as optional",
+    "screenshotRole": "Broad store/category/layout understanding only where evidence is legible; do not infer exact product identity or details",
+    "generationRole": "Illustrative decoration assets, not verified customer SKUs"
+  },
+  "generationTool": "built-in image_gen.imagegen",
+  "modelId": null,
+  "cost": null,
+  "supplementDimensions": [
+    992,
+    1586
+  ],
+  "originalGenerationPath": "C:/Users/Administrator/.codex/generated_images/01a0a28a-4429-76f0-b3b4-32effdfcbca9/exec-1103b717-3662-48e9-a6ce-7d456ed76fe0.png",
+  "preview": "完整长页-批量素材预览.html",
+  "verification": "verification.json",
+  "moduleInstances": 22,
+  "photoSlots": 44
+}

@@ -1,0 +1,463 @@
+{
+  "width": 483,
+  "modules": [
+    {
+      "id": "module01",
+      "type": "signboard.default",
+      "label": "默认招牌",
+      "content": {
+        "background": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+        "shop": {
+          "name": "示例店铺",
+          "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+          "vip": true,
+          "newCount": "12",
+          "totalCount": "120"
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "module02",
+      "type": "signboard.classic",
+      "label": "经典招牌",
+      "content": {
+        "background": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+        "shop": {
+          "name": "示例店铺",
+          "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+          "vip": true,
+          "newCount": "12",
+          "totalCount": "120"
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "module03",
+      "type": "signboard.minimal",
+      "label": "极简招牌",
+      "content": {
+        "shop": {
+          "name": "示例店铺",
+          "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+          "vip": true,
+          "newCount": "12",
+          "totalCount": "120"
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "module04",
+      "type": "signboard.fullscreen",
+      "label": "全屏轮播招牌",
+      "content": {
+        "background": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+        "shop": {
+          "name": "示例店铺",
+          "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+          "vip": true,
+          "newCount": "12",
+          "totalCount": "120"
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "module05",
+      "type": "navigation.four",
+      "label": "每行 4 个",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module06",
+      "type": "navigation.five",
+      "label": "每行 5 个",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "label": "分类 1"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "label": "分类 2"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "label": "分类 3"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "label": "分类 4"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "label": "分类 5"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module07",
+      "type": "poster.single",
+      "label": "单列海报",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module08",
+      "type": "poster.two",
+      "label": "双列海报",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module09",
+      "type": "poster.three",
+      "label": "三列海报",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module10",
+      "type": "poster.combo1",
+      "label": "三图组合 1 · 左大右小",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module11",
+      "type": "poster.combo2",
+      "label": "三图组合 2 · 右大左小",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module12",
+      "type": "poster.combo3",
+      "label": "三图组合 3 · 上大下小",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module13",
+      "type": "poster.sliding",
+      "label": "多图滑动海报",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          },
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module14",
+      "type": "carousel.small",
+      "label": "小图轮播",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module15",
+      "type": "carousel.medium",
+      "label": "中图轮播",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module16",
+      "type": "carousel.large",
+      "label": "大图轮播",
+      "content": {
+        "images": [
+          {
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "id": "module17",
+      "type": "showcase.single",
+      "label": "单列橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 01\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "module18",
+      "type": "showcase.two",
+      "label": "双列橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 01\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 02\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "module19",
+      "type": "showcase.three",
+      "label": "三列橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 01\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 02\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 03\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 04\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 05\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 06\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 07\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 08\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 09\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "module20",
+      "type": "showcase.sliding",
+      "label": "滑动橱窗",
+      "content": {
+        "items": [
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 01\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 02\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 03\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 04\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          },
+          {
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC",
+            "title": "示例商品 05\n商品说明文字",
+            "price": "22.44",
+            "currency": "$"
+          }
+        ]
+      },
+      "options": {
+        "singleLineTitles": false
+      }
+    },
+    {
+      "id": "module21",
+      "type": "text.single",
+      "label": "单行公告",
+      "content": {
+        "text": "店铺公告：欢迎选购本店商品"
+      },
+      "options": {}
+    },
+    {
+      "id": "module22",
+      "type": "text.multiline",
+      "label": "多行公告",
+      "content": {
+        "text": "这里是店铺公告第一行。\n这里是店铺公告第二行。\n这里是店铺公告第三行。\n这里是店铺公告第四行。\n这里是店铺公告第五行。"
+      },
+      "options": {}
+    },
+    {
+      "id": "module23",
+      "type": "text.link",
+      "label": "文字链接",
+      "content": {
+        "text": "查看更多店铺信息"
+      },
+      "options": {}
+    }
+  ]
+}

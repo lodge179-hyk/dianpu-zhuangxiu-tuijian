@@ -1,0 +1,37 @@
+{
+  "scope": "Basic rendering only; these variants are not visually accepted by the user.",
+  "results": [
+    {
+      "type": "signboard.classic",
+      "htmlGenerated": true,
+      "width": 483,
+      "height": 224,
+      "namedComponents": 10,
+      "visualReview": false
+    },
+    {
+      "type": "signboard.minimal",
+      "htmlGenerated": true,
+      "width": 483,
+      "height": 113.84402079722705,
+      "namedComponents": 10,
+      "visualReview": false
+    },
+    {
+      "type": "signboard.fullscreen",
+      "htmlGenerated": true,
+      "width": 483,
+      "height": 784.3518197573658,
+      "namedComponents": 10,
+      "visualReview": false
+    },
+    {
+      "type": "navigation.five",
+      "htmlGenerated": true,
+      "width": 483,
+      "height": 275.28125,
+      "namedComponents": 21,
+      "visualReview": false
+    }
+  ]
+}
