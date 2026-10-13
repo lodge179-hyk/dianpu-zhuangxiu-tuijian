@@ -8,7 +8,7 @@ const planSchema = z.object({
   summary: z.string().min(1).max(300),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)) }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120) }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -40,6 +40,14 @@ function validatePlan(input) {
     });
   }
   for (const asset of plan.assets) if (!used.has(asset.id)) throw new Error(`素材 ${asset.id} 没有对应模块，避免无用途生图`);
+  const categoryAssets = new Set(plan.modules.filter(m => m.type.startsWith('navigation.')).flatMap(m => m.props.assetIds));
+  for (const m of plan.modules.filter(m => /^(poster|carousel)\./.test(m.type))) {
+    m.props.assetIds.forEach((assetId, index) => {
+      if (categoryAssets.has(assetId) && entries[m.type].slots[index].width >= 200) warnings.push(`${m.id} 将导航素材 ${assetId} 复用到较大画面，建议给主视觉独立构图，避免整页反复出现同一单品照。`);
+    });
+  }
+  const editorial = plan.assets.filter(a => a.direction && a.direction.role !== 'category' && a.direction.role !== 'product');
+  if (editorial.length >= 4 && new Set(editorial.map(a => a.direction.camera)).size < 2) warnings.push('素材计划中的主视觉都使用同一镜头类型，建议混合场景、俯拍或特写；此检查只看计划，不代表实际生图质量。');
   const assigned = [];
   for (const batch of plan.batches) {
     if (batch.rows.flat().length > 6) throw new Error(`${batch.id} 超过每张总图6个画面的上限`);
@@ -57,7 +65,7 @@ function validatePlan(input) {
 }
 
 function styleLock(style) {
-  return `Shared visual direction: palette ${style.palette.join(', ')}; background: ${style.background}; light: ${style.lighting}; photography: ${style.photography}. Keep this direction consistent across all panels and batches.`;
+  return `Shared art direction: color family ${style.palette.join(', ')}; setting family: ${style.background}; light: ${style.lighting}; photographic finish: ${style.photography}. Unify color grading and image quality. Treat the palette as available accents, not a requirement to put every color in every photo. Each panel's own background, camera and product selection take priority. Different categories may use different packaging, materials and scenes; do not turn the whole store into one imaginary product brand.`;
 }
 function buildBatches(plan) {
   const lookup = new Map(plan.assets.map(a => [a.id, a]));
@@ -68,9 +76,10 @@ function buildBatches(plan) {
     const prompt = [
       'Create ONE photographic asset sheet for a store decoration reference. This is a sheet of independent photographs, not a website or UI.',
       lock,
-      index ? 'Use the previous completed sheet as a visual reference for lighting, palette and materials only. Do not copy its panel arrangement.' : '',
+      index ? 'Reference scope: use the previous sheet only to match white balance, photographic finish and the overall color family. Do not copy its bottles, packaging, props, background set, camera angle or panel arrangement unless explicitly requested for an individual asset. Follow each new panel brief.' : '',
+      'Assign distinct visual jobs to the panels: atmosphere, hero, category identification, scene or detail. Vary camera distance, angle, subject grouping and negative space according to each brief. A coherent collection should contain visibly different photographs. Do not repeat the same product-on-pedestal scene across the sheet.',
       `Exactly ${batch.rows.flat().length} rectangular panels in ${batch.rows.length} horizontal rows, with row counts ${batch.rows.map(r => r.length).join(' / ')}. Approximate whole sheet width:height = 1:${total.toFixed(2)}. Keep all panels complete.`,
-      ...batch.rows.map((row, i) => `Row ${i + 1}, about ${Math.round(rowWeights[i] / total * 100)}% of usable sheet height: ` + row.map((id, j) => { const a = lookup.get(id); return `panel ${j + 1}: ${a.subject}; ${a.composition}; image aspect ${a.aspect}`; }).join(' | ')),
+      ...batch.rows.map((row, i) => `Row ${i + 1}, about ${Math.round(rowWeights[i] / total * 100)}% of usable sheet height: ` + row.map((id, j) => { const a = lookup.get(id), d = a.direction; return `panel ${j + 1} (${id}): ${a.subject}; ${a.composition}; image aspect ${a.aspect}` + (d ? `; job: ${d.role}; camera: ${d.camera}; this panel's setting: ${d.background}; this panel's accents: ${d.accents}` : ''); }).join(' | ')),
       'Use uniform, solid MAGENTA #FF00FF for the outer margin and straight gaps between every panel (about 1-2% of width). Each photo must have its own opaque background. No gradient in separators; no magenta in photos; no object or shadow may cross a panel boundary.',
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',

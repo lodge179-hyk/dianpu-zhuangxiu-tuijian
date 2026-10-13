@@ -42,6 +42,7 @@ function show(state){
   };
   const actions=el('div',undefined,'actions');actions.append(copy,upload);box.append(actions);
   if(state.importedBatches.includes(batch.id))box.append(el('p','本批次已填入','badge'));
+  for(const crop of state.cropReports?.[batch.id]?.crops||[])if(crop.framingReviewRequired)box.append(el('p',crop.assetId+' 为小尺寸品类素材，裁剪去掉约'+crop.removedAreaPercent+'%面积，请检查主体是否保留。','notice'));
   batches.append(box);
  }
  $('preview-note').textContent=state.source==='saved-example'?'复用已存素材的参考效果；商品为示意，价格留空。':state.filledAssets.length===p.assets.length?'素材已全部填入；商品为装修示意，仍需你检验效果。':'黑色区域是待生成素材；固定模块与顺序已按方案显示。';

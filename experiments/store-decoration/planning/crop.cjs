@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 const { aspectRatios, validatePlan } = require('./plan.cjs');
+const { entries } = require('./catalog.cjs');
 function runs(values) {
   const spans = []; let start = null;
   for (let i = 0; i <= values.length; i++) {
@@ -53,12 +54,14 @@ async function cropBatch(bytes, input, batchId, folder) {
     const rect = { left: clean.left + Math.floor((clean.width - cropWidth) / 2), top: clean.top + Math.floor((clean.height - cropHeight) / 2), width: cropWidth, height: cropHeight };
     if (Math.min(cropWidth, cropHeight) < 100) throw new Error(`${panel.id} 裁剪后短边不足100像素，请提高总图尺寸或减少同图画面数。`);
     const removed = 1 - cropWidth * cropHeight / (box.width * box.height);
-    if (removed > .3) throw new Error(`${panel.id} 比例偏差导致裁剪超过30%，本批次暂不填入。`);
+    const smallCategory = asset.direction?.role === 'category' && plan.modules.every(m => m.props.assetIds.every((id, i) => id !== asset.id || entries[m.type].slots[i].width <= 200));
+    const cropLimit = smallCategory ? .35 : .3;
+    if (removed > cropLimit) throw new Error(`${panel.id} 比例偏差导致裁剪超过${Math.round(cropLimit * 100)}%，本批次暂不填入。`);
     let separators = 0;
     for (let y = rect.top; y < rect.top + rect.height; y++) for (let x = rect.left; x < rect.left + rect.width; x++) if (magenta(x, y)) separators++;
     if (separators) throw new Error(`${panel.id} 内仍有分隔色，未写入素材。`);
     const buffer = await sharp(normalized).extract(rect).png().toBuffer();
-    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: rect, aspect: asset.aspect, removedAreaPercent: +(removed * 100).toFixed(2), upscaled: false } });
+    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: rect, aspect: asset.aspect, removedAreaPercent: +(removed * 100).toFixed(2), allowedRemovedAreaPercent: cropLimit * 100, framingReviewRequired: removed > .3, upscaled: false } });
   }
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
   for (const item of prepared) fs.writeFileSync(path.join(folder, 'assets', `${item.report.assetId}.png`), item.buffer);
