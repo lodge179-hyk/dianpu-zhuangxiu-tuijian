@@ -12,7 +12,7 @@ import { AppError, analyzeStore, prepareScreenshot } from './analyze.mjs';
 import { CATALOG } from './catalog.mjs';
 import { planDesign } from './plan.mjs';
 import { validatePlan } from './validate.mjs';
-import { buildSheetPrompt, cropFromScreenshot, cropSheetIntoSlots, generateSheet, layoutSheet, panelsFromSheet, readImageAsDataUrl } from './assets.mjs';
+import { buildSheetPrompt, cropFromScreenshot, cropSheetIntoSlots, generateSheet, layoutSheet, panelsFromSheet, readImageAsDataUrl, splitIntoSpanningSheets } from './assets.mjs';
 import { buildManifest, renderPlan } from './render.mjs';
 
 export function readEnv(env = process.env) {
@@ -95,6 +95,7 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
   let degraded = false;
   const assetsBySlot = new Map();
   const allAssets = [];
+  const skippedPanels = [];
 
   try {
     await mkdir(assetsDir, { recursive: true });
@@ -118,13 +119,21 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
 
     // ---- 3. AI 做装修决策 ----
     await mark(3, STEPS[2]);
-    const planned = await call('plan-design', () => planDesign(env, analyzed.shop, log));
+    let planned;
+    try {
+      planned = await call('plan-design', () => planDesign(env, analyzed.shop, log));
+    } catch (error) {
+      // 计划被拦下时把模型原始输出落盘，便于核对是提示词还是模型的问题
+      if (error?.raw) await writeFile(path.join(dir, 'plan-raw.txt'), error.raw, 'utf8').catch(() => {});
+      throw error;
+    }
     state.plan = planned.plan;
     state.design = planned.plan.design;
     state.validation = planned.plan.validation;
     if (planned.usage) state.usage.push({ step: 'plan', ...pickUsage(planned.usage, env.visionModel) });
     await writeFile(path.join(dir, 'plan.json'), JSON.stringify(planned.plan, null, 2));
     planned.plan.validation.warnings.forEach(warn);
+    (planned.plan.notes || []).forEach(warn);
     if (!planned.plan.design.decisions.length) warn('AI 没有给出设计决策理由，本轮的选型理由不可核对。');
 
     const plan = planned.plan;
@@ -132,9 +141,15 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
 
     // ---- 4. 生成组合素材并裁切 ----
     await mark(4, STEPS[3]);
-    const sheets = plan.design.imagePlan.images;
+    const plannedSheets = plan.design.imagePlan.images;
+    // 把 AI 安排的画布按形状拆成真正可生成的若干张（宽幅/竖长格子单独成图），
+    // 拆分由程序决定，实际生图次数会在界面上如实说明。
+    const sheets = plannedSheets.flatMap(sheet => splitIntoSpanningSheets(sheet, slotsById));
+    if (sheets.length > plannedSheets.length) {
+      warn(`AI 计划 ${plannedSheets.length} 次生图；其中宽高比与方格差异大的格子已单独成图，实际生图 ${sheets.length} 次。`);
+    }
     for (const [index, sheet] of sheets.entries()) {
-      const panels = panelsFromSheet(sheet, slotsById);
+      const panels = sheet.panels;
       if (!panels.length) { warn(`生图计划 ${sheet.id} 没有对应到任何有效槽位，已跳过。`); continue; }
       const layout = layoutSheet(panels);
       const prompt = buildSheetPrompt({ sheet, layout, design: plan.design, shop: analyzed.shop });
@@ -148,18 +163,39 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
       try {
         const generated = await call(`generate-${sheet.id}`, () => generateSheet(env, prompt, sheetFile, layout, log));
         const cropped = await call(`crop-${sheet.id}`, () => cropSheetIntoSlots(sheetFile, layout, assetsDir, log));
-        for (const asset of cropped) {
+        for (const asset of cropped.assets) {
           assetsBySlot.set(asset.slotId, asset);
           allAssets.push(asset);
         }
+        for (const skip of cropped.skipped) {
+          degrade(skip.reason);
+          skippedPanels.push(skip);
+        }
+        if (cropped.detection.rowCount !== layout.rows.length) {
+          warn(`素材画布的实际行数（${cropped.detection.rowCount} 行，每行 ${cropped.detection.rowCounts.join('/')} 格）与计划（${layout.rows.length} 行）不同，已按实际检测结果顺序对应。`);
+        }
+        if (generated.sourceFormat && generated.sourceFormat !== 'png') {
+          warn(`生图服务返回的是 ${generated.sourceFormat.toUpperCase()}，已统一转成 PNG 保存。`);
+        }
         if (!generated.aspectMatchesRequest) warn(`素材画布实际尺寸 ${generated.width}×${generated.height} 与请求的 ${generated.requestedSize} 不同，裁切按实际画面进行。`);
-        const upscaled = cropped.filter(a => a.upscaled);
+        const upscaled = cropped.assets.filter(a => a.upscaled);
         if (upscaled.length) warn(`有 ${upscaled.length} 张素材由较小像素放大到槽位尺寸（最大 ${Math.max(...upscaled.map(a => a.upscaleFactor))} 倍），大屏下会偏软。`);
-        state.sheet = { ...(state.sheet || {}), [sheet.id]: { requested: { width: layout.width, height: layout.height }, actual: [generated.width, generated.height], panels: layout.panels.length } };
+        state.sheet = {
+          ...(state.sheet || {}),
+          [sheet.id]: {
+            requested: { width: layout.width, height: layout.height },
+            actual: [generated.width, generated.height],
+            sourceFormat: generated.sourceFormat,
+            planned: { rows: layout.rows.length, panels: layout.panels.length },
+            detected: cropped.detection,
+            cropped: cropped.assets.length,
+            skipped: cropped.skipped.length,
+          },
+        };
       } catch (error) {
         degraded = true;
         warn(`这一批素材（${sheet.id}）生成或裁切失败：${error.message}`);
-        state.sheet = { ...(state.sheet || {}), [sheet.id]: { failed: error.message } };
+        state.sheet = { ...(state.sheet || {}), [sheet.id]: { failed: error.message, requested: { width: layout.width, height: layout.height } } };
       }
       await save(state);
     }
@@ -187,6 +223,12 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
     if (missingSlots.length) {
       degraded = true;
       warn(`有 ${missingSlots.length} 个图片位没有拿到素材（${missingSlots.slice(0, 6).join('、')}），页面用标注占位图保持布局。`);
+    }
+    if (skippedPanels.length) {
+      state.skippedPanels = skippedPanels.map(s => ({
+        slotId: s.slotId, subject: s.subject, slotRatio: s.slotRatio,
+        detectedRatio: s.detectedRatio, wouldRemovePercent: s.wouldRemovePercent, reason: s.reason,
+      }));
     }
 
     // ---- 5. 渲染完整页面 ----

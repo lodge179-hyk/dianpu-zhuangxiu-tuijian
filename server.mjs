@@ -30,8 +30,32 @@ let activeId = null;
 const validId = id => typeof id === 'string' && /^[a-f0-9-]{36}$/.test(id);
 const runDir = id => path.join(RUNS, id);
 const readJson = async file => JSON.parse(await readFile(file, 'utf8'));
-const saveState = state => writeFile(path.join(runDir(state.id), 'run.json.tmp'), JSON.stringify(state, null, 2))
-  .then(() => rename(path.join(runDir(state.id), 'run.json.tmp'), path.join(runDir(state.id), 'run.json')));
+
+/**
+ * 状态写入串行化。
+ * 一个任务里状态会被频繁保存（每步、每次调用前后），并发 rename 到同一个目标文件
+ * 在 Windows 上会直接 EPERM 失败。这里按任务排队，保证同一时刻只有一次写入。
+ */
+const saveQueues = new Map();
+function saveState(state) {
+  const previous = saveQueues.get(state.id) || Promise.resolve();
+  const next = previous
+    .catch(() => {})
+    .then(async () => {
+      const file = path.join(runDir(state.id), 'run.json');
+      const tmp = `${file}.${process.pid}.tmp`;
+      await writeFile(tmp, JSON.stringify(state, null, 2));
+      await rename(tmp, file);
+    })
+    .catch(error => {
+      console.error(`状态保存失败（${state.id.slice(0, 8)}）：${error.message}`);
+    })
+    .finally(() => {
+      if (saveQueues.get(state.id) === next) saveQueues.delete(state.id);
+    });
+  saveQueues.set(state.id, next);
+  return next;
+}
 
 function safeMessage(error) {
   let message = error instanceof Error ? error.message : '处理未完成，请重新提交。';

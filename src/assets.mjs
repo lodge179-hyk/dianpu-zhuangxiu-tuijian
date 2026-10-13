@@ -22,6 +22,10 @@ const MIN_TOTAL_PIXELS = 940_000;
 const MIN_DIMENSION = 512;
 const MAX_ASPECT = 15.5;
 const MAX_SHEET_LONG_EDGE = 4096;
+/** 同一行里最矮的格子相对最高的格子允许被压掉的比例（超出则拆行）。 */
+const MAX_ROW_HEIGHT_SPREAD = 1.45;
+/** 允许的最大裁切损失：超过这个比例就宁可不用这张图，并说明原因。 */
+const MAX_CROP_LOSS = 0.25;
 
 const even = n => Math.max(4, Math.round(n / 2) * 2);
 const round2 = n => Math.round(n * 100) / 100;
@@ -31,10 +35,11 @@ function columnsFor(count) {
   if (count <= 1) return 1;
   if (count === 2) return 2;
   if (count === 3) return 3;
-  if (count === 4) return 2;
+  if (count === 4) return 4;
+  if (count === 5) return 3;
   if (count <= 6) return 3;
-  if (count <= 9) return 3;
-  return 4;
+  if (count <= 8) return 4;
+  return 3;
 }
 
 function chunk(list, size) {
@@ -43,34 +48,98 @@ function chunk(list, size) {
   return out;
 }
 
+/** 一个比例能否并入已有组：与组内所有比例都足够接近。 */
+const within = (ratios, ratio, tolerance) => ratios.every(r => Math.abs(r - ratio) / r <= tolerance);
+/** 组内比例跨度（最大相对差）。 */
+const spread = ratios => {
+  if (ratios.length < 2) return 0;
+  const min = Math.min(...ratios);
+  const max = Math.max(...ratios);
+  return (max - min) / min;
+};
+
+/**
+ * 把 AI 安排的一张画布拆成「可以真正生成」的若干张。
+ *
+ * 实测结论：模型会把同一张画布上的格子画成统一网格。宽幅（例如招牌 483×258 ≈ 1.87:1）
+ * 或竖长格子混在方格网格里时，画出来的比例会差到四成以上，只能作废。
+ * 因此这里按形状把格子分开：极端比例的格子各自独立成一张，其余方格合并成一张。
+ * 拆分是程序决定，并且会在界面上如实说明实际生图次数。
+ */
+export function splitIntoSpanningSheets(sheet, slotsById, limits = { extremeHigh: 1.55, extremeLow: 0.72 }) {
+  const panels = panelsFromSheet(sheet, slotsById);
+  const extreme = panels.filter(p => p.ratio >= limits.extremeHigh || p.ratio <= limits.extremeLow);
+  const normal = panels.filter(p => !(p.ratio >= limits.extremeHigh || p.ratio <= limits.extremeLow));
+  const sheets = [];
+  for (const [index, panel] of extreme.entries()) {
+    sheets.push({
+      id: panels.length === 1 ? sheet.id : `${sheet.id}-shape${index + 1}`,
+      purpose: `${panel.subject || panel.slotId}（宽高比与方格差异大，单独生成）`,
+      panels: [panel],
+      split: true,
+    });
+  }
+  if (normal.length) {
+    sheets.push({
+      id: extreme.length ? `${sheet.id}-grid` : sheet.id,
+      purpose: sheet.purpose,
+      panels: normal,
+      split: false,
+    });
+  }
+  return sheets;
+}
+
 /**
  * 计算素材画布尺寸与每个面板的位置。
- * 所有面板共用同一比例因子，保持各自槽位的真实宽高比不变。
+ * 组内等高、不同形状分行，避免模型把宽幅格子画成方格。
  */
 export function layoutSheet(panels) {
   const count = panels.length;
   if (!count) throw new AppError('没有需要生成的图片格子。', { stage: 'assets' });
-  const columns = columnsFor(count);
-  const rows = chunk(panels, columns);
-  const gutter = TARGET_PANEL * GUTTER_RATIO;
-  const border = TARGET_PANEL * BORDER_RATIO;
 
-  // 所有面板统一缩放到「长边 = TARGET_PANEL（方形面板则边长为 TARGET_PANEL）」
-  const sizes = panels.map(p => {
-    const long = Math.max(p.ratio, 1 / p.ratio);
-    const longEdge = TARGET_PANEL;
-    return p.ratio >= 1
-      ? { w: longEdge, h: longEdge / p.ratio }
-      : { w: longEdge * p.ratio, h: longEdge };
+  // 1. 按「格子高度跨度」聚类：同一行的格子高度必须一致（模型会照最高那个画），
+  //    因此判断标准不是比例接近，而是最矮的格子相对最高的格子不能被压掉太多。
+  const groups = [];
+  for (const panel of panels) {
+    const ratio = panel.ratio >= 1 ? panel.ratio : 1 / panel.ratio;
+    const height = 1 / ratio; // 以统一宽度为基准的相对高度
+    const group = groups.find(g => {
+      const heights = [...g.heights, height];
+      return Math.max(...heights) / Math.min(...heights) <= MAX_ROW_HEIGHT_SPREAD;
+    });
+    if (group) { group.panels.push(panel); group.heights.push(height); } else groups.push({ heights: [height], panels: [panel] });
+  }
+  groups.sort((a, b) => Math.max(...b.heights) - Math.max(...a.heights));
+
+  // 2. 每组内部分行，每行格子数尽量接近方形排布
+  const planned = [];
+  for (const group of groups) {
+    const columns = columnsFor(group.panels.length);
+    for (const row of chunk(group.panels, columns)) planned.push({ panels: row });
+  }
+
+  // 以「长边 = TARGET_PANEL」给每个格子定尺寸；同一行的格子高度统一取该行最高者，
+  // 这样模型看到的就是「一行等高、宽度不同」的规整网格。
+  const sized = planned.map(row => {
+    const raw = row.panels.map(p => (p.ratio >= 1
+      ? { w: TARGET_PANEL, h: TARGET_PANEL / p.ratio }
+      : { w: TARGET_PANEL * p.ratio, h: TARGET_PANEL }));
+    const rowHeight = Math.max(...raw.map(c => c.h));
+    return {
+      ...row,
+      cells: raw.map(c => ({ w: c.w * (rowHeight / c.h), h: rowHeight })),
+    };
   });
 
-  const rowHeights = rows.map(row => Math.max(...row.map(p => sizes[panels.indexOf(p)].h)));
-  const rowWidths = rows.map(row => row.reduce((sum, p) => sum + sizes[panels.indexOf(p)].w, 0) + gutter * (row.length - 1));
+  const gutter = TARGET_PANEL * GUTTER_RATIO;
+  const border = TARGET_PANEL * BORDER_RATIO;
+  const rowWidths = sized.map(row => row.cells.reduce((sum, c) => sum + c.w, 0) + gutter * (row.cells.length - 1));
+  const rowHeights = sized.map(row => Math.max(...row.cells.map(c => c.h)));
   const rawW = Math.max(...rowWidths) + border * 2;
-  const rawH = rowHeights.reduce((a, b) => a + b, 0) + gutter * (rows.length - 1) + border * 2;
+  const rawH = rowHeights.reduce((a, b) => a + b, 0) + gutter * (sized.length - 1) + border * 2;
 
-  // 归一化到合法尺寸：总像素区间 + 宽高比上限 + 长边上限 + 偶数边长
-  let scale = 1;
+  // 4. 归一化到合法尺寸：总像素区间 + 宽高比上限 + 长边上限 + 偶数边长
   const adjust = () => {
     let w = rawW * scale;
     let h = rawH * scale;
@@ -78,18 +147,18 @@ export function layoutSheet(panels) {
     if (total > MAX_TOTAL_PIXELS) scale *= Math.sqrt(MAX_TOTAL_PIXELS / total);
     const aspect = h / w;
     if (aspect > MAX_ASPECT) scale *= aspect / MAX_ASPECT;
-    if (1 / aspect > MAX_ASPECT) scale *= 1 / aspect / MAX_ASPECT;
-    const long = Math.max(w, h) * 1;
-    if (long > MAX_SHEET_LONG_EDGE && MAX_SHEET_LONG_EDGE / long < 1) scale *= MAX_SHEET_LONG_EDGE / long;
+    if (1 / aspect > MAX_ASPECT) scale *= (1 / aspect) / MAX_ASPECT;
+    const long = Math.max(w, h);
+    if (long > MAX_SHEET_LONG_EDGE) scale *= MAX_SHEET_LONG_EDGE / long;
     w = rawW * scale;
     h = rawH * scale;
     if (w < MIN_DIMENSION || h < MIN_DIMENSION) scale *= Math.max(MIN_DIMENSION / w, MIN_DIMENSION / h);
     return { w: even(rawW * scale), h: even(rawH * scale) };
   };
+  let scale = 1;
   let dims = adjust();
   if (dims.w * dims.h < MIN_TOTAL_PIXELS) {
-    const grow = Math.min(2.2, Math.sqrt(MIN_TOTAL_PIXELS / (dims.w * dims.h)));
-    scale *= grow;
+    scale *= Math.min(2.2, Math.sqrt(MIN_TOTAL_PIXELS / (dims.w * dims.h)));
     dims = adjust();
   }
 
@@ -99,32 +168,28 @@ export function layoutSheet(panels) {
   const g = gutter * k;
   const b = border * k;
 
-  const boxes = [];
+  const boxes = new Map();
   let y = b;
-  for (const [r, row] of rows.entries()) {
+  for (const [r, row] of sized.entries()) {
     const rowWidth = rowWidths[r] * k;
+    const rowHeight = rowHeights[r] * k;
     let x = (sheetW - rowWidth) / 2;
-    for (const panel of row) {
-      const size = sizes[panels.indexOf(panel)];
-      const w = size.w * k;
-      const h = size.h * k;
-      boxes.push({
-        id: panel.id,
-        left: Math.round(x),
-        top: Math.round(y + (rowHeights[r] * k - h) / 2),
-        width: Math.max(8, Math.round(w)),
-        height: Math.max(8, Math.round(h)),
+    for (const cell of row.cells) {
+      const w = cell.w * k;
+      const h = cell.h * k;
+      boxes.set(row.panels[row.cells.indexOf(cell)].id, {
+        left: Math.round(x), top: Math.round(y + (rowHeight - h) / 2),
+        width: Math.max(8, Math.round(w)), height: Math.max(8, Math.round(h)),
       });
       x += w + g;
     }
-    y += rowHeights[r] * k + g;
+    y += rowHeight + g;
   }
 
   const laidOut = panels.map(p => {
-    const box = boxes.find(b2 => b2.id === p.id);
+    const box = boxes.get(p.id);
     return {
       ...p,
-      columns,
       panelRect: box,
       percent: {
         x: round2(box.left / sheetW * 100), y: round2(box.top / sheetH * 100),
@@ -136,12 +201,11 @@ export function layoutSheet(panels) {
   return {
     width: sheetW,
     height: sheetH,
-    columns,
-    rowCount: rows.length,
+    rowCount: sized.length,
     totalPixels: sheetW * sheetH,
     aspect: round2(sheetH / sheetW),
     panels: laidOut,
-    rows: chunk(laidOut, columns),
+    rows: sized.map((row, r) => row.panels.map(p => laidOut.find(l => l.id === p.id))),
   };
 }
 
@@ -174,12 +238,14 @@ const ratioText = r => {
 /** 拼装生图提示词：结构、分隔色、坐标、禁止项全部由程序写死。 */
 export function buildSheetPrompt({ sheet, layout, design, shop }) {
   const lines = [];
+  const widest = Math.max(...layout.rows.map(r => r.length));
   lines.push('Use case: product-mockup.');
-  lines.push(`Create ONE raster photographic asset sheet containing EXACTLY ${layout.panels.length} separate complete e-commerce photographs, arranged in ${layout.rowCount} row(s) of up to ${layout.columns} panel(s), with straight rectangular edges.`);
-  lines.push(`Canvas must be landscape/portrait exactly ${layout.width} x ${layout.height} pixels (aspect ratio ${layout.aspect}:1).`);
+  lines.push(`Create ONE raster photographic asset sheet containing EXACTLY ${layout.panels.length} separate complete e-commerce photographs, arranged in ${layout.rowCount} row(s) of up to ${widest} panel(s), with straight rectangular edges.`);
+  lines.push(`Canvas must be exactly ${layout.width} x ${layout.height} pixels.`);
   lines.push('This is a sheet of source photographs, not a website, not a shop screenshot and not a UI design.');
   lines.push('');
   lines.push('Panel content, left to right then top to bottom:');
+  lines.push('IMPORTANT: panels in the same row have the SAME pixel height. Follow the given panel pixel sizes; do not force every panel to be square.');
 
   for (const [r, row] of layout.rows.entries()) {
     lines.push(`ROW ${r + 1} — ${row.length} panel(s):`);
@@ -252,11 +318,17 @@ export async function generateSheet(env, prompt, sheetPath, layout, log = () => 
     bytes = Buffer.from(await download.arrayBuffer());
   } else throw new AppError('生图服务没有返回图片数据。', { stage: 'generate' });
 
+  // 统一转成真正的 PNG 再落盘：模型可能返回 JPEG，后缀写着 .png 会让人误判格式。
   await mkdir(path.dirname(sheetPath), { recursive: true });
-  await writeFile(sheetPath, bytes);
-  const meta = await sharp(bytes).metadata();
-  log(`素材画布已生成 ${meta.width}×${meta.height}（请求 ${size}）`);
-  return { bytes, width: meta.width, height: meta.height, requestedSize: size, aspectMatchesRequest: Math.abs((meta.height / meta.width) - (layout.height / layout.width)) < 0.02 };
+  const incoming = await sharp(bytes).metadata();
+  await sharp(bytes).png({ compressionLevel: 6 }).toFile(sheetPath);
+  const meta = await sharp(sheetPath).metadata();
+  log(`素材画布已生成 ${meta.width}×${meta.height}（请求 ${size}，返回格式 ${incoming.format}）`);
+  return {
+    bytes, width: meta.width, height: meta.height, requestedSize: size,
+    sourceFormat: incoming.format,
+    aspectMatchesRequest: Math.abs((meta.height / meta.width) - (layout.height / layout.width)) < 0.02,
+  };
 }
 
 /** 品红分隔像素判定。 */
@@ -283,35 +355,38 @@ function runs(values, minLength) {
 }
 
 /**
- * 按品红投影检测实际面板框。
- * 模型画出的画布尺寸可能与请求不同，因此这里只依赖「行数/每行格子数」与分隔色，不依赖坐标预测。
+ * 按品红投影检测实际面板框，并按阅读顺序返回。
+ *
+ * 宽容之处：模型不一定会严格照计划的行数画（它更倾向于画成统一网格），
+ * 因此这里只依赖「分隔色是否画出来」和「格子总数够不够」，不强制行数一致。
+ * 比例是否可用由裁切环节按容差判断——比例差太多时仍然拒绝，不会硬裁。
  */
-export function detectPanels(data, W, H, channels, rowsSpec) {
+export function detectPanels(data, W, H, channels, expectedRows) {
+  const expectedCount = expectedRows.reduce((n, row) => n + row.length, 0);
   const rowFlags = Array.from({ length: H }, (_, y) => {
     let content = 0;
     for (let x = 0; x < W; x += 1) if (!isSeparator(data, W, channels, x, y)) content += 1;
     return content / W > 0.1;
   });
   const rows = runs(rowFlags, 20);
-  if (rows.length !== rowsSpec.length) {
-    throw new AppError(`素材画布的行数与计划不符：检测到 ${rows.length} 行，计划 ${rowsSpec.length} 行。可能模型没有画出分隔色，本次不采用。`, { stage: 'crop' });
+  if (!rows.length) {
+    throw new AppError('素材画布上没有检测到画面区域，可能模型没有按分隔色绘制。本次不采用。', { stage: 'crop' });
   }
   const boxes = [];
-  for (const [r, [y0, y1]] of rows.entries()) {
+  const rowCounts = [];
+  for (const [y0, y1] of rows) {
     const colFlags = Array.from({ length: W }, (_, x) => {
       let content = 0;
       for (let y = y0; y < y1; y += 1) if (!isSeparator(data, W, channels, x, y)) content += 1;
       return content / (y1 - y0) > 0.9;
     });
     const cols = runs(colFlags, 20);
-    if (cols.length !== rowsSpec[r].length) {
-      throw new AppError(`素材画布第 ${r + 1} 行的格子数与计划不符：检测到 ${cols.length} 个，计划 ${rowsSpec[r].length} 个。本次不采用。`, { stage: 'crop' });
-    }
+    rowCounts.push(cols.length);
     for (const [x0, x1] of cols) {
       boxes.push({ left: x0 + 1, top: y0 + 1, width: Math.max(8, x1 - x0 - 2), height: Math.max(8, y1 - y0 - 2) });
     }
   }
-  return boxes;
+  return { boxes, rowCounts, rowCount: rows.length, expectedCount };
 }
 
 /** 裁切画布并填入槽位；返回值如实记录裁切质量。 */
@@ -319,10 +394,15 @@ export async function cropSheetIntoSlots(sourcePath, layout, outDir, log = () =>
   await mkdir(outDir, { recursive: true });
   const { data, info } = await sharp(sourcePath).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: W, height: H, channels } = info;
-  const boxes = detectPanels(data, W, H, channels, layout.rows);
-  if (boxes.length !== layout.panels.length) throw new AppError('检测到的面板数量与计划不一致。', { stage: 'crop' });
+  const detected = detectPanels(data, W, H, channels, layout.rows);
+  const { boxes, rowCounts, rowCount } = detected;
+  log(`检测到 ${rowCount} 行（每行格子数 ${rowCounts.join('/')}），共 ${boxes.length} 个格子；计划 ${layout.panels.length} 格 / ${layout.rows.length} 行`);
+  if (boxes.length < layout.panels.length) {
+    throw new AppError(`素材画布上只检测到 ${boxes.length} 个格子，少于计划的 ${layout.panels.length} 个。本次不采用。`, { stage: 'crop' });
+  }
 
   const assets = [];
+  const skipped = [];
   for (const [i, panel] of layout.panels.entries()) {
     const box = boxes[i];
     const target = panel.ratio;
@@ -338,8 +418,19 @@ export async function cropSheetIntoSlots(sourcePath, layout, outDir, log = () =>
       cropRect = { left: box.left, top: box.top + Math.round((box.height - height) / 2), width: box.width, height };
     }
     const removedArea = 1 - (cropRect.width * cropRect.height) / (box.width * box.height);
-    if (removedArea > 0.25) {
-      throw new AppError(`面板 ${panel.id} 的实际比例与槽位差太多，裁切会丢掉 ${(removedArea * 100).toFixed(0)}% 画面；不采用这种裁切。`, { stage: 'crop' });
+
+    // 比例差太多就不裁：宁可用占位图并说明，也不把裁掉四成画面的图当成成品。
+    if (removedArea > MAX_CROP_LOSS) {
+      skipped.push({
+        slotId: panel.slotId,
+        subject: panel.subject,
+        slotRatio: round2(target),
+        detectedRatio: round2(boxRatio),
+        detectedPanel: box,
+        wouldRemovePercent: round2(removedArea * 100),
+        reason: `模型把这一格画成了 ${round2(boxRatio)}:1，而槽位要 ${round2(target)}:1，按比例裁切会丢掉 ${round2(removedArea * 100)}% 画面，因此没有采用。`,
+      });
+      continue;
     }
 
     let separatorPixels = 0;
@@ -374,10 +465,11 @@ export async function cropSheetIntoSlots(sourcePath, layout, outDir, log = () =>
       separatorPixels,
       upscaled: scale > 1.02,
       upscaleFactor: round2(scale),
+      accurate: true,
     });
   }
-  log(`已裁切 ${assets.length} 张素材`);
-  return assets;
+  log(`已裁切 ${assets.length} 张素材${skipped.length ? `，${skipped.length} 格因比例不符未采用` : ''}`);
+  return { assets, skipped, detection: { rowCount, rowCounts, boxes: boxes.length } };
 }
 
 /**

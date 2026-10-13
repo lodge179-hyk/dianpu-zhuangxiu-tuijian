@@ -78,6 +78,14 @@ const SYSTEM = `你是一名电商店铺视觉设计顾问。商家完全不懂�
 
 补充说明：
 - modules[].content 里凡是要放图片的字段，值统一写成 slotId（例如 "m04.img1"）。程序会把它换成实际图片文件。
+- **字段名必须用下面这套，不能自己改名**（写成别的名字这个模块就读不到图片）：
+  · 招牌 signboard.*：{"background":"mNN.img1","shop":{"name":"店名","avatar":"mNN.img2","vip":false,"newCount":"0","totalCount":"0"}}
+  · 导航 navigation.*：{"images":["mNN.img1","mNN.img2","mNN.img3","mNN.img4"]}
+  · 海报 poster.*（除 combo）：{"images":["mNN.img1", ...]}；三图组合 poster.combo1/2/3 同样是 {"images":[三张]}
+  · 轮播 carousel.*：{"images":["mNN.img1"]}（注意是 images，不是 slides）
+  · 商品橱窗 showcase.*：{"items":[{"image":"mNN.img1","title":"商品名","price":"199","currency":"¥"}]}
+  · 公告与文本 text.*：{"text":"文案"}
+  注意：只有商品橱窗才用 items；海报、轮播、导航一律用 images。
 - 招牌的 shop.name 用识别到的店名；newCount/totalCount 不确定就写 "0"；avatar 也当作一个图片槽位处理。
 - 商品橱窗的 content.items[] 里每件商品：image 写 slotId，title 写商品名（可含换行），price/currency 只在截图确实有价格时才写。
 - 只用一个 image 就能装下所有生成图时，不要拆成两个。`;
@@ -96,16 +104,28 @@ export async function planDesign(env, shop, log = () => {}) {
     '记住：所有图片槽位都必须被分配，且每张图都要归入四种来源之一。',
   ].join('\n');
 
-  const { value, usage } = await callTextModel(env, { system, user, maxTokens: 6000, timeoutMs: 240_000 });
+  const { value, usage } = await callTextModel(env, { system, user, maxTokens: 12_000, timeoutMs: 300_000 });
   const plan = normalizePlan(value, shop);
   const { validatePlan } = await import('./validate.mjs');
   const check = validatePlan(plan);
   if (!check.ok) {
+    // 失败也要留下证据：把模型原始输出一并带上，便于诊断是提示词问题还是模型问题。
     throw new AppError('AI 的装修计划不合法，已停止执行（不会带着错误计划去生图）。', {
       stage: 'plan',
       hint: check.errors.join(' / '),
+      raw: JSON.stringify(value, null, 1).slice(0, 12000) || String(value),
     });
   }
+  // 计划被收窄过（例如橱窗商品超出模块容量）时如实记录，不静默改内容。
+  const shrunk = [];
+  for (const module_ of value?.modules || []) {
+    const items = module_?.content?.items;
+    const normalizedModule = plan.modules.find(m => m.id === module_.id);
+    if (Array.isArray(items) && normalizedModule && Array.isArray(normalizedModule.content?.items) && items.length !== normalizedModule.content.items.length) {
+      shrunk.push(`${module_.type}：原计划 ${items.length} 件，该模块只能放 ${normalizedModule.content.items.length} 件，已按容量保留前 ${normalizedModule.content.items.length} 件。`);
+    }
+  }
+  plan.notes = shrunk;
   plan.validation = check;
   log(`计划通过校验：${plan.modules.length} 个模块，${check.slotCount} 张图，分 ${plan.design.imagePlan.images.length} 次生图`);
   return { plan, usage };
@@ -144,22 +164,115 @@ export function normalizePlan(value, shop = {}) {
         })),
       },
     },
-    modules: (Array.isArray(value?.modules) ? value.modules : []).map((m, i) => ({
-      id: clampText(m?.id, 12) || `m${String(i + 1).padStart(2, '0')}`,
-      type: clampText(m?.type, 40),
-      label: clampText(m?.label, 20) || MODULE_BY_TYPE.get(clampText(m?.type, 40))?.name || '',
-      reason: clampText(m?.reason, 160),
-      content: m?.content && typeof m.content === 'object' ? m.content : {},
-      options: m?.options && typeof m.options === 'object' ? m.options : {},
-      images: (Array.isArray(m?.images) ? m.images : []).map(img => ({
+    modules: (Array.isArray(value?.modules) ? value.modules : []).map((m, i) => {
+      const type = clampText(m?.type, 40);
+      const id = clampText(m?.id, 12) || `m${String(i + 1).padStart(2, '0')}`;
+      const images = (Array.isArray(m?.images) ? m.images : []).map(img => ({
         slotId: clampText(img?.slotId, 24),
         source: clampText(img?.source, 24),
         subject: clampText(img?.subject, 120),
         aspect: clampText(img?.aspect, 12),
-      })).filter(img => img.slotId),
-    })).filter(m => m.type),
+      })).filter(img => img.slotId);
+      const normalized = normalizeContent(type, m?.content, images);
+      return {
+        id,
+        type,
+        label: clampText(m?.label, 20) || MODULE_BY_TYPE.get(type)?.name || '',
+        reason: clampText(m?.reason, 160),
+        content: normalized.content,
+        options: m?.options && typeof m.options === 'object' ? m.options : {},
+        // 商品橱窗的槽位以商品列表为准重算，其余模块沿用模型声明。
+        images: normalized.images || images,
+      };
+    }).filter(m => m.type),
   };
   return plan;
+}
+
+/**
+ * 内容字段消歧。
+ *
+ * 组件库对每个模块的图片字段名是固定的（图片类统一叫 images），
+ * 但模型偶尔会按自己的直觉写成 slides / items[].icon / items[].image。
+ * 这些变体的含义是明确的，因此在这里安全地映射到规范字段，
+ * 而不是把一份判断合理的计划整份丢掉——丢掉的代价是一次真实调用和一次等待。
+ * 只处理语义明确的变体；真正缺内容的情况仍然会被校验拦下。
+ */
+function normalizeContent(type, rawContent, images) {
+  const content = rawContent && typeof rawContent === 'object' ? { ...rawContent } : {};
+  const spec = MODULE_BY_TYPE.get(type);
+  if (!spec) return { content };
+  const slotIds = images.map(i => i.slotId);
+  let rebuiltImages = null;
+
+  if (spec.group === '图片海报' || spec.group === '轮播图' || spec.group === '分类导航') {
+    if (!Array.isArray(content.images) || !content.images.length) {
+      // 组件库要求这些模块统一用 images；以下是语义明确的同义变体写法。
+      // 导航：items[].icon；轮播：slides；海报：items[].image。
+      const asStrings = list => (Array.isArray(list) ? list.map(v => (typeof v === 'string' ? v : (v?.image ?? v?.src ?? v?.icon))).filter(v => typeof v === 'string' && v) : []);
+      const fromSlides = asStrings(content.slides);
+      const fromItems = asStrings(content.items);
+      const candidate = fromSlides.length ? fromSlides : fromItems;
+      content.images = candidate.length ? candidate : slotIds;
+    }
+  } else if (spec.group === '店铺招牌') {
+    if (!content.background && images[0]) content.background = images[0].slotId;
+    if (content.shop && typeof content.shop === 'object') {
+      const shop = { ...content.shop };
+      if (!shop.avatar && images[1]) shop.avatar = images[1].slotId;
+      for (const key of ['newCount', 'totalCount']) if (shop[key] === undefined) shop[key] = '0';
+      if (shop.vip === undefined) shop.vip = false;
+      content.shop = shop;
+    }
+  } else if (spec.group === '商品橱窗') {
+    if (Array.isArray(content.items)) {
+      // 商品数超出该模块容量时按容量裁剪（三列橱窗向下取到 3 的倍数），
+      // 多出的商品在页面上没有位置。
+      const max = spec.capacity.max;
+      if (content.items.length > max) {
+        const keep = spec.type === 'showcase.three' ? Math.max(3, Math.floor(max / 3) * 3) : max;
+        content.items = content.items.slice(0, keep);
+      }
+      // 槽位以「实际商品列表」为准：模型声明的 images 数量多一个少一个都不会再造成不一致。
+      content.items = content.items.map((item, index) => {
+        const out = item && typeof item === 'object' ? { ...item } : {};
+        const declared = images[index]?.slotId;
+        const fromItem = typeof out.image === 'string' && out.image ? out.image : null;
+        out.image = fromItem || declared || slotIds[index] || '';
+        // 标题里常被商家写上「🅿️150」「放💰235」这类价格暗号。它属于原始文案，
+        // 不是可靠价格来源，因此从标题里去掉，同时不把它当价格使用。
+        if (typeof out.title === 'string' && /[🅿️💰¥￥$]|\bp\d{2,}\b/i.test(out.title)) {
+          const cleaned = out.title
+            .split('\n')
+            .filter(line => !/[🅿️💰¥￥$]|\bp\d{2,}\b/i.test(line))
+            .join('\n')
+            .trim();
+          if (cleaned) out.title = cleaned;
+          out.titlePriceMarkRemoved = true;
+        }
+        // 组件库要求每件商品都有价格字段。没有可靠价格时给空字符串（页面上不显示金额），
+        // 而不是编一个价格，也不是把整份计划丢掉。
+        if (out.price === undefined || out.price === null) {
+          out.price = '';
+          out.priceNote = '截图里没有可确认的价格，已按空价格处理';
+        }
+        if (out.currency === undefined || out.currency === null) out.currency = '¥';
+        return out;
+      });
+      // 商品橱窗的槽位一律来自商家截图裁切：商品图绝不能交给生图模型（会画错商品）。
+      // 因此来源不依赖模型声明——模型漏写第 9 件的来源时，也不会被误判成「需要生成」。
+      rebuiltImages = content.items.map((item, index) => {
+        const declared = images[index] || {};
+        return {
+          slotId: item.image,
+          source: 'product-photo',
+          subject: declared.subject || item.title || '商品照片',
+          aspect: declared.aspect || '1:1',
+        };
+      });
+    }
+  }
+  return { content, images: rebuiltImages };
 }
 
 function clampText(value, limit) {

@@ -35,6 +35,21 @@ function deepResolve(node, assetsBySlot, missing, slotIds) {
 }
 
 /**
+ * 组件库对模块内容的字段名是严格白名单，内部标记字段不能传进去。
+ * 这里在渲染前剥离我们自己加的元数据，元数据仍然保留在计划与清单里供用户查看。
+ */
+const INTERNAL_KEYS = new Set(['priceNote', 'titlePriceMarkRemoved', 'note', 'accurate']);
+function stripInternal(node) {
+  if (Array.isArray(node)) { node.forEach(stripInternal); return; }
+  if (node && typeof node === 'object') {
+    for (const key of Object.keys(node)) {
+      if (INTERNAL_KEYS.has(key)) delete node[key];
+      else stripInternal(node[key]);
+    }
+  }
+}
+
+/**
  * @param {object} plan 已校验的计划
  * @param {Map<string, {file:string}>} assetsBySlot slotId -> 素材
  * @param {string} outDir 输出目录（HTML 与 assets 子目录所在）
@@ -60,6 +75,7 @@ export async function renderPlan(plan, assetsBySlot, outDir, log = () => {}) {
     content: deepResolve(m.content, assetsBySlot, missing, slotIds),
     options: m.options || {},
   }));
+  modules.forEach(m => stripInternal(m.content));
 
   // 缺图时保持布局可用：组件库要求图片字段存在，用一张明确的占位图顶上并标注
   if (missing.size) {

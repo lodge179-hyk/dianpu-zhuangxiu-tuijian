@@ -12,6 +12,8 @@ export class AppError extends Error {
     this.name = 'AppError';
     this.stage = options.stage || 'unknown';
     this.hint = options.hint || '';
+    // 原始模型输出：计划被拦下时保留证据，便于区分是提示词问题还是模型问题。
+    this.raw = options.raw || '';
   }
 }
 
@@ -86,7 +88,59 @@ export function parseJsonLoose(text) {
       }
     }
   }
-  return null;
+  // 没有走到完整的收尾括号：多半是输出被 token 上限截断。保守补全后重试。
+  return repairTruncatedJson(body.slice(start), open, close);
+}
+
+/**
+ * 修复被截断的 JSON：先去掉最后一段不完整的值，再补齐未闭合的字符串与括号。
+ * 只在明显被截断时使用；补不齐就返回 null，宁可失败也不猜内容。
+ */
+function repairTruncatedJson(text, open, close) {
+  const pair = { '{': '}', '[': ']' };
+  let inString = false;
+  let escaped = false;
+  const stack = [];
+  let safeCut = -1; // 最后一个"安全截断点"之后的位置（逗号或完整的键值之后）
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') { inString = true; continue; }
+    if (ch === '{' || ch === '[') stack.push(ch);
+    else if (ch === '}' || ch === ']') stack.pop();
+    else if (ch === ',') safeCut = i;
+  }
+  let candidate = text;
+  if (inString || safeCut < 0) {
+    // 字符串被截断，或连一个安全的逗号都没有：退到最后一个完整分隔位置
+    if (safeCut < 0) return null;
+    candidate = text.slice(0, safeCut);
+  } else {
+    candidate = text.slice(0, safeCut + 1).replace(/,\s*$/, '');
+  }
+  // 重新计算未闭合的括号
+  const stack2 = [];
+  let inString2 = false;
+  let escaped2 = false;
+  for (const ch of candidate) {
+    if (inString2) {
+      if (escaped2) escaped2 = false;
+      else if (ch === '\\') escaped2 = true;
+      else if (ch === '"') inString2 = false;
+      continue;
+    }
+    if (ch === '"') { inString2 = true; continue; }
+    if (ch === '{' || ch === '[') stack2.push(ch);
+    else if (ch === '}' || ch === ']') stack2.pop();
+  }
+  let repaired = candidate.replace(/,\s*$/, '');
+  for (let i = stack2.length - 1; i >= 0; i -= 1) repaired += pair[stack2[i]];
+  try { return JSON.parse(repaired); } catch { return null; }
 }
 
 /** 截图过长时先降采样，保证一次请求能装下且不丢整体结构。 */

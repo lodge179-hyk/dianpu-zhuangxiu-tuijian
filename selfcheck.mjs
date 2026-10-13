@@ -113,6 +113,29 @@ for (const [label, build] of badCases) {
   else ok(`已拦下：${label}`, result.errors[0].slice(0, 56));
 }
 
+// ---- 4b. 字段名消歧：模型写错字段名时不该整份丢计划 ----
+console.log('\n字段名消歧（真实案例回归）');
+const variantCases = [
+  ['轮播写成 slides', { id: 'm3', type: 'carousel.medium', content: { slides: ['m3.img1'] }, images: [{ slotId: 'm3.img1', source: 'generated-poster', subject: 'x' }] }, 'images', ['m3.img1']],
+  ['导航写成 items[].icon', { id: 'm4', type: 'navigation.four', content: { items: [1, 2, 3, 4].map(i => ({ icon: `m4.img${i}`, label: `类${i}` })) }, images: [1, 2, 3, 4].map(i => ({ slotId: `m4.img${i}`, source: 'generated-nav-icon', subject: 'x' })) }, 'images', ['m4.img1', 'm4.img2', 'm4.img3', 'm4.img4']],
+  ['海报写成 items[].image', { id: 'm5', type: 'poster.three', content: { items: [1, 2, 3].map(i => ({ image: `m5.img${i}`, label: `主题${i}` })) }, images: [1, 2, 3].map(i => ({ slotId: `m5.img${i}`, source: 'generated-poster', subject: 'x' })) }, 'images', ['m5.img1', 'm5.img2', 'm5.img3']],
+];
+for (const [label, module_, key, expected] of variantCases) {
+  const normalized = normalizePlan({ design: { title: 't' }, modules: [module_] }, {});
+  const content = normalized.modules[0].content;
+  const got = content[key];
+  if (JSON.stringify(got) !== JSON.stringify(expected)) bad(`消歧失败：${label}`, `得到 ${JSON.stringify(got)}`);
+  else ok(`消歧成功：${label}`, `${key} = ${JSON.stringify(got)}`);
+}
+// 招牌与橱窗的补全
+const signboardFix = normalizePlan({ design: { title: 't' }, modules: [
+  { id: 'm1', type: 'signboard.default', content: { shop: { name: '店' } }, images: [
+    { slotId: 'm1.img1', source: 'generated-scene', subject: 'a' }, { slotId: 'm1.img2', source: 'generated-scene', subject: 'b' }] },
+] }, {});
+const sbContent = signboardFix.modules[0].content;
+if (sbContent.background !== 'm1.img1' || sbContent.shop.avatar !== 'm1.img2' || sbContent.shop.newCount !== '0') bad('招牌内容补全失败', JSON.stringify(sbContent));
+else ok('招牌内容补全', 'background/avatar/newCount 均已补齐');
+
 // ---- 5. 渲染：用占位图跑通整页（不调用模型） ----
 console.log('\n渲染');
 const dir = await mkdtemp(path.join(tmpdir(), 'aidesign-'));
