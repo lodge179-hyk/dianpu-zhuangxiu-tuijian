@@ -203,16 +203,20 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
     // 真实商品照片：从截图裁切，优先按识别到的商品位置
     const productSlots = plan.validation.slots.filter(s => s.source === 'product-photo');
     if (productSlots.length) {
-      const boxes = analyzed.shop.visibleProducts.map(p => p.box).filter(Boolean);
-      if (!boxes.length) warn('识别阶段没有拿到商品位置，截图裁切的商品图只能取中上部区域，仅作装修示意。');
+      const boxes = analyzed.shop.visibleProducts.filter(p => p.box).map(p => p.box);
+      const uncertain = analyzed.shop.visibleProducts.filter(p => p.box && p.boxPlausible === false).length;
+      if (!boxes.length) warn('识别阶段没有拿到商品位置，截图裁切的商品图只能取中上部区域，仅作版式示意。');
       try {
         const sliced = await call('crop-from-screenshot', () => cropFromScreenshot(screenshot.buffer, productSlots, assetsDir, log, boxes));
         for (const asset of sliced) {
           assetsBySlot.set(asset.slotId, asset);
           allAssets.push(asset);
         }
-        const inaccurate = sliced.filter(a => !a.accurate).length;
-        if (inaccurate) warn(`有 ${inaccurate} 张商品图没有精确位置，取的是截图中上部区域。`);
+        const notLocated = sliced.filter(a => a.reliability !== 'located').length;
+        if (notLocated) {
+          warn(`有 ${notLocated} 张商品图的位置不够可靠（识别到的框形状不像完整商品照片），已标注为「位置待确认」，请核对后再上传到店铺。`);
+        }
+        if (uncertain) warn(`识别到 ${uncertain} 个商品框的形状异常，说明这张截图的商品定位不可全信。`);
       } catch (error) {
         degraded = true;
         warn(`从截图裁切商品照片失败：${error.message}`);

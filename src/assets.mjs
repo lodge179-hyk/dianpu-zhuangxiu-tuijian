@@ -474,7 +474,12 @@ export async function cropSheetIntoSlots(sourcePath, layout, outDir, log = () =>
 
 /**
  * 从商家截图裁切真实商品照片（不生成，避免画错商品）。
- * 优先使用识别阶段给出的商品框；没有框时退回截图上部的可辨认区域，并如实标注。
+ *
+ * 坐标可信度：视觉模型给长截图的坐标并不总是可靠（实测出现过把"占宽度比例"当成
+ * "占高度比例"，裁出来只有瓶底和文字）。因此每张裁切都按框的形状给一个可信度：
+ * - 比例接近方形且尺寸合理 → 视为已定位；
+ * - 比例明显狭长或面积过小/过大 → 仍裁切（保持布局），但标为"位置待确认"并如实告知，
+ *   不会把它当成"精准还原了你的商品"。
  */
 export async function cropFromScreenshot(screenshotBytes, assignments, outDir, log = () => {}, productBoxes = []) {
   await mkdir(outDir, { recursive: true });
@@ -488,14 +493,18 @@ export async function cropFromScreenshot(screenshotBytes, assignments, outDir, l
     const box = boxes.length ? boxes[index % boxes.length] : null;
 
     let pipeline;
+    let reliability = 'fallback';
     if (box) {
       const left = Math.min(meta.width - 2, Math.max(0, Math.round(box.x * meta.width)));
       const top = Math.min(meta.height - 2, Math.max(0, Math.round(box.y * meta.height)));
       const width = Math.max(8, Math.min(meta.width - left, Math.round(box.w * meta.width)));
       const height = Math.max(8, Math.min(meta.height - top, Math.round(box.h * meta.height)));
       pipeline = sharp(screenshotBytes).extract({ left, top, width, height });
+      const ratio = width / height;
+      const area = (width * height) / (meta.width * meta.height);
+      reliability = (ratio > 0.5 && ratio < 2 && area > 0.01 && area < 0.3) ? 'located' : 'uncertain';
     } else {
-      // 没有定位信息时，取截图中商品通常出现的中上部区域，避免只取到顶部横幅
+      // 没有任何定位信息：取截图中部区域，避免只取到顶栏
       const height = Math.round(meta.height * 0.5);
       pipeline = sharp(screenshotBytes).extract({ left: 0, top: Math.round(meta.height * 0.15), width: meta.width, height });
     }
@@ -514,13 +523,16 @@ export async function cropFromScreenshot(screenshotBytes, assignments, outDir, l
       nativePixels: [meta.width, meta.height],
       deliveredPixels: [outWidth, outHeight],
       slotPixels: [round2(assignment.slotWidth), round2(assignment.slotHeight)],
-      upscaled: outWidth > meta.width * (box ? box.w : 1),
-      note: box
-        ? '来自商家上传的截图，按识别到的商品位置裁切。'
-        : '来自商家上传的截图中部区域，未取得精确商品位置，仅作装修示意。',
-      accurate: Boolean(box),
+      upscaled: outWidth > (box ? box.w * meta.width : meta.width),
+      reliability,
+      accurate: reliability === 'located',
+      note: reliability === 'located'
+        ? '来自商家上传的截图，已按识别到的商品位置裁切。'
+        : reliability === 'uncertain'
+          ? '来自商家上传的截图，但识别到的位置形状不像完整商品照片，这张仅作版式示意，请核对后再使用。'
+          : '来自商家上传的截图中部区域，未取得商品位置，仅作版式示意。',
     });
-    log(`已从截图裁切 ${assignment.slotId}${box ? '（按识别位置）' : '（未定位，取中上部）'}`);
+    log(`已从截图裁切 ${assignment.slotId}（${reliability === 'located' ? '已定位' : reliability === 'uncertain' ? '位置待确认' : '无定位'}）`);
   }
   return assets;
 }

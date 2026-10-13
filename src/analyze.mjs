@@ -179,8 +179,10 @@ const ANALYZE_SYSTEM = `你在帮一个不懂设计的电商商家做店铺装�
   "confidence": {"overall":"high|medium|low","missing":["哪些信息截图里看不清，导致你无法判断"]}
 }
 
-box 是商品照片在截图中的归一化位置（0~1，x/y 为左上角，w/h 为宽高）。
-它会用来从截图里裁出商品图给装修页面使用，所以必须框住「整张商品照片」：
+box 是商品照片在截图中的位置。**请以图片宽度为基准**：x、y、w、h 都表示"占图片宽度的比例"（0~1）。
+这张截图很长，如果按高度的比例来算会把框拉到相邻商品上，所以统一用宽度基准：
+例如某商品照片宽度约为图片宽度的 40%、位于从上往下 35% 位置，就写 {"x":0.05,"y":0.35,"w":0.4,"h":0.4}（h 同样以宽度为基准，方形照片 w 与 h 接近）。
+box 会用来从截图里裁出商品图给装修页面使用，所以必须框住「整张商品照片」：
 包含完整商品与包装，排除商品名称文字、价格、按钮和相邻商品；看不清完整照片时就不要给 box。
 
 规则：
@@ -198,16 +200,24 @@ export async function analyzeStore(env, screenshot, log = () => {}) {
     images: [{ buffer: screenshot.buffer, label: '店铺截图' }],
     maxTokens: 3000,
   });
+  const frame = { width: screenshot.width, height: screenshot.height };
   const shop = {
     shopName: str(value?.shopName, 30),
     category: str(value?.category, 12),
     positioning: str(value?.positioning, 120),
-    visibleProducts: (Array.isArray(value?.visibleProducts) ? value.visibleProducts : []).slice(0, 8).map(p => ({
-      name: str(p?.name, 30) || '商品',
-      category: str(p?.category, 8),
-      note: str(p?.note, 60),
-      box: normalizeBox(p?.box),
-    })),
+    visibleProducts: (Array.isArray(value?.visibleProducts) ? value.visibleProducts : []).slice(0, 8).map(p => {
+      const resolved = resolveProductBox(p?.box, frame);
+      return {
+        name: str(p?.name, 30) || '商品',
+        category: str(p?.category, 8),
+        note: str(p?.note, 60),
+        box: resolved ? { x: round4(resolved.x), y: round4(resolved.y), w: round4(resolved.w), h: round4(resolved.h) } : null,
+        boxPixel: resolved ? resolved.pixel : null,
+        boxInterpretation: resolved ? resolved.interpretation : null,
+        boxRatio: resolved ? resolved.ratio : null,
+        boxPlausible: resolved ? resolved.plausible : null,
+      };
+    }),
     contentSignals: {
       hasPromotion: value?.contentSignals?.hasPromotion === true,
       hasPriceInfo: value?.contentSignals?.hasPriceInfo === true,
@@ -235,23 +245,60 @@ export async function analyzeStore(env, screenshot, log = () => {}) {
 function str(value, limit) {
   return String(value ?? '').replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, limit);
 }
+const round4 = n => Math.round(n * 10000) / 10000;
 
-/** 商品框夹取：越界一律收进图内，绝不因为坐标问题中断流程。 */
-function normalizeBox(box) {
-  if (!box || typeof box !== 'object') return null;
-  const nums = ['x', 'y', 'w', 'h'].map(k => Number(box[k]));
+/**
+ * 商品框解读与择优。
+ *
+ * 视觉模型对长截图的 box 常常按"正方形画面"理解：它给的 h 其实是"占宽度的比例"。
+ * 直接按高度换算，会把下一个商品和名称文字一起框进来（实测发生过）。
+ * 因此这里同时算出两种解读，按合理性择优，并把采用了哪种解读记录下来。
+ *
+ * @param {{width:number,height:number}} frame 图片实际像素
+ * @returns {{x,y,w,h,interpretation,ratio}|null} 像素坐标的框
+ */
+export function resolveProductBox(raw, frame) {
+  const nums = ['x', 'y', 'w', 'h'].map(k => Number(raw?.[k]));
   if (nums.some(n => !Number.isFinite(n))) return null;
   let [x, y, w, h] = nums;
   if (w <= 0 || h <= 0) return null;
   if (x > 1.5 || y > 1.5 || w > 1.5 || h > 1.5) { x /= 100; y /= 100; w /= 100; h /= 100; }
-  const x2 = Math.min(1, Math.max(0, x));
-  const y2 = Math.min(1, Math.max(0, y));
-  const w2 = Math.min(1 - x2, Math.max(0.001, w));
-  const h2 = Math.min(1 - y2, Math.max(0.001, h));
-  if (w2 < 0.03 || h2 < 0.03) return null;
-  return { x: round4(x2), y: round4(y2), w: round4(w2), h: round4(h2) };
+  if (w <= 0 || h <= 0) return null;
+
+  const candidates = [
+    { interpretation: 'height', box: { x: x * frame.width, y: y * frame.height, w: w * frame.width, h: h * frame.height } },
+    { interpretation: 'width', box: { x: x * frame.width, y: y * frame.width, w: w * frame.width, h: h * frame.width } },
+  ].map(candidate => {
+    const b = candidate.box;
+    const left = Math.max(0, Math.round(b.x));
+    const top = Math.max(0, Math.round(b.y));
+    const width = Math.min(frame.width - left, Math.round(b.w));
+    const height = Math.min(frame.height - top, Math.round(b.h));
+    if (width < 24 || height < 24) return null;
+    const ratio = width / height;
+    // 商品照片通常接近方形：过于狭长说明解读错了（例如把标签栏也框进来）
+    const plausible = ratio > 0.45 && ratio < 2.2;
+    // 越界越多说明解读越可疑
+    const overflow = Math.max(0, b.x + b.w - frame.width) / frame.width + Math.max(0, b.y + b.h - frame.height) / frame.height;
+    const area = (width * height) / (frame.width * frame.height);
+    // 面积过小多半只框到瓶子一角；过大又多半框进了整屏
+    const sizeScore = area > 0.008 && area < 0.35 ? 1 : 0;
+    const score = (plausible ? 2 : 0) + sizeScore - overflow * 4;
+    return { interpretation: candidate.interpretation, left, top, width, height, ratio, plausible, overflow, area, score };
+  }).filter(Boolean);
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  const best = candidates[0];
+  return {
+    x: best.left / frame.width, y: best.top / frame.height,
+    w: best.width / frame.width, h: best.height / frame.height,
+    pixel: { left: best.left, top: best.top, width: best.width, height: best.height },
+    interpretation: best.interpretation,
+    ratio: Math.round(best.ratio * 1000) / 1000,
+    plausible: best.plausible,
+  };
 }
-const round4 = n => Math.round(n * 10000) / 10000;
 
 function hex(value, fallback) {
   const s = String(value ?? '').trim();
