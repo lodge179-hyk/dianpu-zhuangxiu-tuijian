@@ -134,6 +134,9 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
     await writeFile(path.join(dir, 'plan.json'), JSON.stringify(planned.plan, null, 2));
     planned.plan.validation.warnings.forEach(warn);
     (planned.plan.notes || []).forEach(warn);
+    if (planned.plan.slotRenames?.length) {
+      warn(`有 ${planned.plan.slotRenames.length} 个图片编号被纠正（模型把别的模块的编号复制了过来），已同步到生图计划：${planned.plan.slotRenames.map(r => `${r.from}→${r.to}`).join('、')}。`);
+    }
     if (!planned.plan.design.decisions.length) warn('AI 没有给出设计决策理由，本轮的选型理由不可核对。');
 
     const plan = planned.plan;

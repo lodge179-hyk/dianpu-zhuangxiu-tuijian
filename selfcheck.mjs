@@ -168,6 +168,9 @@ console.log('\n生图提示词（防同质化）');
     ['保留共享艺术方向', /SHARED ART DIRECTION|ONE shop/],
     ['约束只作为调性而非统一背景', /NOT instructions to repeat one background/],
     ['明确背景与构图必须逐格不同', /must differ from panel to panel/],
+    ['禁止所有格子用同一底色', /Do NOT use the same background colour for every panel/],
+    ['要求轮换背景色', /Rotate the backdrop between panels/],
+    ['要求变化打光方式', /Vary the lighting set-up as well/],
     ['禁止文字', /ABSOLUTELY NO text/],
     ['品红分隔要求', /MAGENTA #FF00FF/],
   ];

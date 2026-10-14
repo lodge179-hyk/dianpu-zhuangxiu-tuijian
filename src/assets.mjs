@@ -283,7 +283,9 @@ const PANEL_TREATMENT = {
 const PANEL_VARIETY = [
   'Every panel must be visually DIFFERENT from the others in camera angle, background treatment and composition.',
   'Never repeat the same photograph with a different crop. Each panel is its own shot.',
+  'Do NOT use the same background colour for every panel. Rotate the backdrop between panels — for example one cream, one pale stone grey, one soft blush, one light warm wood — while staying inside the same palette family.',
   'Vary the scene across panels: some closer, some wider; some with props, some minimal; some stylised, some plain.',
+  'Vary the lighting set-up as well: some panels with soft directional side light, others flat and diffused, others with a stronger specular highlight.',
   'Keep one shared art direction across the sheet — the same broad palette, materials and light quality — so the panels still belong to one shop.',
 ];
 
