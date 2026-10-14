@@ -3,7 +3,7 @@ const { planSchema, validatePlan, aspectRatios } = require('./plan.cjs');
 
 const briefSchema = z.object({
   version: z.literal(1), shop: planSchema.shape.shop,
-  categories: z.array(z.string().trim().min(1).max(20)).min(2).max(5),
+  categories: z.array(z.string().trim().min(1).max(20)).min(1).max(5),
   theme: z.string().trim().min(1).max(100),
   style: planSchema.shape.style,
   navigationStyle: z.enum(['auto', 'clean', 'warm']).default('auto'),
@@ -25,7 +25,7 @@ function validateBrief(input) {
   if (!result.success) throw Error('店铺资料不完整：' + result.error.issues.slice(0, 4).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const brief = result.data;
   const labels = brief.categories.map(c => c.normalize('NFKC').toLowerCase().replace(/\s/g, ''));
-  if (new Set(labels).size !== labels.length) throw Error('品类不能重复，请保留 2 至 5 个明确品类');
+  if (new Set(labels).size !== labels.length) throw Error('品类不能重复，请保留 1 至 5 个明确品类');
   if (brief.featuredCategory && !brief.categories.includes(brief.featuredCategory.name)) throw Error('主推品类必须属于已确认的经营品类');
   return brief;
 }
@@ -52,13 +52,13 @@ function sceneFor(category, index) {
   if (/上衣|衬衫|衬衣|裤|裙|服装|针织/.test(category)) return [index % 2 ? '服装的俯拍搭配，展示轮廓与层次' : '日常穿着局部，展示衣服的形态，不宣称面料成分', index % 2 ? 'top-down' : 'eye-level', index % 2 ? 'still-life' : 'human-use'];
   return ['品类示意物件与使用环境的构图，不推断功能、材质或认证', index % 2 ? 'top-down' : 'eye-level', 'still-life'];
 }
-function tasksFor(brief, density) {
+function tasksFor(brief, density, creative = false) {
   const tasks = [], nav = brief.categories.length >= 4;
   const add = (id, aspect, subject, composition, role, camera, treatment, background) => tasks.push({ id, aspect, subject: subject.slice(0, 180), composition, direction: { role, camera, treatment, background: background.slice(0, 180), accents: '使用共享色板中的少量颜色；保留品类自身形态，不统一包装' } });
   if (nav) brief.categories.forEach((c, i) => add(`nav-${i + 1}`, '1:1', `${c}的清楚品类示意，无品牌`, '单个或少量代表物居中，主体在中央65%，适应小尺寸圆形裁剪', 'category', 'eye-level', 'still-life', '干净浅色背景；同组导航保持一致'));
   add('overview', density === 'compact' ? '3:1' : '4:3', `${brief.theme}；围绕${brief.categories.join('、')}组织一个整体画面`, '建立一个视觉重点，前后景有层次；不做多格拼贴，不烘焙标题', 'hero', 'wide', 'environment', brief.style.background);
   brief.categories.forEach((c, i) => {
-    const [description, camera, treatment] = sceneFor(c, i);
+    const [description, camera, treatment] = creative ? ['根据已识别商品和联网风格设计具体画面', 'eye-level', 'still-life'] : sceneFor(c, i);
     add(`scene-${i + 1}`, '1:1', `${c}：${description}`, '本图只表达一个品类，主体与必要环境各有空间；适应方形画面', 'scene', camera, treatment, i % 2 ? '清楚简洁的局部背景，与整页保持白平衡联系' : '与主题相符的使用环境；不要求与其他图采用同一台面');
   });
   if (density === 'balanced') add('detail', '1:1', `${brief.categories[0]}的可见表面、形态或质地局部；不据此宣称真实商品材料或功效`, '近距离表达与场景图不同的信息，不再完整重复陈列同一商品', 'detail', 'macro', /护肤|底妆|彩妆|上衣|衬衫|裤|裙/.test(brief.categories[0]) ? 'texture' : 'still-life', '去掉场景道具，以局部明暗和质感建立联系');
@@ -75,7 +75,7 @@ function decideStructure(brief) {
       : `已确认 ${brief.categories.length} 个品类，经营范围较集中；先用一个整体画面建立印象，再逐类展示，不为凑四列导航增加品类。`;
   return { recipeId, density, reason, lengthReason: density === 'compact' ? '品类较少且无主推细节依据，采用短横幅并省去独立细节图。' : '品类较多或有明确主推，保留主视觉和一张局部图；仍不补齐无用途模块。' };
 }
-function recommendPlan(input) {
+function recommendPlan(input, options = {}) {
   const brief = validateBrief(input), choice = decideStructure(brief), { density } = choice;
   if (brief.featuredCategory) brief.categories = [brief.featuredCategory.name, ...brief.categories.filter(c => c !== brief.featuredCategory.name)];
   const recipe = recipes.find(r => r.id === choice.recipeId);
@@ -103,7 +103,7 @@ function recommendPlan(input) {
     while (tiles.length) group(tiles.splice(0, tiles.length === 3 ? 3 : Math.min(2, tiles.length)));
     if (recipe.id === 'category-first') hero();
   // Decide one structure first. Only then allocate its image jobs and batches.
-  const tasks = tasksFor(brief, density);
+  const tasks = tasksFor(brief, density, options.creative);
   const plan = { version: 1, shop: brief.shop, navigationLibrary: { style: brief.navigationStyle }, summary: `${recipe.name}：${recipe.aim}。系统根据经营范围安排 ${modules.length} 个模块；每个品类都有对应画面，图片为装修示意。`, artDirection: { concept: brief.theme, narrative: recipe.aim, anchors: ['共享白平衡与色彩关系', '各图片按用途变化镜头与场景'], focalAssetId: 'overview' }, style: brief.style, modules, assets: tasks, batches: batchesFor(tasks) };
   return { ...validatePlan(plan), recommendation: { version: 1, method: 'reference-rules', name: recipe.name, ...choice, tradeoff: recipe.tradeoff, decisions, sources: sources.filter(s => recipe.evidence.includes(s.id)), brief } };
 }

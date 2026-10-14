@@ -4,13 +4,14 @@ const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
 const planSchema = z.object({
   version: z.literal(1),
+  imageMode: z.literal('category-inspired').optional(),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
   navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -18,6 +19,7 @@ function validatePlan(input) {
   const parsed = planSchema.safeParse(input);
   if (!parsed.success) throw new Error('方案格式不合格：' + parsed.error.issues.slice(0, 6).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const plan = parsed.data;
+  if (plan.imageMode && (!plan.artDirection || plan.assets.some(a => !a.prompt || !a.direction))) throw new Error('商品装修方案缺少 AI 画面设计或最终提示词');
   const unique = (list, label) => { if (new Set(list).size !== list.length) throw new Error(`${label}编号重复`); };
   unique(plan.modules.map(m => m.id), '模块'); unique(plan.assets.map(a => a.id), '素材'); unique(plan.batches.map(b => b.id), '批次');
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
@@ -79,7 +81,7 @@ function buildBatches(plan, excludedAssetIds = []) {
   return pending.map((batch, index) => {
     const rowWeights = batch.rows.map(row => 1 / (row.length * aspectRatios[lookup.get(row[0]).aspect]));
     const total = rowWeights.reduce((a, b) => a + b, 0);
-    const prompt = [
+    const prompt = plan.imageMode === 'category-inspired' ? productBatchPrompt(plan, batch, lookup, rowWeights, total, index) : [
       'Create ONE asset sheet for an art-directed store campaign. Each panel is an independent finished visual in the medium specified by its brief, not a website or UI. Do not default every panel to a product packshot.',
       lock,
       plan.artDirection ? `Page concept: ${plan.artDirection.concept}. Narrative and visual hierarchy: ${plan.artDirection.narrative}. Shared anchors: ${plan.artDirection.anchors.join('; ')}. The page focal asset is ${plan.artDirection.focalAssetId}; give supporting visuals quieter or closer framing instead of making every panel compete as a hero. Follow each panel brief; do not repeat the same subject just to create unity.` : '',
@@ -93,5 +95,17 @@ function buildBatches(plan, excludedAssetIds = []) {
     ].filter(Boolean).join('\n\n');
     return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, styleLock: lock, prompt };
   });
+}
+function productBatchPrompt(plan, batch, lookup, weights, total, index) {
+  return [
+    '生成一张可裁剪的装修素材总图。每格是一张独立完整图片，不是网页截图。商品为已确认品类的相似或同类型示意商品，无须复刻上传的具体 SKU。不得加入品牌标识、价格、功效、认证、文字或界面元素。',
+    `整套视觉方向：${plan.artDirection.concept}。主次：${plan.artDirection.narrative}。贯穿要素：${plan.artDirection.anchors.join('；')}。`,
+    `共享配色：${plan.style.palette.join('、')}；环境：${plan.style.background}；光线：${plan.style.lighting}；表现：${plan.style.photography}。配色作为协调依据，不要求每张用尽所有颜色。`,
+    index ? '所附上一批总图仅用于保持视觉方向与色彩关系。不要复制上一批的商品、背景、机位或格子排布。' : '',
+    `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
+    ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => { const a = lookup.get(id); return `第 ${j + 1} 格（仅供定位，不绘制编号），比例 ${a.aspect}：${a.prompt}`; }).join('\n')),
+    '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。每格有自己的不透明背景，物体及阴影不跨格。画面内禁止出现该分隔色。',
+    '主体保留适应比例修正的安全边距。导航图片主体集中在中央 65%，适应圆形裁剪。只生成图片内容，标题和导航文字由程序排版。',
+  ].filter(Boolean).join('\n\n');
 }
 module.exports = { planSchema, validatePlan, buildBatches, aspectRatios };

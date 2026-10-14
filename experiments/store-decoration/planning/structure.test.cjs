@@ -51,7 +51,7 @@ test('a proposed theme is not evidence of merchandising priority; real priority 
 });
 test('invalid or ambiguous briefs do not silently gain invented categories', () => {
   const brief = exampleBrief('beauty');
-  for (const categories of [['护肤'], ['护肤', '护肤'], ['A', 'Ｂ', 'b'], ['A', 'B', 'C', 'D', 'E', 'F']]) assert.throws(() => validateBrief({ ...brief, categories }));
+  for (const categories of [[], ['护肤', '护肤'], ['A', 'Ｂ', 'b'], ['A', 'B', 'C', 'D', 'E', 'F']]) assert.throws(() => validateBrief({ ...brief, categories }));
   assert.throws(() => validateBrief({ ...brief, featuredCategory: { name: '鞋子', evidence: '错误资料' } }), /主推品类/);
   assert.throws(() => manualBrief({ name: '', categories: '上衣、衬衫' }), /资料/);
   const custom = manualBrief({ name: '<测试店>', categories: '工具、家居', theme: '居家片刻' });
@@ -156,6 +156,8 @@ test('HTTP creates a single ready plan, exports it and preserves older tasks wit
   const exported = await post(`/api/runs/${id}/download/materials.zip`); assert.equal(exported.status, 200); assert.ok(exported.data.bytes > 1000);
   const updated = await post(`/api/runs/${id}/recommendation`); assert.equal(updated.data.status, 'ready'); assert.notEqual(updated.data.id, id);
   assert.deepEqual(fs.readFileSync(savedFile), snapshot);
-  assert.equal((await post('/api/recommendation', { name: '测试', categories: '只有一类' })).status, 400);
+  const single = await post('/api/recommendation', { name: '测试', categories: '只有一类' });
+  assert.equal(single.status, 201); assert.ok(!single.data.plan.modules.some(m => m.type.startsWith('navigation.')));
+  assert.equal((await post('/api/recommendation', { name: '测试', categories: '' })).status, 400);
   const restored = await (await fetch(address + '/api/runs/' + id)).json(); assert.equal(restored.id, id);
 });

@@ -9,7 +9,9 @@ const { createExample } = require('./example.cjs');
 const { navigationExamplePlan } = require('./navigation-example.cjs');
 const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs');
 const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
-const { plannerPrompt, structurePrompt, planScreenshot, publicCatalog } = require('./planner.cjs');
+const { plannerPrompt, publicCatalog } = require('./planner.cjs');
+const { limits, recognitionPrompt, productWorkflow, generateRemaining } = require('./product-workflow.cjs');
+const { publicSettings, redact } = require('./qwen-provider.cjs');
 const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
 const { fillStructureExample } = require('./structure-example.cjs');
 let port = Number(process.env.PLANNER_PORT || 5182);
@@ -48,14 +50,12 @@ async function body(req, max) {
 }
 function imageType(req) { if (!/^image\/(png|jpeg|webp)(?:;|$)/i.test(req.headers['content-type'] || '')) throw new Error('仅支持PNG、JPG或WebP图片'); }
 function safeError(error) {
-  let text = error instanceof Error ? error.message : '操作未完成';
-  if (process.env.ARK_API_KEY) text = text.replaceAll(process.env.ARK_API_KEY, '[已隐藏]');
-  return text.slice(0, 600);
+  return redact(error instanceof Error ? error.message : '操作未完成').slice(0, 600);
 }
 // A stopped planning request is never presented as still running after a restart.
 for (const id of fs.readdirSync(root)) {
   if (!/^[a-f0-9-]{36}$/.test(id)) continue;
-  try { const state = load(id); if (state.status === 'planning') { state.status = 'failed'; state.error = '上次规划被服务停止中断，结果与计费未确认；没有自动重新调用。'; const auditFile = path.join(folderFor(id), 'planner-call.json'); if (fs.existsSync(auditFile)) state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditFile, 'utf8')).requestAttempts; save(folderFor(id), state); } } catch {}
+  try { const state = load(id); if (['planning', 'generating'].includes(state.status)) { const message = '上次任务被服务停止中断，结果与计费未确认；没有自动重新调用。'; state.status = state.plan ? 'ready' : 'failed'; if (state.plan) state.generationError = message; else state.error = message; if (state.workflow) state.workflow = { ...state.workflow, stage: 'interrupted', label: message }; save(folderFor(id), state); } } catch {}
 }
 const server = http.createServer(async (req, res) => {
   try {
@@ -63,7 +63,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return json(res, 403, { error: '来源不允许' });
     const url = new URL(req.url, `http://127.0.0.1:${port}`), pathname = decodeURIComponent(url.pathname);
     if (req.method === 'GET' && pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(fs.readFileSync(path.join(__dirname, 'index.html'))); }
-    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { plannerConfigured: !!(process.env.ARK_API_KEY && process.env.ARK_VISION_MODEL && process.env.ARK_RESPONSES_ENDPOINT), maxUploadMB: 30, maxGenerationBatches: 2 });
+    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, plannerConfigured: publicSettings().configured, maxGenerationBatches: 2 });
     if (req.method === 'GET' && pathname === '/api/catalog') return json(res, 200, publicCatalog());
     if (req.method === 'GET' && pathname === '/api/navigation-library') return json(res, 200, publicNavigationLibrary());
     const libraryFile = pathname.match(/^\/navigation-assets\/([a-z0-9-]+)\.png$/);
@@ -74,7 +74,7 @@ const server = http.createServer(async (req, res) => {
       return fs.createReadStream(file).pipe(res);
     }
     if (req.method === 'GET' && pathname === '/api/planner-prompt') return json(res, 200, { prompt: plannerPrompt() });
-    if (req.method === 'GET' && pathname === '/api/structure-prompt') return json(res, 200, { prompt: structurePrompt() });
+    if (req.method === 'GET' && pathname === '/api/structure-prompt') return json(res, 200, { prompt: recognitionPrompt() });
     if (req.method === 'POST' && ['/api/recommendation', '/api/recommendation-example'].includes(pathname)) {
       const request = JSON.parse((await body(req, 64 * 1024)).toString('utf8'));
       const sample = pathname === '/api/recommendation-example';
@@ -103,19 +103,37 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && pathname === '/api/import-plan') {
       const input = JSON.parse((await body(req, 512 * 1024)).toString('utf8'));
-      const { plan } = validatePlan({ ...input, navigationLibrary: input.navigationLibrary || { style: 'auto' } });
+      const { plan } = validatePlan(input.imageMode ? input : { ...input, navigationLibrary: input.navigationLibrary || { style: 'auto' } });
       const run = makeRun('external-ai-plan');
       return json(res, 201, finish(run, compose(run.folder, plan)));
     }
-    if (req.method === 'POST' && ['/api/plan', '/api/legacy-plan'].includes(pathname)) {
+    if (req.method === 'POST' && pathname === '/api/legacy-plan') return json(res, 410, { error: '旧火山模型入口已停用，请使用商品截图新流程。' });
+    if (req.method === 'POST' && pathname === '/api/plan') {
       if (planning) return json(res, 409, { error: '已有一个截图正在规划，请等待完成，避免重复调用。' });
-      const structureMode = pathname === '/api/plan';
-      imageType(req); planning = true;
-      let bytes;
-      try { bytes = await body(req, 30 * 1024 * 1024); } catch (error) { planning = false; throw error; }
-      const run = makeRun(structureMode ? 'recommendation-screenshot' : 'screenshot');
+      if (!publicSettings().configured) return json(res, 503, { error: '请配置本机百炼 DASHSCOPE_API_KEY。旧火山模型不会作为回退。' });
+      planning = true;
+      let images;
+      try {
+        if (/^application\/json/.test(req.headers['content-type'] || '')) images = JSON.parse((await body(req, 42 * 1024 * 1024)).toString('utf8')).images;
+        else { imageType(req); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
+        if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
+      } catch (error) { planning = false; throw error; }
+      const run = makeRun('product-screenshots'); locks.add(run.id);
       json(res, 202, run.state);
-      void planScreenshot(bytes, run.folder, { structure: structureMode }).then(result => structureMode ? finishRecommendation(run, result.brief) : finish(run, compose(run.folder, { ...result.plan, navigationLibrary: result.plan.navigationLibrary || { style: 'auto' } }))).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); const auditPath = path.join(run.folder, 'planner-call.json'); if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts; save(run.folder, run.state); }).finally(() => { planning = false; });
+      void productWorkflow(run, images, save).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); save(run.folder, run.state); }).finally(() => { planning = false; locks.delete(run.id); });
+      return;
+    }
+    const generateMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/generate$/);
+    if (req.method === 'POST' && generateMatch) {
+      const id = generateMatch[1];
+      if (planning || locks.has(id)) return json(res, 409, { error: '已有任务正在执行，请等待完成。' });
+      if (!publicSettings().configured) return json(res, 503, { error: '请先配置本机百炼密钥，未发起生图。' });
+      const state = load(id);
+      if (state.status !== 'ready' || state.plan?.imageMode !== 'category-inspired') throw Error('只有新商品截图流程的已规划任务可以继续生图。');
+      if (state.plan.assets.every(a => state.filledAssets.includes(a.id))) return json(res, 200, state);
+      locks.add(id); planning = true; state.status = 'generating'; delete state.generationError; save(folderFor(id), state);
+      json(res, 202, state);
+      void generateRemaining({ id, folder: folderFor(id), state }, save).catch(error => { state.status = 'ready'; state.generationError = safeError(error); save(folderFor(id), state); }).finally(() => { locks.delete(id); planning = false; });
       return;
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
@@ -162,10 +180,12 @@ const server = http.createServer(async (req, res) => {
         state.filledAssets = [...new Set([...state.filledAssets, ...report.crops.map(c => c.assetId)])];
         state.importedBatches = [...new Set([...state.importedBatches, batchId])];
         state.cropReports = { ...(state.cropReports || {}), [batchId]: report };
+        delete state.generationError;
+        if (state.workflow) state.workflow = { ...state.workflow, stage: state.plan.assets.every(a => state.filledAssets.includes(a.id)) ? 'complete' : 'planned', label: '已手动填入素材' };
         return json(res, 200, finish({ id, folder, state }, compose(folder, state.plan)));
       } finally { locks.delete(id); }
     }
-    const fileMatch = pathname.match(/^\/runs\/([a-f0-9-]{36})\/(shop\.html|input\.jpg|plan\.json|generation-batches\.json|[a-z][a-z0-9_-]*-(?:prompt\.txt|source\.png|crop-report\.json)|assets\/[a-z][a-z0-9_-]*\.png)$/);
+    const fileMatch = pathname.match(/^\/runs\/([a-f0-9-]{36})\/(shop\.html|input\.jpg|input-[1-6]\.jpg|plan\.json|recognition\.json|style-research\.json|search-sources\.json|generation-batches\.json|[a-z][a-z0-9_-]*-(?:prompt\.txt|source\.png|crop-report\.json)|assets\/[a-z][a-z0-9_-]*\.png)$/);
     if (req.method === 'GET' && fileMatch) {
       const file = path.join(folderFor(fileMatch[1]), fileMatch[2]);
       if (!fs.existsSync(file)) return json(res, 404, { error: '文件不存在' });
