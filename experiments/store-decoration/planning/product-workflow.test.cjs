@@ -5,7 +5,7 @@ const path = require('path');
 const sharp = require('sharp');
 const { randomUUID } = require('crypto');
 const { unzipSync } = require('fflate');
-const { productWorkflow, generateRemaining, prepareInputs, applyDesign } = require('./product-workflow.cjs');
+const { productWorkflow, generateRemaining, prepareInputs, applyDesign, sourceChoices, validateResearch, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
 const { searchSources, batchSize, imageBytes, askJson } = require('./qwen-provider.cjs');
 const { aspectRatios } = require('./plan.cjs');
 const { materialsZip } = require('./download.cjs');
@@ -34,7 +34,7 @@ function mockProvider(run, options = {}) {
   const calls = [], categories = options.categories || ['耳机']; let imageCalls = 0;
   const source = { url: 'https://www.example.com/products', title: '测试用数码展示参考' };
   const recognition = { sufficient: !options.insufficient, categories, products: Array.from({ length: options.insufficient ? 1 : Math.max(2, categories.length) }, (_, i) => ({ category: categories[i % categories.length], description: `可见商品款式 ${i + 1}`, imageIndex: 1 })), observations: ['列表包含不同款式'], uncertainties: ['具体材质未确认'], missing: options.insufficient ? ['请补充其他清楚款式'] : [] };
-  const research = { concept: '清透的数码日常', reason: '结合搜索资料组织产品展示，实际画面效果待验证', style: { palette: ['#124578', '#CCEEDD'], background: '明亮工作空间与抽象色面', lighting: '清晰自然光', photography: '按用途切换场景与局部视角' }, anchors: ['蓝绿关系'], selectedSources: [{ url: options.fakeSource ? 'https://fabricated.example.com/' : source.url, application: '参考主体留白与场景组织' }] };
+  const research = { concept: '清透的数码日常', reason: '结合搜索主题提出画面设计，实际效果待验证', style: { palette: ['#124578', '#CCEEDD'], background: '明亮工作空间与抽象色面', lighting: '清晰自然光', photography: '按用途切换场景与局部视角' }, anchors: ['蓝绿关系'], selectedSources: [{ sourceId: options.fakeSource ? 'source-99' : 'source-1', application: '来源主题是数码展示，建议使用主体留白组织新画面，未观察原网页图片' }] };
   const fetcher = async (url, init) => {
     const body = JSON.parse(init.body); calls.push({ url, body });
     assert.match(body.model, /^qwen/); assert.ok(!/ark|volces|doubao/i.test(url));
@@ -51,12 +51,17 @@ function mockProvider(run, options = {}) {
     let value = recognition;
     if (textOnly) {
       assert.equal(body.parameters.enable_search, true); assert.equal(body.parameters.search_options.forced_search, true); assert.equal(body.parameters.search_options.enable_source, true);
+      value = { selectedSources: [{ url: 'https://fabricated.example.com/product-2026' }], reason: '未核实的搜索回答，不能流入后续设计' };
+    } else if (input.sources) {
+      assert.equal(body.parameters.enable_search, undefined);
+      assert.deepEqual(input.sources, [{ id: 'source-1', ...source }]);
+      assert.ok(!JSON.stringify(body).includes('fabricated.example.com'));
       value = research;
     } else if (input.tasks) value = {
       artDirection: { concept: research.concept, narrative: '主视觉到品类场景', anchors: research.anchors, focalAssetId: 'overview' },
       assets: input.tasks.map((a, i) => ({ id: a.id, aspect: a.aspect, subject: a.category + '示意商品', composition: '按图片用途组织画面，主体留出安全边距', prompt: `${a.category}同类型示意商品，画面用途为${a.role}，放置于蓝绿色协调空间中，保持自然光、主体留白以及清楚的外形，每张按用途组织视角，不绘制任何文字或商标。`, direction: { role: a.role, camera: i % 2 ? 'top-down' : 'eye-level', background: '蓝绿空间', accents: '银色局部', treatment: i % 2 ? 'still-life' : 'environment' } }))
     };
-    return response({ output: { choices: [{ message: { content: textOnly ? JSON.stringify(value) : [{ text: JSON.stringify(value) }] } }], ...(textOnly ? { search_info: { search_results: options.noSources ? [] : [source] } } : {}) }, usage: { total_tokens: 1 }, request_id: 'mock-text' });
+    return response({ output: { choices: [{ message: { content: textOnly ? '搜索概括（不要求 JSON）：' + JSON.stringify(value) : [{ text: JSON.stringify(value) }] } }], ...(textOnly ? { search_info: { search_results: options.noSources ? [] : [source] } } : {}) }, usage: { total_tokens: 1 }, request_id: 'mock-text' });
   };
   return { fetcher, calls, recognition, research };
 }
@@ -65,12 +70,13 @@ test('multiple product screenshots create one generic plan, exact prompts, crops
   const run = workspace(t), mock = mockProvider(run);
   const result = await productWorkflow(run, [await screenshot(), await screenshot(1800)], save, mock);
   assert.equal(result.workflow.stage, 'complete'); assert.equal(result.inputs.length, 2);
-  assert.equal(result.planningRequestAttempts, 3); assert.equal(result.imageGenerationCallsByThisTool, 1);
+  assert.equal(result.planningRequestAttempts, 4); assert.equal(result.imageGenerationCallsByThisTool, 1);
   assert.equal(result.plan.imageMode, 'category-inspired'); assert.equal(result.plan.navigationLibrary, undefined);
   assert.equal(result.libraryAssetIds.length, 0); assert.equal(result.filledAssets.length, result.plan.assets.length);
   assert.ok(!result.plan.modules.some(m => m.type.startsWith('navigation.'))); assert.equal(result.candidates, undefined);
   assert.ok(!/护肤|梳妆|美妆|beige/i.test(result.batches[0].prompt));
-  assert.equal(mock.calls.length, 4); assert.equal(mock.calls[0].body.input.messages[1].content.filter(c => c.image).length, 4);
+  assert.equal(mock.calls.length, 5); assert.equal(mock.calls[0].body.input.messages[1].content.filter(c => c.image).length, 4);
+  assert.equal(result.research.selectedSources[0].url, 'https://www.example.com/products');
   const actual = fs.readFileSync(path.join(run.folder, result.batches[0].id + '-attempt-1-prompt.txt'), 'utf8');
   assert.equal(actual, result.batches[0].prompt);
   const imageRequest = mock.calls.at(-1).body;
@@ -93,7 +99,7 @@ test('web references must be real search records, not model-written URLs', async
   for (const options of [{ noSources: true }, { fakeSource: true }]) {
     const run = workspace(t), mock = mockProvider(run, options);
     await assert.rejects(productWorkflow(run, [await screenshot()], save, mock), /来源|搜索之外/);
-    assert.equal(mock.calls.length, 2); assert.equal(run.state.imageGenerationCallsByThisTool, 0);
+    assert.equal(mock.calls.length, options.noSources ? 2 : 3); assert.equal(run.state.imageGenerationCallsByThisTool, 0);
   }
   assert.deepEqual(searchSources({ output: { search_info: { search_results: [{ url: 'javascript:alert(1)' }, { url: 'http://127.0.0.1/test' }, { url: 'https://www.example.com/a#x' }, { url: 'https://www.example.com/a#y' }] } } }).map(s => s.url), ['https://www.example.com/a']);
   let fetched = false; await assert.rejects(imageBytes('https://untrusted.example.com/image.png', async () => { fetched = true; }), /未下载/); assert.equal(fetched, false);
@@ -103,15 +109,15 @@ test('second batch failure preserves the first batch; explicit continuation gene
   const run = workspace(t), mock = mockProvider(run, { categories: ['耳机', '键盘', '鼠标', '音箱', '相机'], failImage: 2 });
   await productWorkflow(run, [await screenshot()], save, mock);
   assert.equal(run.state.workflow.stage, 'generation-failed'); assert.equal(run.state.batches.length, 2);
-  assert.equal(mock.calls.length, 5); assert.equal(run.state.imageGenerationCallsByThisTool, 2);
+  assert.equal(mock.calls.length, 6); assert.equal(run.state.imageGenerationCallsByThisTool, 2);
   const first = run.state.batches[0], preserved = fs.readFileSync(path.join(run.folder, 'assets', first.rows[0][0] + '.png'));
   assert.deepEqual(run.state.filledAssets, first.rows.flat()); assert.ok(!run.state.generationError.includes('test-secret'));
   await generateRemaining(run, save, mock);
-  assert.equal(mock.calls.length, 6); assert.equal(run.state.workflow.stage, 'complete');
+  assert.equal(mock.calls.length, 7); assert.equal(run.state.workflow.stage, 'complete');
   assert.deepEqual(run.state.generationAttempts, { [first.id]: 1, [run.state.batches[1].id]: 2 });
   assert.deepEqual(fs.readFileSync(path.join(run.folder, 'assets', first.rows[0][0] + '.png')), preserved);
   assert.ok(mock.calls.at(-1).body.input.messages[0].content.some(c => c.image));
-  await generateRemaining(run, save, mock); assert.equal(mock.calls.length, 6);
+  await generateRemaining(run, save, mock); assert.equal(mock.calls.length, 7);
 });
 
 test('a malformed generated sheet is retained for review and never automatically regenerated', async t => {
@@ -119,7 +125,35 @@ test('a malformed generated sheet is retained for review and never automatically
   await productWorkflow(run, [await screenshot()], save, mock);
   assert.equal(run.state.workflow.stage, 'generation-failed'); assert.equal(run.state.filledAssets.length, 0);
   const id = run.state.batches[0].id; assert.equal(run.state.generatedSheets[id], 1);
-  assert.ok(fs.existsSync(path.join(run.folder, id + '-attempt-1-source.png'))); assert.equal(mock.calls.length, 4);
+  assert.ok(fs.existsSync(path.join(run.folder, id + '-attempt-1-source.png'))); assert.equal(mock.calls.length, 5);
+});
+
+test('source selection retains later results and rejects invented IDs, duplicate citations and model-written URLs', t => {
+  const run = workspace(t), { research } = mockProvider(run);
+  const results = Array.from({ length: 15 }, (_, i) => ({ url: `https://www.example.com/page-${i}`, title: `来源 ${i}` }));
+  const sources = sourceChoices(searchSources({ output: { search_info: { search_results: results } } }));
+  assert.equal(sources.length, 15);
+  assert.equal(validateResearch({ ...research, selectedSources: [{ sourceId: 'source-15', application: '参考主题，提出新画面' }] }, sources).selectedSources[0].url, results[14].url);
+  assert.throws(() => validateResearch({ ...research, selectedSources: [{ url: 'https://fabricated.example.com/', application: '编造' }] }, sources));
+  assert.throws(() => validateResearch({ ...research, selectedSources: [research.selectedSources[0], research.selectedSources[0]] }, sources), /重复/);
+});
+
+test('a legacy failed-link run resumes from cached evidence without repeating recognition/search or modifying inputs', async t => {
+  const run = workspace(t), mock = mockProvider(run);
+  const prepared = await prepareInputs([await screenshot()], run.folder);
+  Object.assign(run.state, { status: 'failed', inputs: prepared.inputs, recognition: mock.recognition, planningRequestAttempts: 2, workflow: { stage: 'researching' }, error: '选定风格引用了本次搜索之外的链接，已停止。' });
+  const sourcesFile = path.join(run.folder, 'search-sources.json'), inputFile = path.join(run.folder, 'input-1.jpg');
+  const oldResponse = '模型所写的不匹配链接'; fs.writeFileSync(path.join(run.folder, 'research-response.txt'), oldResponse);
+  fs.writeFileSync(sourcesFile, JSON.stringify([{ url: 'https://www.example.com/products', title: '测试用数码展示参考' }]));
+  const original = fs.readFileSync(inputFile), originalSources = fs.readFileSync(sourcesFile);
+  assert.ok(cachedResearch(run));
+  await resumeResearch(run, save, { ...mock, generate: false });
+  assert.equal(mock.calls.length, 2); assert.ok(mock.calls.every(c => !c.url.includes('/text-generation/')));
+  assert.equal(run.state.status, 'ready'); assert.equal(run.state.planningRequestAttempts, 4); assert.equal(run.state.previousErrors.length, 1);
+  assert.deepEqual(fs.readFileSync(inputFile), original); assert.deepEqual(fs.readFileSync(sourcesFile), originalSources);
+  assert.equal(fs.readFileSync(path.join(run.folder, 'research-response.txt'), 'utf8'), oldResponse);
+  assert.equal(cachedResearch(run), null);
+  await assert.rejects(resumeResearch(run, save, mock), /无法从风格选择继续/); assert.equal(mock.calls.length, 2);
 });
 
 test('native-provider errors and malformed JSON are recorded without retry or leaking credentials', async t => {
@@ -172,11 +206,11 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
     assert.equal((await post('/api/plan', { images: inputs })).status, 409);
     assert.equal((await post('/api/runs/' + latestId + '/download/materials.zip')).status, 409);
     release(); held = null;
-    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 5);
+    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 6);
     assert.equal(state.filledAssets.length, 10); assert.equal(state.libraryAssetIds.length, 0);
     assert.equal((await fetch(address + '/runs/' + latestId + '/input-2.jpg')).status, 200);
     assert.equal((await fetch(address + '/runs/' + latestId + '/research-call.json')).status, 404);
-    assert.equal((await post('/api/runs/' + latestId + '/generate')).status, 200); assert.equal(mock.calls.length, 5);
+    assert.equal((await post('/api/runs/' + latestId + '/generate')).status, 200); assert.equal(mock.calls.length, 6);
     const zip = await post('/api/runs/' + latestId + '/download/materials.zip'); assert.equal(zip.status, 200);
     assert.ok((await zip.json()).bytes > 1000);
 
@@ -211,6 +245,29 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
       await page.screenshot({ path: path.join(proof, 'mock-needs-input.png'), fullPage: true });
       assert.deepEqual(errors, []); await browser.close(); browser = null;
     }
+
+    mock = mockProvider(bridge, { fakeSource: true });
+    held = new Promise(resolve => { release = resolve; });
+    latestId = (await (await post('/api/plan', { images: inputs })).json()).id; release(); held = null;
+    const failed = await waitReady(); assert.equal(failed.status, 'failed'); assert.equal(failed.canResumeResearch, true);
+    assert.equal(mock.calls.length, 3);
+    const preservedRecognition = fs.readFileSync(path.join(runsRoot, latestId, 'recognition.json'));
+    mock = mockProvider(bridge);
+    held = new Promise(resolve => { release = resolve; });
+    if (process.env.PLANNER_BROWSER_PROOF) {
+      browser = await require('playwright-core').chromium.launch({ channel: 'chrome', headless: true });
+      const page = await browser.newPage(); await page.goto(address + '/?run=' + latestId);
+      const resumed = page.waitForResponse(r => r.url().endsWith('/resume-research'));
+      await page.getByRole('button', { name: '沿用已有资料继续' }).click(); assert.equal((await resumed).status(), 202);
+      assert.equal(await page.locator('#screenshot').isDisabled(), true);
+    } else assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 202);
+    assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 409);
+    release(); held = null;
+    state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 3);
+    assert.ok(mock.calls.every(c => !c.url.includes('/text-generation/')));
+    assert.deepEqual(fs.readFileSync(path.join(runsRoot, latestId, 'recognition.json')), preservedRecognition);
+    assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 400);
+    if (browser) { await browser.close(); browser = null; }
 
     state = await read(); state.status = 'generating';
     const file = path.join(runsRoot, latestId, 'state.json'); fs.writeFileSync(file, JSON.stringify(state));

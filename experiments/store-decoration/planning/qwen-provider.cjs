@@ -53,14 +53,18 @@ async function call(folder, stage, model, payload, { textOnly = false, timeout =
   fs.writeFileSync(path.join(folder, `${stage}-response.txt`), redact(responseText(data)));
   return data;
 }
-async function askJson(folder, stage, system, input, { images = [], search = false, fetcher } = {}) {
+async function ask(folder, stage, system, input, { images = [], search = false, fetcher } = {}) {
   fs.writeFileSync(path.join(folder, `${stage}-instructions.txt`), system);
   writeJson(folder, `${stage}-input.json`, input);
   const c = settings(), text = JSON.stringify(input);
   const messages = search ? [{ role: 'system', content: system }, { role: 'user', content: text }] : [{ role: 'system', content: [{ text: system }] }, { role: 'user', content: [{ text }, ...images.map(image => ({ image }))] }];
   const parameters = { result_format: 'message', max_tokens: 10000, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : {}) };
-  const payload = await call(folder, stage, search ? c.search : c.vision, { input: { messages }, parameters }, { textOnly: search, fetcher });
-  return { value: parseJson(responseText(payload)), payload };
+  return call(folder, stage, search ? c.search : c.vision, { input: { messages }, parameters }, { textOnly: search, fetcher });
+}
+async function askJson(...args) { const payload = await ask(...args); return { value: parseJson(responseText(payload)), payload }; }
+async function searchWeb(folder, stage, system, input, options = {}) {
+  // Search answers are unverified model prose. Only provider search records become selectable sources.
+  return searchSources(await ask(folder, stage, system, input, { ...options, search: true }));
 }
 function publicSourceUrl(value) {
   try {
@@ -72,7 +76,7 @@ function publicSourceUrl(value) {
 function searchSources(payload) {
   const results = payload.output?.search_info?.search_results || payload.search_info?.search_results || [];
   const seen = new Set();
-  return results.flatMap(item => { const url = publicSourceUrl(item.url || item.link); if (!url || seen.has(url)) return []; seen.add(url); return [{ url, title: String(item.title || item.name || new URL(url).hostname).slice(0, 160) }]; }).slice(0, 12);
+  return results.flatMap(item => { const url = publicSourceUrl(item.url || item.link); if (!url || seen.has(url)) return []; seen.add(url); return [{ url, title: String(item.title || item.name || new URL(url).hostname).slice(0, 160) }]; });
 }
 function batchSize(plan, batch) {
   const { aspectRatios } = require('./plan.cjs');
@@ -110,4 +114,4 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher } = {}) {
   await sharp(bytes, { limitInputPixels: 40000000 }).png().toFile(path.join(folder, `${stage}-source.png`));
   return bytes;
 }
-module.exports = { settings, publicSettings, redact, writeJson, askJson, searchSources, publicSourceUrl, batchSize, generateSheet, imageBytes };
+module.exports = { settings, publicSettings, redact, writeJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, imageBytes };

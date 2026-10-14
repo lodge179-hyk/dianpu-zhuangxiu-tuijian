@@ -10,7 +10,7 @@ const { navigationExamplePlan } = require('./navigation-example.cjs');
 const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs');
 const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
 const { plannerPrompt, publicCatalog } = require('./planner.cjs');
-const { limits, recognitionPrompt, productWorkflow, generateRemaining } = require('./product-workflow.cjs');
+const { limits, recognitionPrompt, productWorkflow, generateRemaining, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
 const { publicSettings, redact } = require('./qwen-provider.cjs');
 const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
 const { fillStructureExample } = require('./structure-example.cjs');
@@ -123,6 +123,19 @@ const server = http.createServer(async (req, res) => {
       void productWorkflow(run, images, save).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); save(run.folder, run.state); }).finally(() => { planning = false; locks.delete(run.id); });
       return;
     }
+    const resumeMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/resume-research$/);
+    if (req.method === 'POST' && resumeMatch) {
+      const id = resumeMatch[1];
+      if (planning || locks.has(id)) return json(res, 409, { error: '已有任务正在执行，请等待完成。' });
+      if (!publicSettings().configured) return json(res, 503, { error: '请先配置本机百炼密钥，未发起调用。' });
+      const run = { id, folder: folderFor(id), state: load(id) };
+      if (!cachedResearch(run)) throw Error('本任务没有可复用的商品资料和搜索记录，无法从风格选择继续。');
+      planning = true; locks.add(id);
+      const completion = resumeResearch(run, save);
+      json(res, 202, run.state);
+      void completion.catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); save(run.folder, run.state); }).finally(() => { planning = false; locks.delete(id); });
+      return;
+    }
     const generateMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/generate$/);
     if (req.method === 'POST' && generateMatch) {
       const id = generateMatch[1];
@@ -137,7 +150,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
-    if (req.method === 'GET' && runMatch) return json(res, 200, load(runMatch[1]));
+    if (req.method === 'GET' && runMatch) {
+      const id = runMatch[1], state = load(id);
+      return json(res, 200, { ...state, canResumeResearch: !!cachedResearch({ id, folder: folderFor(id), state }) });
+    }
     const downloadMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/download\/(shop\.png|materials\.zip)$/);
     if (['GET', 'POST'].includes(req.method) && downloadMatch) {
       const [, id, filename] = downloadMatch;

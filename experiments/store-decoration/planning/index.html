@@ -38,7 +38,7 @@ async function api(url,options={}){const response=await fetch(url,options);const
 function reveal(id){const node=$(id);node.replaceChildren();node.classList.remove('hidden');return node;}
 function showWorkflow(state){
  const area=$('pipeline');area.replaceChildren();if(!state.workflow)return;
- const labels=[['recognizing','识别商品'],['researching','联网找风格'],['designing','设计画面'],['generating','生成图片'],['cropping','裁剪组装'],['complete','等待验收']];
+ const labels=[['recognizing','识别商品'],['researching','联网检索'],['selecting-style','选择风格'],['designing','设计画面'],['generating','生成图片'],['cropping','裁剪组装'],['complete','等待验收']];
  const stages=el('div',undefined,'stage-list');for(const [id,label] of labels)stages.append(el('span',label,state.workflow.stage===id?'active':''));area.append(stages);
  if(state.recognition){area.append(el('p','识别品类：'+(state.recognition.categories.join('、')||'尚不清楚')));const details=el('details');details.append(el('summary','查看商品理解'));for(const p of state.recognition.products)details.append(el('p',p.category+'：'+p.description));for(const text of state.recognition.uncertainties)details.append(el('p',text,'muted'));area.append(details);}
  if(state.research){area.append(el('strong','选定风格：'+state.research.concept),el('p',state.research.reason));const details=el('details');details.append(el('summary','查看本次联网参考'));for(const source of state.research.selectedSources){const a=el('a',source.title);a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';details.append(a,el('p',source.application));}details.append(el('small',state.research.basis,'muted'));area.append(details);}
@@ -52,7 +52,7 @@ function show(state){
  if(state.status!=='ready'){for(const id of ['summary','modules','batches'])$(id).classList.add('hidden');$('frame').classList.add('hidden');$('empty').classList.remove('hidden');$('preview-note').textContent='完成方案和素材后可查看整页。';}
  if(['planning','generating'].includes(state.status)){lock(true);status(state.workflow?.label||'正在准备商品装修任务…');poll=setTimeout(()=>refresh(state.id),1800);return;}
  lock(false);
- if(state.status==='failed'){status(state.error,true);return;}
+ if(state.status==='failed'){status(state.error,true);if(state.canResumeResearch){const retry=el('button','沿用已有资料继续','structure-action');retry.onclick=async()=>{if(busy)return;lock(true);try{show(await api('/api/runs/'+state.id+'/resume-research',{method:'POST'}));}catch(e){lock(false);status(e.message,true);}};$('pipeline').append(retry,el('p','复用已完成的商品识别和搜索结果，从风格选择继续；点击后会调用后续设计和生图。','muted'));}return;}
  if(state.status==='needs-input'){status(state.workflow.label+' 请补充截图后重新提交。',true);return;}
  if(state.status==='choosing'){status('这是暂停前的结构比较记录，新版本直接生成一套方案。原记录保留，未自动重新调用。');const old=reveal('summary');old.append(el('h2','原实验记录'));const button=el('button','按这份资料生成一套方案','structure-action');button.onclick=()=>requestRecommendation('/api/runs/'+state.id+'/recommendation');old.append(button);return;}
  status(state.source==='saved-example'?'已载入保存的素材。这次没有调用AI。':state.filledAssets.length===state.plan.assets.length?'素材已全部填入，可以查看完整店铺参考。':'方案已就绪。黑色区域等待批量素材填入。');
