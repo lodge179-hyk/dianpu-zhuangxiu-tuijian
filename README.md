@@ -6,7 +6,11 @@
 - 入口：<http://127.0.0.1:5191/>
 - 启动：`npm start`（等价于 `node --env-file-if-exists=.env.local server.mjs`）
 - 自检（不调用模型）：`node selfcheck.mjs`
-- 样例渲染（不调用模型）：`node render-sample.mjs` → `output/sample-render/preview.html`
+- 完整运行（会调用模型）：`node tools/run-case.mjs <截图路径>`
+- 结果回看：`node tools/report-run.mjs <任务目录>`
+- 配色检查：`node tools/panel-colors.mjs <任务目录>`
+
+> 代码最后提交点：已 git 提交。`output/runs/` 里保留了多轮真实运行的记录，便于你对比每次的效果与决策。
 
 ## 一、这一轮验证什么
 
