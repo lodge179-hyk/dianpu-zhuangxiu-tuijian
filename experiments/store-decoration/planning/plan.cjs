@@ -6,9 +6,10 @@ const planSchema = z.object({
   version: z.literal(1),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
+  artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120) }).strict().optional() }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -23,6 +24,7 @@ function validatePlan(input) {
   const spec = { modules: plan.modules.map(({ id, type, props }) => ({ id, type, props })) };
   if (!catalog.validate(spec).success) throw new Error('方案未通过组件目录校验');
   const assets = new Map(plan.assets.map(a => [a.id, a])), used = new Set(), warnings = [];
+  if (plan.artDirection && !assets.has(plan.artDirection.focalAssetId)) throw new Error('整页视觉重点必须引用已声明素材');
   for (const m of plan.modules) {
     const entry = entries[m.type];
     const props = entry.props.safeParse(m.props);
@@ -48,6 +50,7 @@ function validatePlan(input) {
   }
   const editorial = plan.assets.filter(a => a.direction && a.direction.role !== 'category' && a.direction.role !== 'product');
   if (editorial.length >= 4 && new Set(editorial.map(a => a.direction.camera)).size < 2) warnings.push('素材计划中的主视觉都使用同一镜头类型，建议混合场景、俯拍或特写；此检查只看计划，不代表实际生图质量。');
+  if (editorial.length >= 4 && editorial.every(a => a.direction.treatment) && new Set(editorial.map(a => a.direction.treatment)).size < 2) warnings.push('主要素材仍是同一种表现方式；换角度不一定能减少重复，需检查整页主题及主次。');
   const assigned = [];
   for (const batch of plan.batches) {
     if (batch.rows.flat().length > 6) throw new Error(`${batch.id} 超过每张总图6个画面的上限`);
@@ -74,12 +77,13 @@ function buildBatches(plan) {
     const rowWeights = batch.rows.map(row => 1 / (row.length * aspectRatios[lookup.get(row[0]).aspect]));
     const total = rowWeights.reduce((a, b) => a + b, 0);
     const prompt = [
-      'Create ONE photographic asset sheet for a store decoration reference. This is a sheet of independent photographs, not a website or UI.',
+      'Create ONE asset sheet for an art-directed store campaign. Each panel is an independent finished visual in the medium specified by its brief, not a website or UI. Do not default every panel to a product packshot.',
       lock,
+      plan.artDirection ? `Page concept: ${plan.artDirection.concept}. Narrative and visual hierarchy: ${plan.artDirection.narrative}. Shared anchors: ${plan.artDirection.anchors.join('; ')}. The page focal asset is ${plan.artDirection.focalAssetId}; give supporting visuals quieter or closer framing instead of making every panel compete as a hero. Follow each panel brief; do not repeat the same subject just to create unity.` : '',
       index ? 'Reference scope: use the previous sheet only to match white balance, photographic finish and the overall color family. Do not copy its bottles, packaging, props, background set, camera angle or panel arrangement unless explicitly requested for an individual asset. Follow each new panel brief.' : '',
       'Assign distinct visual jobs to the panels: atmosphere, hero, category identification, scene or detail. Vary camera distance, angle, subject grouping and negative space according to each brief. A coherent collection should contain visibly different photographs. Do not repeat the same product-on-pedestal scene across the sheet.',
       `Exactly ${batch.rows.flat().length} rectangular panels in ${batch.rows.length} horizontal rows, with row counts ${batch.rows.map(r => r.length).join(' / ')}. Approximate whole sheet width:height = 1:${total.toFixed(2)}. Keep all panels complete.`,
-      ...batch.rows.map((row, i) => `Row ${i + 1}, about ${Math.round(rowWeights[i] / total * 100)}% of usable sheet height: ` + row.map((id, j) => { const a = lookup.get(id), d = a.direction; return `panel ${j + 1} (${id}): ${a.subject}; ${a.composition}; image aspect ${a.aspect}` + (d ? `; job: ${d.role}; camera: ${d.camera}; this panel's setting: ${d.background}; this panel's accents: ${d.accents}` : ''); }).join(' | ')),
+      ...batch.rows.map((row, i) => `Row ${i + 1}, about ${Math.round(rowWeights[i] / total * 100)}% of usable sheet height: ` + row.map((id, j) => { const a = lookup.get(id), d = a.direction; return `panel ${j + 1} (${id}): ${a.subject}; ${a.composition}; image aspect ${a.aspect}` + (d ? `; job: ${d.role}; camera: ${d.camera}; this panel's setting: ${d.background}; this panel's accents: ${d.accents}${d.treatment ? '; visual treatment: ' + d.treatment : ''}` : ''); }).join(' | ')),
       'Use uniform, solid MAGENTA #FF00FF for the outer margin and straight gaps between every panel (about 1-2% of width). Each photo must have its own opaque background. No gradient in separators; no magenta in photos; no object or shadow may cross a panel boundary.',
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',
