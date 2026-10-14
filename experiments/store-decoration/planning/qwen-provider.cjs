@@ -16,10 +16,13 @@ function redact(text) {
   for (const [key, secret] of Object.entries(process.env)) if (/API_KEY|TOKEN|SECRET/.test(key) && secret?.length >= 6) value = value.replaceAll(secret, '[已隐藏]');
   return value.replace(/sk-[a-zA-Z0-9_-]{12,}/g, '[已隐藏]');
 }
-function writeJson(folder, name, value) { fs.writeFileSync(path.join(folder, name), redact(JSON.stringify(value, null, 2))); }
+function writeJson(folder, name, value) {
+  const file = path.join(folder, name), temporary = file + '.tmp';
+  fs.writeFileSync(temporary, redact(JSON.stringify(value, null, 2))); fs.renameSync(temporary, file);
+}
 function responseText(payload) {
   const content = payload.output?.choices?.[0]?.message?.content ?? payload.choices?.[0]?.message?.content;
-  return typeof content === 'string' ? content : Array.isArray(content) ? content.map(p => p.text || '').join('') : '';
+  return typeof content === 'string' ? content : Array.isArray(content) ? content.map(p => p?.text || '').join('') : '';
 }
 function parseJson(text, folder, stage) {
   const source = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
@@ -53,9 +56,13 @@ async function call(folder, stage, model, payload, { textOnly = false, timeout =
     data = await response.json();
   } catch {
     Object.assign(record, { status: 'transport-unknown', durationMs: Date.now() - started }); writeJson(folder, auditFile, record);
-    throw Error('模型响应未完整取得，结果及计费未确认；没有自动重试。');
+    throw Error(`模型响应未完整取得${record.httpStatus ? `（HTTP ${record.httpStatus}）` : ''}，结果及计费未确认；没有自动重试。`);
   }
   record.durationMs = Date.now() - started;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    record.status = 'invalid-response'; writeJson(folder, auditFile, record);
+    throw Error('模型服务没有返回有效的响应对象；已保存调用记录，没有自动重试。');
+  }
   record.requestId = data.request_id || data.id || null;
   record.usage = data.usage || null;
   record.finishReason = data.output?.choices?.[0]?.finish_reason || null;
@@ -94,9 +101,10 @@ function publicSourceUrl(value) {
   } catch { return null; }
 }
 function searchSources(payload) {
-  const results = payload.output?.search_info?.search_results || payload.search_info?.search_results || [];
+  const raw = payload.output?.search_info?.search_results || payload.search_info?.search_results;
+  const results = Array.isArray(raw) ? raw : [];
   const seen = new Set();
-  return results.flatMap(item => { const url = publicSourceUrl(item.url || item.link); if (!url || seen.has(url)) return []; seen.add(url); return [{ url, title: String(item.title || item.name || new URL(url).hostname).slice(0, 160) }]; });
+  return results.flatMap(item => { const url = publicSourceUrl(item?.url || item?.link); if (!url || seen.has(url)) return []; seen.add(url); return [{ url, title: String(item.title || item.name || new URL(url).hostname).slice(0, 160) }]; });
 }
 function batchSize(plan, batch) {
   const { aspectRatios } = require('./plan.cjs');
@@ -107,10 +115,10 @@ function batchSize(plan, batch) {
 async function imageBytes(url, fetcher = fetch) {
   const data = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(url || '');
   if (data) { const bytes = Buffer.from(data[2], 'base64'); if (bytes.length > 30 * 1024 * 1024) throw Error('生成图片超过 30MB。'); return bytes; }
-  const parsed = new URL(url);
-  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || !/(^|\.)(aliyuncs\.com|alicdn\.com)$/.test(parsed.hostname)) throw Error('生成图片地址不是受支持的百炼资源地址，未下载。');
+  let parsed; try { parsed = new URL(url); } catch { throw Error('生图返回的图片地址无效，未下载。'); }
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.port && parsed.port !== '443' || !/(^|\.)(aliyuncs\.com|alicdn\.com)$/.test(parsed.hostname)) throw Error('生成图片地址不是受支持的百炼资源地址，未下载。');
   const response = await fetcher(url, { redirect: 'error', signal: AbortSignal.timeout(90000) });
-  if (!response.ok) throw Error('生成图片下载失败。');
+  if (!response.ok) throw Error(`图片已生成，但下载返回 HTTP ${response.status}；可以继续下载，无须重新生图。`);
   const chunks = []; let length = 0;
   for await (const part of response.body) { length += part.length; if (length > 30 * 1024 * 1024) { await response.body.cancel?.().catch(() => {}); throw Error('生成图片超过 30MB。'); } chunks.push(part); }
   return Buffer.concat(chunks);
@@ -127,11 +135,24 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher } = {}) {
   fs.writeFileSync(path.join(folder, `${stage}-prompt.txt`), batch.prompt);
   writeJson(folder, `${stage}-settings.json`, { model: settings().image, parameters, referenceBatchId: batch.referenceBatchId, productReferences: '商品为品类示意，不要求复刻输入 SKU' });
   const payload = await call(folder, stage, settings().image, { input: { messages: [{ role: 'user', content }] }, parameters }, { timeout: 600000, fetcher });
-  const image = payload.output?.choices?.[0]?.message?.content?.find(c => c.image)?.image;
+  const output = payload.output?.choices?.[0]?.message?.content;
+  const image = Array.isArray(output) ? output.find(c => c?.image)?.image : null;
   if (!image) throw Error('生图接口没有返回图片，未重试。');
-  const bytes = await imageBytes(image, fetcher);
-  // Save the unmodified output even when separator detection subsequently fails.
-  await sharp(bytes, { limitInputPixels: 40000000 }).png().toFile(path.join(folder, `${stage}-source.png`));
-  return bytes;
+  writeJson(folder, `${stage}-image.json`, { url: image, receivedAt: new Date().toISOString() });
+  return recoverSheet(folder, batch, attempt, { fetcher });
 }
-module.exports = { settings, publicSettings, redact, writeJson, parseJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, imageBytes };
+async function recoverSheet(folder, batch, attempt, { fetcher } = {}) {
+  if (!Number.isInteger(attempt) || attempt < 1) return null;
+  const stage = `${batch.id}-attempt-${attempt}`, file = path.join(folder, `${stage}-source.png`), manifest = path.join(folder, `${stage}-image.json`);
+  if (fs.existsSync(file)) return fs.readFileSync(file);
+  if (!fs.existsSync(manifest)) return null;
+  try {
+    const bytes = await imageBytes(JSON.parse(fs.readFileSync(manifest, 'utf8')).url, fetcher);
+    let normalized;
+    try { normalized = await sharp(bytes, { limitInputPixels: 40000000 }).rotate().png().toBuffer(); }
+    catch { throw Error('已取得生图地址，但下载内容不是可用图片或尺寸超限；地址已保留，可继续下载，无须立即重新生图。'); }
+    fs.writeFileSync(file + '.tmp', normalized); fs.renameSync(file + '.tmp', file);
+    return normalized;
+  } catch (error) { error.phase = 'download'; throw error; }
+}
+module.exports = { settings, publicSettings, redact, writeJson, parseJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, recoverSheet, imageBytes };

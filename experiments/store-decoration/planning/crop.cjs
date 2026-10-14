@@ -58,17 +58,27 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
     const removed = 1 - cropWidth * cropHeight / (box.width * box.height);
     const smallCategory = asset.direction?.role === 'category' && plan.modules.every(m => m.props.assetIds.every((id, i) => id !== asset.id || entries[m.type].slots[i].width <= 200));
     const cropLimit = smallCategory ? .35 : .3;
-    if (removed > cropLimit) throw new Error(`${panel.id} 比例偏差导致裁剪超过${Math.round(cropLimit * 100)}%，本批次暂不填入。`);
+    const padded = removed > cropLimit && plan.imageMode === 'category-inspired';
+    const outputWidth = Math.max(clean.width, Math.ceil(clean.height * ratio));
+    const outputHeight = Math.max(clean.height, Math.ceil(clean.width / ratio));
+    const paddingFraction = 1 - clean.width * clean.height / (outputWidth * outputHeight);
+    if (removed > cropLimit && (!padded || paddingFraction > .55 || outputWidth * outputHeight > 40000000)) throw new Error(`${panel.id} 比例偏差过大，无法在保留画面的前提下适配；本批次暂不填入。`);
+    const extracted = padded ? clean : rect;
     let separators = 0;
-    for (let y = rect.top; y < rect.top + rect.height; y++) for (let x = rect.left; x < rect.left + rect.width; x++) if (magenta(x, y)) separators++;
+    for (let y = extracted.top; y < extracted.top + extracted.height; y++) for (let x = extracted.left; x < extracted.left + extracted.width; x++) if (magenta(x, y)) separators++;
     if (separators) throw new Error(`${panel.id} 内仍有分隔色，未写入素材。`);
-    const buffer = await sharp(normalized).extract(rect).png().toBuffer();
-    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: rect, aspect: asset.aspect, removedAreaPercent: +(removed * 100).toFixed(2), allowedRemovedAreaPercent: cropLimit * 100, framingReviewRequired: removed > .3, upscaled: false } });
+    let pipeline = sharp(normalized).extract(extracted);
+    if (padded) {
+      const horizontal = outputWidth - clean.width, vertical = outputHeight - clean.height;
+      pipeline = pipeline.extend({ left: Math.floor(horizontal / 2), right: Math.ceil(horizontal / 2), top: Math.floor(vertical / 2), bottom: Math.ceil(vertical / 2), background: plan.style.palette[0] });
+    }
+    const buffer = await pipeline.png().toBuffer();
+    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: extracted, aspect: asset.aspect, fitMethod: padded ? 'contain-with-background' : 'center-crop', paddingAreaPercent: padded ? +(paddingFraction * 100).toFixed(2) : 0, removedAreaPercent: +((padded ? 1 - clean.width * clean.height / (box.width * box.height) : removed) * 100).toFixed(2), allowedRemovedAreaPercent: cropLimit * 100, framingReviewRequired: padded || removed > .3, upscaled: false } });
   }
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
   for (const item of prepared) fs.writeFileSync(path.join(folder, 'assets', `${item.report.assetId}.png`), item.buffer);
   fs.writeFileSync(path.join(folder, `${batchId}-source.png`), normalized);
-  const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop; no resizing or stretching' };
+  const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop or bounded background padding; no resizing or stretching' };
   fs.writeFileSync(path.join(folder, `${batchId}-crop-report.json`), JSON.stringify(report, null, 2));
   return report;
 }

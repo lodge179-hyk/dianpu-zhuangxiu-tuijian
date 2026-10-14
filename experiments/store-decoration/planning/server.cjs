@@ -11,7 +11,7 @@ const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs
 const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
 const { plannerPrompt, publicCatalog } = require('./planner.cjs');
 const { limits, recognitionPrompt, productWorkflow, generateRemaining, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
-const { publicSettings, redact } = require('./qwen-provider.cjs');
+const { publicSettings, redact, writeJson } = require('./qwen-provider.cjs');
 const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
 const { fillStructureExample } = require('./structure-example.cjs');
 let port = Number(process.env.PLANNER_PORT || 5182);
@@ -20,7 +20,7 @@ fs.mkdirSync(root, { recursive: true });
 const locks = new Set(); let planning = false;
 const json = (res, code, value) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(value)); };
 const folderFor = id => { if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('任务编号无效'); return path.join(root, id); };
-const save = (folder, state) => fs.writeFileSync(path.join(folder, 'state.json'), JSON.stringify(state, null, 2));
+const save = (folder, state) => writeJson(folder, 'state.json', state);
 const load = id => JSON.parse(fs.readFileSync(path.join(folderFor(id), 'state.json'), 'utf8'));
 function makeRun(source) {
   const id = randomUUID(), folder = folderFor(id); fs.mkdirSync(folder);
@@ -118,18 +118,18 @@ const server = http.createServer(async (req, res) => {
         else { imageType(req); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
         if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
       } catch (error) { planning = false; throw error; }
-      const run = makeRun('product-screenshots'); locks.add(run.id);
+      let run; try { run = makeRun('product-screenshots'); } catch (error) { planning = false; throw error; } locks.add(run.id);
       json(res, 202, run.state);
       void productWorkflow(run, images, save).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); save(run.folder, run.state); }).finally(() => { planning = false; locks.delete(run.id); });
       return;
     }
-    const resumeMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/resume-research$/);
+    const resumeMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/(?:resume|resume-research)$/);
     if (req.method === 'POST' && resumeMatch) {
       const id = resumeMatch[1];
       if (planning || locks.has(id)) return json(res, 409, { error: '已有任务正在执行，请等待完成。' });
       if (!publicSettings().configured) return json(res, 503, { error: '请先配置本机百炼密钥，未发起调用。' });
       const run = { id, folder: folderFor(id), state: load(id) };
-      if (!cachedResearch(run)) throw Error('本任务没有可复用的商品资料和搜索记录，无法从风格选择继续。');
+      if (!cachedResearch(run)) throw Error('本任务没有可复用的输入，无法继续。');
       planning = true; locks.add(id);
       const completion = resumeResearch(run, save);
       json(res, 202, run.state);
@@ -144,9 +144,11 @@ const server = http.createServer(async (req, res) => {
       const state = load(id);
       if (state.status !== 'ready' || state.plan?.imageMode !== 'category-inspired') throw Error('只有新商品截图流程的已规划任务可以继续生图。');
       if (state.plan.assets.every(a => state.filledAssets.includes(a.id))) return json(res, 200, state);
+      const request = /^application\/json/.test(req.headers['content-type'] || '') ? JSON.parse((await body(req, 4096)).toString('utf8')) : {};
+      if (request.regenerate !== undefined && typeof request.regenerate !== 'boolean') throw Error('重新生图选项无效');
       locks.add(id); planning = true; state.status = 'generating'; delete state.generationError; save(folderFor(id), state);
       json(res, 202, state);
-      void generateRemaining({ id, folder: folderFor(id), state }, save).catch(error => { state.status = 'ready'; state.generationError = safeError(error); save(folderFor(id), state); }).finally(() => { locks.delete(id); planning = false; });
+      void generateRemaining({ id, folder: folderFor(id), state }, save, { regenerate: request.regenerate === true }).catch(error => { state.status = 'ready'; state.generationError = safeError(error); save(folderFor(id), state); }).finally(() => { locks.delete(id); planning = false; });
       return;
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
