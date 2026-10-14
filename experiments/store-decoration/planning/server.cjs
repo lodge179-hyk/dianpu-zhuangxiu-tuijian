@@ -9,8 +9,10 @@ const { createExample } = require('./example.cjs');
 const { navigationExamplePlan } = require('./navigation-example.cjs');
 const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs');
 const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
-const { plannerPrompt, planScreenshot, publicCatalog } = require('./planner.cjs');
-const port = Number(process.env.PLANNER_PORT || 5182);
+const { plannerPrompt, structurePrompt, planScreenshot, publicCatalog } = require('./planner.cjs');
+const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
+const { fillStructureExample } = require('./structure-example.cjs');
+let port = Number(process.env.PLANNER_PORT || 5182);
 const root = path.resolve(process.env.PLANNER_OUTPUT_DIR || path.join(__dirname, 'output/runs'));
 fs.mkdirSync(root, { recursive: true });
 const locks = new Set(); let planning = false;
@@ -31,6 +33,13 @@ function finish(run, compiled) {
   fs.writeFileSync(path.join(run.folder, 'plan.json'), JSON.stringify(compiled.plan, null, 2));
   save(run.folder, run.state); return run.state;
 }
+function finishRecommendation(run, brief, exampleId) {
+  const { plan, recommendation } = recommendPlan(brief);
+  run.state.recommendation = recommendation;
+  const reused = fillStructureExample(run.folder, { exampleId }, plan);
+  run.state.filledAssets = reused; run.state.reusedExampleAssets = reused;
+  return finish(run, compose(run.folder, plan));
+}
 async function body(req, max) {
   if (Number(req.headers['content-length']) > max) { req.resume(); throw new Error(`上传内容超过${Math.round(max / 1024 / 1024)}MB限制`); }
   const chunks = []; let size = 0;
@@ -46,7 +55,7 @@ function safeError(error) {
 // A stopped planning request is never presented as still running after a restart.
 for (const id of fs.readdirSync(root)) {
   if (!/^[a-f0-9-]{36}$/.test(id)) continue;
-  try { const state = load(id); if (state.status === 'planning') { state.status = 'failed'; state.error = '上次规划被服务重启中断，结果未确认；没有自动重新调用。'; save(folderFor(id), state); } } catch {}
+  try { const state = load(id); if (state.status === 'planning') { state.status = 'failed'; state.error = '上次规划被服务停止中断，结果与计费未确认；没有自动重新调用。'; const auditFile = path.join(folderFor(id), 'planner-call.json'); if (fs.existsSync(auditFile)) state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditFile, 'utf8')).requestAttempts; save(folderFor(id), state); } } catch {}
 }
 const server = http.createServer(async (req, res) => {
   try {
@@ -65,6 +74,22 @@ const server = http.createServer(async (req, res) => {
       return fs.createReadStream(file).pipe(res);
     }
     if (req.method === 'GET' && pathname === '/api/planner-prompt') return json(res, 200, { prompt: plannerPrompt() });
+    if (req.method === 'GET' && pathname === '/api/structure-prompt') return json(res, 200, { prompt: structurePrompt() });
+    if (req.method === 'POST' && ['/api/recommendation', '/api/recommendation-example'].includes(pathname)) {
+      const request = JSON.parse((await body(req, 64 * 1024)).toString('utf8'));
+      const sample = pathname === '/api/recommendation-example';
+      const brief = sample ? exampleBrief(request.example) : request.brief ? validateBrief(request.brief) : manualBrief(request);
+      const run = makeRun(sample ? 'recommendation-example' : 'recommendation-brief');
+      return json(res, 201, finishRecommendation(run, brief, sample ? request.example : undefined));
+    }
+    const restructureMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/recommendation$/);
+    if (req.method === 'POST' && restructureMatch) {
+      const original = load(restructureMatch[1]);
+      if (!original.plan && !original.structure) throw Error('请先完成店铺资料分析');
+      const brief = original.recommendation?.brief || original.structure?.brief || briefFromPlan(original.plan);
+      const run = makeRun('recommendation-from-run'); run.state.sourceRunId = original.id;
+      return json(res, 201, finishRecommendation(run, brief));
+    }
     if (req.method === 'POST' && pathname === '/api/navigation-example') {
       const request = JSON.parse((await body(req, 4096)).toString('utf8'));
       const plan = navigationExamplePlan(request.style);
@@ -82,14 +107,15 @@ const server = http.createServer(async (req, res) => {
       const run = makeRun('external-ai-plan');
       return json(res, 201, finish(run, compose(run.folder, plan)));
     }
-    if (req.method === 'POST' && pathname === '/api/plan') {
+    if (req.method === 'POST' && ['/api/plan', '/api/legacy-plan'].includes(pathname)) {
       if (planning) return json(res, 409, { error: '已有一个截图正在规划，请等待完成，避免重复调用。' });
+      const structureMode = pathname === '/api/plan';
       imageType(req); planning = true;
       let bytes;
       try { bytes = await body(req, 30 * 1024 * 1024); } catch (error) { planning = false; throw error; }
-      const run = makeRun('screenshot');
+      const run = makeRun(structureMode ? 'recommendation-screenshot' : 'screenshot');
       json(res, 202, run.state);
-      void planScreenshot(bytes, run.folder).then(({ plan }) => finish(run, compose(run.folder, { ...plan, navigationLibrary: plan.navigationLibrary || { style: 'auto' } }))).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); const auditPath = path.join(run.folder, 'planner-call.json'); if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts; save(run.folder, run.state); }).finally(() => { planning = false; });
+      void planScreenshot(bytes, run.folder, { structure: structureMode }).then(result => structureMode ? finishRecommendation(run, result.brief) : finish(run, compose(run.folder, { ...result.plan, navigationLibrary: result.plan.navigationLibrary || { style: 'auto' } }))).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); const auditPath = path.join(run.folder, 'planner-call.json'); if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts; save(run.folder, run.state); }).finally(() => { planning = false; });
       return;
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
@@ -150,5 +176,5 @@ const server = http.createServer(async (req, res) => {
     return json(res, 404, { error: '入口不存在' });
   } catch (error) { if (!res.headersSent) json(res, 400, { error: safeError(error) }); else res.end(); }
 });
-server.listen(port, '127.0.0.1', () => console.log(`装修规划实验：http://127.0.0.1:${port}`));
+server.listen(port, '127.0.0.1', () => { port = server.address().port; console.log(`装修规划实验：http://127.0.0.1:${port}`); });
 server.on('error', error => { console.error(error.code === 'EADDRINUSE' ? '端口已被占用，请用PLANNER_PORT指定其他端口。' : '服务启动失败：' + error.code); process.exitCode = 1; });
