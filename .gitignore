@@ -83,3 +83,6 @@ Desktop.ini
 
 # Validation runtime locks
 /validation/batches/*.lock
+
+# Decision demo runtime data
+scripts/decoration-decision/runs/

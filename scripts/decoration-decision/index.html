@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 店铺装修决策 · Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef1f4;color:#1d2a34;font-family:'Microsoft YaHei','PingFang SC',Arial,sans-serif}
+header{background:#fff;border-bottom:1px solid #dde3e9;padding:18px 28px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0}header span{font-size:12px;color:#6a7a88}
+main{max-width:1180px;margin:26px auto;padding:0 24px;display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start}
+@media(max-width:1000px){main{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #dde3e9;border-radius:10px;padding:20px}
+h2{font-size:15px;margin:0 0 12px}
+.hint{font-size:12px;color:#6a7a88;line-height:1.8;margin:8px 0 0}
+#drop{border:2px dashed #b9c6d0;border-radius:10px;padding:38px 20px;text-align:center;cursor:pointer;transition:.15s}
+#drop.over,#drop:hover{border-color:#4e7d6b;background:#f4faf7}
+#drop strong{font-size:14px}
+#drop .sub{font-size:12px;color:#7c8b98;margin-top:6px}
+#uploadPreview{display:none;text-align:center}
+#uploadPreview img{max-width:100%;max-height:320px;border-radius:8px;border:1px solid #e2e8ee}
+button.primary{background:#2f6f5e;border:0;color:#fff;font-size:14px;padding:11px 26px;border-radius:7px;cursor:pointer;margin-top:14px}
+button.primary:disabled{background:#a9bdb6;cursor:default}
+button.ghost{background:#fff;border:1px solid #c6d2da;color:#33505f;font-size:13px;padding:8px 16px;border-radius:7px;cursor:pointer}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed #e6ebef;font-size:13px;align-items:flex-start}
+.steps li:last-child{border:0}
+.dot{flex:none;width:20px;height:20px;border-radius:50%;font-size:11px;line-height:20px;text-align:center;background:#e6ebef;color:#8a99a6;margin-top:1px}
+li.running .dot{background:#2f6f5e;color:#fff;animation:pulse 1.2s infinite}
+li.done .dot{background:#4e7d6b;color:#fff}
+li.degraded .dot{background:#c98a2c;color:#fff}
+li.failed .dot{background:#b0483a;color:#fff}
+@keyframes pulse{50%{opacity:.55}}
+.stLabel{font-weight:bold}
+.stNote{display:block;font-size:12px;color:#7c8b98;font-weight:normal;margin-top:2px;line-height:1.6}
+#progressCard,#resultCard{display:none}
+.alert{border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.8;margin:10px 0}
+.alert.warn{background:#fbf3e4;color:#7a5a1c;border:1px solid #ecd9b0}
+.alert.error{background:#f9e9e7;color:#8c3a30;border:1px solid #ecc8c3}
+.designTitle{font-size:16px;font-weight:bold;margin:0 0 6px}
+.palette{display:flex;gap:6px;margin:10px 0}
+.palette i{width:26px;height:26px;border-radius:6px;border:1px solid #d7dee5}
+.moduleItem{border:1px solid #e2e8ee;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12.5px}
+.moduleItem b{font-size:13px}
+.moduleItem .type{color:#6a7a88;font-size:11px;margin-left:6px}
+.moduleItem .reason{color:#5b6b78;line-height:1.7;margin-top:4px}
+.slotRow{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.slotRow img{width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #e0e6ec}
+.slotRow .missing{width:44px;height:44px;border-radius:6px;border:1px dashed #d3a49e;background:#faf1f0;color:#a05a50;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center}
+.slotRow a{font-size:11.5px;color:#2f6f5e}
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;background:#eef3f1;color:#4a6a5e}
+.tag.sub{background:#fbf3e4;color:#7a5a1c}
+.tag.miss{background:#f9e9e7;color:#8c3a30}
+#previewWrap{background:#fff;border:1px solid #dde3e9;border-radius:10px;padding:14px}
+#phoneFrame{width:483px;max-width:100%;margin:0 auto;border:1px solid #e2e8ee;border-radius:12px;overflow:hidden;background:#fff}
+#phoneFrame iframe{display:block;width:483px;height:72vh;border:0}
+.pagebar{text-align:center;font-size:12px;color:#6a7a88;padding:8px 0 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.downloads{margin-top:8px}
+.dl{display:flex;justify-content:space-between;align-items:center;padding:7px 4px;border-bottom:1px dashed #e6ebef;font-size:12.5px;gap:8px}
+.dl a{color:#2f6f5e;text-decoration:none}
+.dl a:hover{text-decoration:underline}
+.small{font-size:11.5px;color:#7c8b98}
+#statusLine{font-size:12px;color:#6a7a88;margin-top:10px}
+</style>
+</head>
+<body>
+<header><h1>AI 店铺装修决策</h1><span>上传店铺截图 → AI 决定风格、模块与顺序 → 组合生图 → 固定模块渲染 → 素材交付</span><span id="modelLine"></span></header>
+<main>
+  <div id="left">
+    <div class="card" id="uploadCard">
+      <h2>1 · 上传店铺截图</h2>
+      <div id="drop"><strong>点击或拖入店铺截图</strong><div class="sub">支持长截图 · PNG / JPG / WebP · 不超过 30MB</div></div>
+      <div id="uploadPreview"><img id="uploadImg" alt="截图预览"><div class="hint" id="uploadMeta"></div><button class="primary" id="startBtn">开始生成装修方案</button></div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+    </div>
+    <div class="card" id="progressCard">
+      <h2>2 · 生成进度</h2>
+      <ul class="steps" id="stepList"></ul>
+      <div id="degradations"></div>
+      <div id="statusLine"></div>
+    </div>
+    <div class="card" id="resultCard">
+      <h2>3 · 装修方案与素材交付</h2>
+      <div id="designBox"></div>
+      <div id="moduleBox"></div>
+      <div class="actions">
+        <a id="zipLink"><button class="primary">下载全部素材（ZIP）</button></a>
+        <a id="pageLink" target="_blank"><button class="ghost">打开纯店铺页面</button></a>
+        <button class="ghost" id="resetBtn">重新开始</button>
+      </div>
+      <div id="resultAlerts"></div>
+      <div class="downloads" id="downloadList"></div>
+    </div>
+  </div>
+  <div id="right">
+    <div id="previewWrap" style="display:none">
+      <h2>装修预览（483px · 与微购页面同宽）</h2>
+      <div id="phoneFrame"><iframe id="previewFrame" title="装修预览"></iframe></div>
+      <div class="pagebar">页面由固定模块按 AI 决策的顺序组装</div>
+    </div>
+  </div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let runId = null, pollTimer = null, file = null;
+$('#modelLine').textContent = '';
+fetch('/api/status').then(r => r.json()).then(s => {
+  $('#modelLine').textContent = `视觉 ${s.vision || '未配置'} · 生图 ${s.image || '未配置'}${s.busy ? ' · 有任务进行中' : ''}`;
+  if (s.busy) $('#statusLine').textContent = '上一次生成还在进行中，稍后再试。';
+});
+const lastId = localStorage.getItem('decision_run');
+if (lastId) { $('#statusLine').textContent = '检测到上次生成，'; const a = document.createElement('a'); a.textContent = '查看上次结果'; a.href = '#'; a.onclick = e => { e.preventDefault(); watchRun(lastId); }; $('#statusLine').appendChild(a); }
+
+const drop = $('#drop'), input = $('#fileInput');
+drop.onclick = () => input.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]); };
+input.onchange = () => input.files[0] && pickFile(input.files[0]);
+function pickFile(f) {
+  if (!/^image\//.test(f.type)) return alert('请选择图片文件');
+  if (f.size > 30 * 1024 * 1024) return alert('文件超过 30MB，请压缩后重试');
+  file = f;
+  $('#uploadImg').src = URL.createObjectURL(f);
+  $('#uploadMeta').textContent = `${f.name} · ${(f.size / 1024 / 1024).toFixed(1)}MB`;
+  drop.style.display = 'none'; $('#uploadPreview').style.display = 'block';
+}
+$('#startBtn').onclick = async () => {
+  if (!file) return;
+  $('#startBtn').disabled = true;
+  const fd = new FormData(); fd.append('screenshot', file);
+  const res = await fetch('/api/upload', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (!res.ok) { alert(data.error || '上传失败'); $('#startBtn').disabled = false; return; }
+  localStorage.setItem('decision_run', data.id);
+  watchRun(data.id);
+};
+$('#resetBtn').onclick = () => location.reload();
+
+function renderSteps(steps) {
+  $('#stepList').innerHTML = steps.map(s => {
+    const mark = { pending: '·', running: '…', done: '✓', degraded: '!', failed: '×' }[s.status];
+    return `<li class="${s.status}"><span class="dot">${mark}</span><span><span class="stLabel">${s.label}</span>${s.note ? `<span class="stNote">${s.note}</span>` : ''}</span></li>`;
+  }).join('');
+}
+function renderDegradations(list) {
+  $('#degradations').innerHTML = list.length ? `<div class="alert warn"><b>降级与调整（${list.length}）</b><br>${list.map(d => `· ${d}`).join('<br>')}</div>` : '';
+}
+function watchRun(id) {
+  runId = id;
+  $('#uploadCard').style.display = 'none';
+  $('#progressCard').style.display = 'block';
+  $('#resultCard').style.display = 'none';
+  $('#previewWrap').style.display = 'none';
+  clearInterval(pollTimer);
+  poll();
+  pollTimer = setInterval(poll, 1600);
+  async function poll() {
+    let run;
+    try { const res = await fetch(`/api/runs/${id}`); run = await res.json(); if (!res.ok) throw new Error(run.error); }
+    catch { clearInterval(pollTimer); $('#statusLine').textContent = '生成记录不可用。'; return; }
+    renderSteps(run.steps); renderDegradations(run.degradations || []);
+    $('#statusLine').textContent = run.status === 'running' ? `正在执行：${run.phase || ''}` : '';
+    if (run.status !== 'running') { clearInterval(pollTimer); if (run.status === 'complete') renderResult(run); else renderFailure(run); }
+  }
+}
+function renderFailure(run) {
+  $('#resultCard').style.display = 'block';
+  $('#designBox').innerHTML = '';
+  $('#moduleBox').innerHTML = '';
+  $('#downloadList').innerHTML = '';
+  $('#zipLink').style.display = 'none'; $('#pageLink').style.display = 'none';
+  $('#resultAlerts').innerHTML = `<div class="alert error"><b>这次生成未完成</b><br>${run.error || '未知错误'}<br><br><button class="ghost" onclick="location.reload()">重新上传截图</button></div>`;
+}
+function renderResult(run) {
+  $('#progressCard').style.display = 'none';
+  $('#resultCard').style.display = 'block';
+  $('#previewWrap').style.display = 'block';
+  const base = `/api/runs/${run.id}`;
+  $('#previewFrame').src = `${base}/shop.html`;
+  $('#pageLink').href = `${base}/shop.html`;
+  $('#zipLink').href = `${base}/zip`;
+  const d = run.result.design;
+  $('#designBox').innerHTML = `
+    <p class="designTitle">${d.title}</p>
+    <p class="hint">${d.summary}</p>
+    <div class="palette">${Object.entries(d.palette).map(([k, v]) => `<i title="${k} ${v}" style="background:${v}"></i>`).join('')}</div>
+    <div class="small">摄影风格：${d.style}</div>`;
+  const slotGroups = {};
+  for (const s of run.result.slotMap) (slotGroups[s.moduleId] = slotGroups[s.moduleId] || { label: s.moduleLabel, slots: [] }).slots.push(s);
+  $('#moduleBox').innerHTML = `<h2 style="margin-top:18px">模块清单（自上而下）</h2>` + run.result.modules.map(m => {
+    const g = slotGroups[m.id];
+    const slots = g ? g.slots.map(s => {
+      if (s.file) {
+        const tag = s.status === 'substituted' ? '<span class="tag sub">替代</span>' : s.status === 'reuse' ? '<span class="tag">复用</span>' : '<span class="tag">生成</span>';
+        return `<div class="slotRow"><img src="${base}/${s.file}" alt=""><span>槽位 ${s.slot} · ${s.ratio}</span>${tag}<a href="${base}/${s.file}?download=1">下载 ${s.file.split('/').pop()}</a></div>`;
+      }
+      return `<div class="slotRow"><span class="missing">未回填</span><span>槽位 ${s.slot}</span><span class="tag miss">缺失</span></div>`;
+    }).join('') : '';
+    return `<div class="moduleItem"><b>${m.label}</b><span class="type">${m.type}</span><div class="reason">${m.reason || ''}</div>${slots}</div>`;
+  }).join('');
+  const missing = run.result.slotMap.filter(s => !s.file).length;
+  $('#resultAlerts').innerHTML = (run.degradations.length ? `<div class="alert warn"><b>降级与调整（${run.degradations.length}）</b><br>${run.degradations.map(x => `· ${x}`).join('<br>')}</div>` : '') +
+    (missing ? `<div class="alert warn">${missing} 个图片槽位未能回填（模块已在页面上做相应处理）。</div>` : `<div class="alert" style="background:#eef6f1;color:#335948;border:1px solid #cfe3d8">全部图片槽位已回填。</div>`);
+  const files = [...new Set(run.result.slotMap.filter(s => s.file).map(s => s.file))];
+  $('#downloadList').innerHTML = `<h2 style="margin-top:18px">独立素材（${files.length} 张）</h2>` + files.map(f => `<div class="dl"><span>${f}</span><a href="${base}/${f}?download=1">下载</a></div>`).join('');
+}
+</script>
+</body>
+</html>
