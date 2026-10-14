@@ -112,6 +112,16 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
     await mark(2, STEPS[1]);
     const analyzed = await call('analyze-store', () => analyzeStore(env, screenshot, log));
     state.shop = analyzed.shop;
+    // 程序实测真实主色：防止 AI 用品类刻板印象（美妆→粉色）替代这家店真实的颜色
+    try {
+      const { extractPalette } = await import('./palette.mjs');
+      const palette = await extractPalette(screenshot.buffer);
+      analyzed.shop.measuredPalette = palette;
+      state.shop.measuredPalette = palette;
+      log(`实测主色：${palette.dominant.slice(0, 3).map(c => c.hex).join(' / ')}`);
+    } catch (error) {
+      warn(`主色提取失败（${error.message}），沿用模型判断的配色。`);
+    }
     if (analyzed.usage) state.usage.push({ step: 'analyze', ...pickUsage(analyzed.usage, env.visionModel) });
     await writeFile(path.join(dir, 'shop.json'), JSON.stringify(analyzed.shop, null, 2));
     if (analyzed.shop.confidence.missing.length) {

@@ -111,6 +111,8 @@ export async function planDesign(env, shop, log = () => {}) {
     '',
     '请为这家店做装修决策，按约定输出 JSON 计划。',
     '记住：所有图片槽位都必须被分配，且每张图都要归入四种来源之一。',
+    '',
+    '配色必须来自上面 shop.measuredPalette 里程序实测的主色，不要用品类刻板印象（例如美妆就默认粉色）。',
   ].join('\n');
 
   const { value, usage } = await callTextModel(env, { system, user, maxTokens: 12_000, timeoutMs: 300_000 });
@@ -182,8 +184,8 @@ export function normalizePlan(value, shop = {}) {
         reason: clampText(d?.reason, 120),
       })).filter(d => d.topic && d.choice),
       palette: {
-        background: hex(palette.background, shop?.designReading?.palette?.background || '#F5F3EF'),
-        accent: hex(palette.accent, shop?.designReading?.palette?.accent || '#B4553C'),
+        background: hex(palette.background, shop?.measuredPalette?.background || shop?.designReading?.palette?.background || '#F5F3EF'),
+        accent: hex(palette.accent, shop?.measuredPalette?.accent || shop?.designReading?.palette?.accent || '#B4553C'),
         text: hex(palette.text, shop?.designReading?.palette?.text || '#1F1D1B'),
       },
       styleKeywords: (Array.isArray(value?.design?.styleKeywords) ? value.design.styleKeywords : []).slice(0, 6).map(k => clampText(k, 12)).filter(Boolean),

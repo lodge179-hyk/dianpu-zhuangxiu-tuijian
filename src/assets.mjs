@@ -309,6 +309,10 @@ const lookOf = subject => {
 export function buildSheetPrompt({ sheet, layout, design, shop }) {
   const palette = design?.palette || {};
   const constraints = (design?.imagePlan?.constraints || []).filter(Boolean);
+  // 程序实测的主色（如果拿到了）优先于 AI 的软约束，避免品类刻板印象（美妆→粉色）
+  const measured = shop?.measuredPalette || {};
+  const bg = palette.background || measured.background || '';
+  const accent = palette.accent || measured.accent || '';
 
   const lines = [];
   lines.push('Use case: product-mockup.');
@@ -320,8 +324,8 @@ export function buildSheetPrompt({ sheet, layout, design, shop }) {
   lines.push('');
   lines.push('SHARED ART DIRECTION for the whole sheet (this is what makes the sheet look like ONE shop):');
   lines.push(`- Overall character: ${design?.title || 'clean commercial styling'}${design?.styleKeywords?.length ? `; keywords ${design.styleKeywords.join(', ')}` : ''}${shop?.designReading?.tone ? `; shop tone ${shop.designReading.tone}` : ''}.`);
-  if (palette.background || palette.accent) {
-    lines.push(`- Colour: keep the palette family consistent — background tones near ${palette.background || 'light neutral'} and accents near ${palette.accent || 'a warm highlight'}. Product colours must stay true and never be tinted by this palette.`);
+  if (bg || accent) {
+    lines.push(`- MANDATORY colour anchors: background near ${bg || 'light neutral'} and accents near ${accent || 'a warm highlight'}. Do NOT substitute a category stereotype colour (for a beauty shop, do NOT default to pink/rose). Use the given anchors. Product colours must stay true and never be tinted by this palette.`);
   }
   if (constraints.length) {
     lines.push(`- Shop art direction (colour, material and mood only — these are NOT instructions to repeat one background or one lighting setup): ${constraints.join('；')}`);
