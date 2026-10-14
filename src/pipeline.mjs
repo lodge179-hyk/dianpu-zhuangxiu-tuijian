@@ -134,7 +134,7 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
     try {
       planned = await call('plan-design', () => planDesign(env, analyzed.shop, log));
     } catch (error) {
-      // 计划被拦下时把模型原始输出落盘，便于核对是提示词还是模型的问题
+      // 计划失败（含模型返回非 JSON）时把原始输出落盘，便于核对
       if (error?.raw) await writeFile(path.join(dir, 'plan-raw.txt'), error.raw, 'utf8').catch(() => {});
       throw error;
     }

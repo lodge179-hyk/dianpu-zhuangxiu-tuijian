@@ -54,7 +54,7 @@ export async function callTextModel(env, { system, user, images = [], maxTokens 
     const text = (payload.output || []).flatMap(i => i.content || []).filter(c => c.type === 'output_text').map(c => c.text).join('');
     if (!json) return { text, usage: payload.usage };
     const parsed = parseJsonLoose(text);
-    if (!parsed) throw new AppError('模型没有返回可解析的 JSON。', { stage: 'model', hint: text.slice(0, 300) });
+    if (!parsed) throw new AppError('模型没有返回可解析的 JSON。', { stage: 'model', hint: text.slice(0, 600), raw: text });
     return { value: parsed, text, usage: payload.usage };
   } catch (error) {
     if (error?.name === 'AbortError' || /超时|aborted/i.test(error?.message || '')) {

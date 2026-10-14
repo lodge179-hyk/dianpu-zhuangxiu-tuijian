@@ -115,7 +115,20 @@ export async function planDesign(env, shop, log = () => {}) {
     '配色必须来自上面 shop.measuredPalette 里程序实测的主色，不要用品类刻板印象（例如美妆就默认粉色）。',
   ].join('\n');
 
-  const { value, usage } = await callTextModel(env, { system, user, maxTokens: 12_000, timeoutMs: 300_000 });
+  // 规划偶发返回非 JSON：重试一次，把明确要求写得更硬。
+  let value;
+  let usage;
+  try {
+    ({ value, usage } = await callTextModel(env, { system, user, maxTokens: 12_000, timeoutMs: 300_000 }));
+  } catch (error) {
+    if (error?.stage === 'model' && /没有返回可解析/.test(error.message)) {
+      log('规划返回非 JSON，重试一次（明确要求只输出 JSON）');
+      const retryUser = user + '\n\n上一条没有输出可解析的 JSON。现在重新来：只输出一个 JSON 对象，不要任何解释、不要 markdown 代码块、不要前后缀。';
+      ({ value, usage } = await callTextModel(env, { system, user: retryUser, maxTokens: 12_000, timeoutMs: 300_000 }));
+    } else {
+      throw error;
+    }
+  }
   const plan = normalizePlan(value, shop);
   // 编号归属裁决：模型可能把别的模块的图片编号复制过来，这里按「先声明者拥有」定归属，
   // 并把生图计划里指向旧编号的格子重定向到正确编号。
