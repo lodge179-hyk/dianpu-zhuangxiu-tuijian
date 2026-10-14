@@ -8,6 +8,7 @@ const { validatePlan } = require('./plan.cjs');
 const { createExample } = require('./example.cjs');
 const { navigationExamplePlan } = require('./navigation-example.cjs');
 const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs');
+const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
 const { plannerPrompt, planScreenshot, publicCatalog } = require('./planner.cjs');
 const port = Number(process.env.PLANNER_PORT || 5182);
 const root = path.resolve(process.env.PLANNER_OUTPUT_DIR || path.join(__dirname, 'output/runs'));
@@ -93,10 +94,38 @@ const server = http.createServer(async (req, res) => {
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
     if (req.method === 'GET' && runMatch) return json(res, 200, load(runMatch[1]));
+    const downloadMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/download\/(shop\.png|materials\.zip)$/);
+    if (['GET', 'POST'].includes(req.method) && downloadMatch) {
+      const [, id, filename] = downloadMatch;
+      if (locks.has(id)) return json(res, 409, { error: '当前方案正在填入素材或准备下载，请稍后再试。' });
+      if (!fs.existsSync(path.join(folderFor(id), 'state.json'))) return json(res, 404, { error: '装修方案不存在' });
+      locks.add(id);
+      try {
+        const state = load(id), png = filename === 'shop.png';
+        const bytes = await (png ? shopPng(folderFor(id), state) : materialsZip(folderFor(id), state));
+        if (req.method === 'POST') {
+          const exportFolder = path.join(folderFor(id), 'downloads');
+          fs.mkdirSync(exportFolder, { recursive: true });
+          // Only two current exports per run; each click rebuilds from the current materials.
+          fs.writeFileSync(path.join(exportFolder, filename), bytes);
+          return json(res, 200, { url: `/runs/${id}/downloads/${filename}?v=${randomUUID()}`, bytes: bytes.length });
+        }
+        res.writeHead(200, { 'Content-Type': png ? 'image/png' : 'application/zip', 'Content-Disposition': attachmentHeader(state, png ? 'png' : 'zip'), 'Content-Length': bytes.length, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+        return res.end(bytes);
+      } finally { locks.delete(id); }
+    }
+    const preparedDownload = pathname.match(/^\/runs\/([a-f0-9-]{36})\/downloads\/(shop\.png|materials\.zip)$/);
+    if (req.method === 'GET' && preparedDownload) {
+      const [, id, filename] = preparedDownload, file = path.join(folderFor(id), 'downloads', filename);
+      if (!fs.existsSync(file)) return json(res, 404, { error: '下载文件不存在，请重新点击下载。' });
+      const bytes = fs.readFileSync(file), png = filename === 'shop.png';
+      res.writeHead(200, { 'Content-Type': png ? 'image/png' : 'application/zip', 'Content-Disposition': attachmentHeader(load(id), png ? 'png' : 'zip'), 'Content-Length': bytes.length, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+      return res.end(bytes);
+    }
     const uploadMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})\/batches\/([a-z][a-z0-9_-]{0,39})$/);
     if (req.method === 'POST' && uploadMatch) {
       const [, id, batchId] = uploadMatch;
-      if (locks.has(id)) return json(res, 409, { error: '当前方案正在填入素材，请稍后再试。' });
+      if (locks.has(id)) return json(res, 409, { error: '当前方案正在填入素材或准备下载，请稍后再试。' });
       imageType(req); locks.add(id);
       try {
         const state = load(id); if (state.status !== 'ready') throw new Error('请先完成装修方案');
