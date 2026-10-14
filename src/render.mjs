@@ -183,6 +183,7 @@ export function buildManifest(plan, rendered, assets, shop) {
       slotId: a.slotId, file: `assets/${a.file}`, source: a.source, subject: a.subject,
       deliveredPixels: a.deliveredPixels, nativePixels: a.nativePixels, upscaled: !!a.upscaled,
       separatorPixels: a.separatorPixels ?? null, removedAreaPercent: a.removedAreaPercent ?? null,
+      reliability: a.reliability ?? null, note: a.note || '',
     })),
     howToUse: [
       '打开 preview.html 看整体效果（页面宽度 483px，与真实店铺页面一致）。',

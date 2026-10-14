@@ -8,6 +8,7 @@
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import sharp from 'sharp';
 import { AppError, analyzeStore, prepareScreenshot } from './analyze.mjs';
 import { CATALOG } from './catalog.mjs';
 import { planDesign } from './plan.mjs';
@@ -203,11 +204,31 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
       await save(state);
     }
 
-    // 真实商品照片：从截图裁切，优先按识别到的商品位置
+    // 真实商品照片：从截图裁切。
+    // 优先用程序实测的商品格（像素分析，不依赖模型的坐标），失败或数量不够再退回模型框。
     const productSlots = plan.validation.slots.filter(s => s.source === 'product-photo');
     if (productSlots.length) {
-      const boxes = analyzed.shop.visibleProducts.filter(p => p.box).map(p => p.box);
+      const modelBoxes = analyzed.shop.visibleProducts.filter(p => p.box).map(p => p.box);
       const uncertain = analyzed.shop.visibleProducts.filter(p => p.box && p.boxPlausible === false).length;
+      let boxes = modelBoxes;
+      let locatedBy = 'model';
+      try {
+        const { detectProductGrid } = await import('./grid.mjs');
+        const { data, info } = await sharp(screenshot.buffer).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+        const cells = detectProductGrid(data, info.width, info.height, info.channels)
+          .sort((a, b) => a.top - b.top || a.left - b.left);
+        if (cells.length >= productSlots.length) {
+          // 像素格转归一化坐标（与 cropFromScreenshot 的入参一致）
+          boxes = cells.slice(0, productSlots.length).map(c => ({
+            x: c.left / info.width, y: c.top / info.height, w: c.width / info.width, h: c.height / info.height,
+          }));
+          locatedBy = 'detected';
+        } else if (cells.length) {
+          warn(`程序只检测到 ${cells.length} 个商品格，少于需要的 ${productSlots.length} 个，商品照片改用识别阶段的模型框。`);
+        }
+      } catch (error) {
+        warn(`程序检测商品格失败（${error.message}），商品照片退回识别阶段的模型框。`);
+      }
       if (!boxes.length) warn('识别阶段没有拿到商品位置，截图裁切的商品图只能取中上部区域，仅作版式示意。');
       try {
         const sliced = await call('crop-from-screenshot', () => cropFromScreenshot(screenshot.buffer, productSlots, assetsDir, log, boxes));
@@ -217,9 +238,9 @@ export async function runTask({ state, screenshotBytes, dir, env, save, log = ()
         }
         const notLocated = sliced.filter(a => a.reliability !== 'located').length;
         if (notLocated) {
-          warn(`有 ${notLocated} 张商品图的位置不够可靠（识别到的框形状不像完整商品照片），已标注为「位置待确认」，请核对后再上传到店铺。`);
+          warn(`有 ${notLocated} 张商品图的位置不够可靠（${locatedBy === 'detected' ? '程序检测' : '模型框'}的形状不像完整商品照片），已标注为「位置待确认」，请核对后再上传到店铺。`);
         }
-        if (uncertain) warn(`识别到 ${uncertain} 个商品框的形状异常，说明这张截图的商品定位不可全信。`);
+        if (uncertain && locatedBy === 'model') warn(`识别到 ${uncertain} 个商品框的形状异常，说明这张截图的商品定位不可全信。`);
       } catch (error) {
         degraded = true;
         warn(`从截图裁切商品照片失败：${error.message}`);
