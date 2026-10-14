@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+const { jsonrepair } = require('jsonrepair');
 
 function settings(env = process.env) {
   const base = (env.PLANNER_DASHSCOPE_BASE_URL || (env.DASHSCOPE_WORKSPACE_ID ? `https://${env.DASHSCOPE_WORKSPACE_ID}.cn-beijing.maas.aliyuncs.com` : 'https://dashscope.aliyuncs.com')).replace(/\/$/, '');
@@ -20,9 +21,23 @@ function responseText(payload) {
   const content = payload.output?.choices?.[0]?.message?.content ?? payload.choices?.[0]?.message?.content;
   return typeof content === 'string' ? content : Array.isArray(content) ? content.map(p => p.text || '').join('') : '';
 }
-function parseJson(text) {
-  try { return JSON.parse(text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')); }
-  catch { throw Error('模型返回的结构化内容不完整，原始文本已保存；没有自动重试。'); }
+function parseJson(text, folder, stage) {
+  const source = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  try { return JSON.parse(source); } catch {}
+  try {
+    const fixed = jsonrepair(source);
+    // Accept only inserted quote escapes. Never complete truncated JSON or invent missing values.
+    let i = 0, inserted = 0;
+    for (let j = 0; j < fixed.length; j++) {
+      if (fixed[j] === source[i]) { i++; continue; }
+      if (fixed[j] === '\\' && fixed[j + 1] === '"' && source[i] === '"') { inserted++; continue; }
+      throw Error('Unsupported repair');
+    }
+    if (i !== source.length || !inserted) throw Error('Unsupported repair');
+    const value = JSON.parse(fixed);
+    if (folder && stage) writeJson(folder, `${stage}-parse-repair.json`, { method: 'escape-interior-quotes-only', insertedEscapes: inserted, modelRequests: 0 });
+    return value;
+  } catch { throw Error('模型返回的 JSON 格式不正确或内容被截断，原始文本已保存；没有自动重试。'); }
 }
 async function call(folder, stage, model, payload, { textOnly = false, timeout = 240000, fetcher = fetch } = {}) {
   const config = settings();
@@ -43,6 +58,7 @@ async function call(folder, stage, model, payload, { textOnly = false, timeout =
   record.durationMs = Date.now() - started;
   record.requestId = data.request_id || data.id || null;
   record.usage = data.usage || null;
+  record.finishReason = data.output?.choices?.[0]?.finish_reason || null;
   if (!response.ok || data.code || data.error) {
     const code = String(data.code || data.error?.code || '').replace(/[^\w.\-]/g, '').slice(0, 80);
     Object.assign(record, { status: 'failed', errorCode: code, errorMessage: String(data.message || data.error?.message || '').slice(0, 800) }); writeJson(folder, auditFile, record);
@@ -58,10 +74,14 @@ async function ask(folder, stage, system, input, { images = [], search = false, 
   writeJson(folder, `${stage}-input.json`, input);
   const c = settings(), text = JSON.stringify(input);
   const messages = search ? [{ role: 'system', content: system }, { role: 'user', content: text }] : [{ role: 'system', content: [{ text: system }] }, { role: 'user', content: [{ text }, ...images.map(image => ({ image }))] }];
-  const parameters = { result_format: 'message', max_tokens: 10000, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : {}) };
+  const parameters = { result_format: 'message', max_tokens: 10000, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : { response_format: { type: 'json_object' } }) };
   return call(folder, stage, search ? c.search : c.vision, { input: { messages }, parameters }, { textOnly: search, fetcher });
 }
-async function askJson(...args) { const payload = await ask(...args); return { value: parseJson(responseText(payload)), payload }; }
+async function askJson(...args) {
+  const payload = await ask(...args);
+  if (payload.output?.choices?.[0]?.finish_reason === 'length') throw Error('模型输出达到长度上限，内容被截断；原始文本已保存，没有自动重试。');
+  return { value: parseJson(responseText(payload), args[0], args[1]), payload };
+}
 async function searchWeb(folder, stage, system, input, options = {}) {
   // Search answers are unverified model prose. Only provider search records become selectable sources.
   return searchSources(await ask(folder, stage, system, input, { ...options, search: true }));
@@ -114,4 +134,4 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher } = {}) {
   await sharp(bytes, { limitInputPixels: 40000000 }).png().toFile(path.join(folder, `${stage}-source.png`));
   return bytes;
 }
-module.exports = { settings, publicSettings, redact, writeJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, imageBytes };
+module.exports = { settings, publicSettings, redact, writeJson, parseJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, imageBytes };

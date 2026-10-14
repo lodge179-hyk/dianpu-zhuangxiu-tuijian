@@ -6,7 +6,7 @@ const { planSchema, validatePlan } = require('./plan.cjs');
 const { recommendPlan } = require('./structure.cjs');
 const { compose } = require('./compose.cjs');
 const { cropBatch } = require('./crop.cjs');
-const { askJson, searchWeb, publicSourceUrl, writeJson, generateSheet, redact } = require('./qwen-provider.cjs');
+const { askJson, parseJson, searchWeb, publicSourceUrl, writeJson, generateSheet, redact } = require('./qwen-provider.cjs');
 
 const limits = { maxImages: 6, maxImageMB: 10, maxTotalMB: 30 };
 const line = z.string().trim().min(1).max(180);
@@ -142,17 +142,31 @@ async function resumeResearch(run, save, { fetcher, generate = true } = {}) {
   run.state.status = 'planning'; delete run.state.error;
   setStage(run, 'selecting-style', '正在复用已保存的商品资料和搜索结果', save);
   const prepared = await prepareInputs(images, run.folder, { persist: false });
-  return selectStyleAndDesign(run, prepared, sources, save, { fetcher, generate });
+  return selectStyleAndDesign(run, prepared, sources, save, { fetcher, generate, reuseSavedStyle: true });
 }
-async function selectStyleAndDesign(run, prepared, sources, save, { fetcher, generate }) {
+function savedStyle(run, sources) {
+  const attempt = run.state.styleSelectionAttempts;
+  if (!Number.isInteger(attempt) || attempt < 1) return null;
+  const stage = `style-attempt-${attempt}`;
+  try {
+    const audit = JSON.parse(fs.readFileSync(path.join(run.folder, `${stage}-call.json`), 'utf8'));
+    if (audit.status !== 'completed' || audit.finishReason === 'length') return null;
+    return validateResearch(parseJson(fs.readFileSync(path.join(run.folder, `${stage}-response.txt`), 'utf8'), run.folder, stage), sources);
+  } catch { return null; }
+}
+async function selectStyleAndDesign(run, prepared, sources, save, { fetcher, generate, reuseSavedStyle = false }) {
   if (!sources.length) throw Error('联网检索没有返回可核实的来源，已停止，未把模型自编链接当成案例。');
   const recognition = run.state.recognition;
   const attached = prepared.visionImages.map(({ imageIndex, view }, i) => ({ attachment: i + 1, imageIndex, view }));
   setStage(run, 'selecting-style', '正在从已取得的搜索来源选择风格', save);
-  const attempt = run.state.styleSelectionAttempts = (run.state.styleSelectionAttempts || 0) + 1;
-  run.state.planningRequestAttempts++;
-  const researched = await askJson(run.folder, `style-attempt-${attempt}`, researchPrompt(sources), { categories: recognition.categories, products: recognition.products, sources, evidenceScope: '仅来源标题与网址；具体风格是设计提案，未读取网页正文或图片' }, { fetcher });
-  const research = validateResearch(researched.value, sources);
+  let research = reuseSavedStyle ? savedStyle(run, sources) : null;
+  if (research) run.state.reusedStyleAttempt = run.state.styleSelectionAttempts;
+  else {
+    const attempt = run.state.styleSelectionAttempts = (run.state.styleSelectionAttempts || 0) + 1;
+    run.state.planningRequestAttempts++;
+    const researched = await askJson(run.folder, `style-attempt-${attempt}`, researchPrompt(sources), { categories: recognition.categories, products: recognition.products, sources, evidenceScope: '仅来源标题与网址；具体风格是设计提案，未读取网页正文或图片' }, { fetcher });
+    research = validateResearch(researched.value, sources);
+  }
   run.state.research = { ...research, basis: '基于商品及搜索来源标题提出的设计方案；未读取网页正文或外站图片', sources }; writeJson(run.folder, 'style-research.json', run.state.research);
   const brief = { version: 1, shop: { name: '商品装修参考', category: recognition.categories.join('、'), observations: recognition.observations, uncertainties: [...recognition.uncertainties.slice(0, 8), '图片为同类型商品示意，不要求复刻上传 SKU'] }, categories: recognition.categories, theme: research.concept, style: research.style, navigationStyle: 'auto', featuredCategory: null };
   const skeleton = recommendPlan(brief, { creative: true }); delete skeleton.plan.navigationLibrary;
@@ -166,4 +180,4 @@ async function selectStyleAndDesign(run, prepared, sources, save, { fetcher, gen
   if (generate) return generateRemaining(run, save, { fetcher });
   return run.state;
 }
-module.exports = { limits, recognitionSchema, researchSchema, designSchema, recognitionPrompt, searchPrompt, researchPrompt, designPrompt, validateRecognition, validateResearch, sourceChoices, cachedResearch, resumeResearch, applyDesign, prepareInputs, productWorkflow, generateRemaining };
+module.exports = { limits, recognitionSchema, researchSchema, designSchema, recognitionPrompt, searchPrompt, researchPrompt, designPrompt, validateRecognition, validateResearch, sourceChoices, cachedResearch, savedStyle, resumeResearch, applyDesign, prepareInputs, productWorkflow, generateRemaining };

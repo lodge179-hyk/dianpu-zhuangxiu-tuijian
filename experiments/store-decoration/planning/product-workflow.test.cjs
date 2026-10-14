@@ -6,7 +6,7 @@ const sharp = require('sharp');
 const { randomUUID } = require('crypto');
 const { unzipSync } = require('fflate');
 const { productWorkflow, generateRemaining, prepareInputs, applyDesign, sourceChoices, validateResearch, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
-const { searchSources, batchSize, imageBytes, askJson } = require('./qwen-provider.cjs');
+const { searchSources, batchSize, imageBytes, askJson, parseJson } = require('./qwen-provider.cjs');
 const { aspectRatios } = require('./plan.cjs');
 const { materialsZip } = require('./download.cjs');
 
@@ -48,6 +48,8 @@ function mockProvider(run, options = {}) {
       return response({ request_id: 'mock-image', output: { choices: [{ message: { content: [{ image: 'data:image/png;base64,' + bytes.toString('base64') }] } }] } });
     }
     const textOnly = url.includes('/text-generation/'), input = JSON.parse(textOnly ? body.input.messages[1].content : body.input.messages[1].content[0].text);
+    if (!textOnly) assert.deepEqual(body.parameters.response_format, { type: 'json_object' });
+    else assert.equal(body.parameters.response_format, undefined);
     let value = recognition;
     if (textOnly) {
       assert.equal(body.parameters.enable_search, true); assert.equal(body.parameters.search_options.forced_search, true); assert.equal(body.parameters.search_options.enable_source, true);
@@ -161,8 +163,37 @@ test('native-provider errors and malformed JSON are recorded without retry or le
   const fetcher = async () => { calls++; return new Response(JSON.stringify({ code: 'InvalidApiKey', message: process.env.DASHSCOPE_API_KEY }), { status: 401 }); };
   await assert.rejects(askJson(run.folder, 'test', 'test', {}, { fetcher }), /权限.*没有自动重试/);
   assert.equal(calls, 1); assert.ok(!fs.readFileSync(path.join(run.folder, 'test-call.json'), 'utf8').includes(process.env.DASHSCOPE_API_KEY));
-  await assert.rejects(askJson(run.folder, 'bad-json', 'test', {}, { fetcher: async () => { calls++; return new Response(JSON.stringify({ output: { choices: [{ message: { content: 'not JSON' } }] } })); } }), /结构化内容不完整/);
+  await assert.rejects(askJson(run.folder, 'bad-json', 'test', {}, { fetcher: async () => { calls++; return new Response(JSON.stringify({ output: { choices: [{ message: { content: 'not JSON' } }] } })); } }), /JSON 格式/);
   assert.equal(calls, 2); assert.equal(fs.readFileSync(path.join(run.folder, 'bad-json-response.txt'), 'utf8'), 'not JSON');
+});
+
+test('JSON quote repair preserves wording but never fills truncated or missing content', t => {
+  const run = workspace(t);
+  const raw = '{"application":"借鉴标题中"V 领开叉”与“回头率”的主题。"}';
+  assert.deepEqual(parseJson(raw, run.folder, 'quote'), { application: '借鉴标题中"V 领开叉”与“回头率”的主题。' });
+  const audit = JSON.parse(fs.readFileSync(path.join(run.folder, 'quote-parse-repair.json')));
+  assert.equal(audit.insertedEscapes, 1); assert.equal(audit.modelRequests, 0);
+  for (const bad of ['{"application":"未完成', '{"application":', '{"application":"a" "extra":true}', '{"a":undefined}']) assert.throws(() => parseJson(bad), /JSON 格式/);
+  assert.deepEqual(parseJson('```json\n{"a":"escaped \\" text"}\n```'), { a: 'escaped " text' });
+});
+
+test('continuation reuses a complete saved style with broken quote escaping and makes no second style request', async t => {
+  const run = workspace(t), mock = mockProvider(run), prepared = await prepareInputs([await screenshot()], run.folder);
+  Object.assign(run.state, { status: 'failed', inputs: prepared.inputs, recognition: mock.recognition, planningRequestAttempts: 3, styleSelectionAttempts: 1, workflow: { stage: 'selecting-style' }, error: 'JSON 格式不正确' });
+  fs.writeFileSync(path.join(run.folder, 'search-sources.json'), JSON.stringify([{ url: 'https://www.example.com/products', title: '测试用数码展示参考' }]));
+  const research = { ...mock.research, reason: '根据"数码”主题设计' };
+  const raw = JSON.stringify(research).replace('\\"数码', '"数码');
+  fs.writeFileSync(path.join(run.folder, 'style-attempt-1-response.txt'), raw);
+  fs.writeFileSync(path.join(run.folder, 'style-attempt-1-call.json'), JSON.stringify({ status: 'completed', finishReason: 'stop' }));
+  await resumeResearch(run, save, { ...mock, generate: false });
+  assert.equal(mock.calls.length, 1); assert.equal(run.state.reusedStyleAttempt, 1); assert.equal(run.state.styleSelectionAttempts, 1);
+  assert.equal(run.state.planningRequestAttempts, 4); assert.equal(run.state.research.reason, research.reason);
+  assert.equal(fs.readFileSync(path.join(run.folder, 'style-attempt-1-response.txt'), 'utf8'), raw);
+});
+
+test('provider length termination is never accepted as complete JSON', async t => {
+  const run = workspace(t);
+  await assert.rejects(askJson(run.folder, 'length', 'JSON', {}, { fetcher: async () => new Response(JSON.stringify({ output: { choices: [{ finish_reason: 'length', message: { content: '{"apparently":"valid"}' } }] } })) }), /长度上限/);
 });
 
 test('HTTP upload, saved progress, download and restart use the new provider without automatic replay', async t => {
