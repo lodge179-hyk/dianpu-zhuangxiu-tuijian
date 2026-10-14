@@ -2,11 +2,21 @@ const fs = require('fs');
 const path = require('path');
 const { renderPage } = require('../a9-component-library/lib/index.cjs');
 const { validatePlan, buildBatches } = require('./plan.cjs');
+const { resolveNavigation, assetFile } = require('./navigation-library.cjs');
 const black = path.join(__dirname, '../a10-black-module-review/black.png');
 
 function compose(folder, input) {
   const validated = validatePlan(input), { plan } = validated;
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
+  // A run retains its selected library version and copied files across uploads.
+  const selectionFile = path.join(folder, 'navigation-library.json');
+  const pinned = fs.existsSync(selectionFile);
+  const navigationLibrary = pinned ? JSON.parse(fs.readFileSync(selectionFile, 'utf8')) : resolveNavigation(plan);
+  for (const match of navigationLibrary.matched) {
+    const target = path.join(folder, 'assets', match.assetId + '.png');
+    if (!pinned || !fs.existsSync(target)) fs.copyFileSync(assetFile(match.libraryId), target);
+  }
+  if (navigationLibrary.enabled && !pinned) fs.writeFileSync(selectionFile, JSON.stringify(navigationLibrary, null, 2));
   for (const asset of plan.assets) {
     const target = path.join(folder, 'assets', asset.id + '.png');
     if (!fs.existsSync(target)) fs.copyFileSync(black, target);
@@ -27,9 +37,10 @@ function compose(folder, input) {
   const bindings = plan.modules.flatMap(m => result.photos.filter(p => p.moduleId === m.id).map((p, i) => ({ ...p, assetId: m.props.assetIds[i] })));
   const layout = { width: result.width, height: result.height, moduleCount: result.moduleCount, components: result.components, photos: bindings };
   fs.writeFileSync(path.join(folder, 'layout.json'), JSON.stringify(layout, null, 2));
-  const batches = buildBatches(plan);
+  const libraryAssetIds = navigationLibrary.matched.map(m => m.assetId);
+  const batches = buildBatches(plan, libraryAssetIds);
   for (const batch of batches) fs.writeFileSync(path.join(folder, `${batch.id}-prompt.txt`), batch.prompt);
   fs.writeFileSync(path.join(folder, 'generation-batches.json'), JSON.stringify(batches, null, 2));
-  return { ...validated, layout: { width: result.width, height: result.height }, batches };
+  return { ...validated, metrics: { ...validated.metrics, libraryAssets: libraryAssetIds.length, generatedAssets: plan.assets.length - libraryAssetIds.length, generationCalls: batches.length }, navigationLibrary, libraryAssetIds, layout: { width: result.width, height: result.height }, batches };
 }
 module.exports = { compose };

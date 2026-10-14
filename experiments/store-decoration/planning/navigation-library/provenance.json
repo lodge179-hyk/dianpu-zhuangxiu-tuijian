@@ -1,0 +1,251 @@
+{
+  "createdOn": "2026-10-14",
+  "categoryReference": "https://www.uniqlo.com/cn/zh/contents/collaboration/uniqlo-u/24fw/?gender=women",
+  "referenceUse": "Category terminology only; no brand photos downloaded or copied.",
+  "illustrativeGoods": true,
+  "totalGenerationCalls": 2,
+  "records": [
+    {
+      "style": "clean",
+      "tool": "Built-in image_gen",
+      "generationCalls": 1,
+      "prompt": "clean-prompt.txt",
+      "cropReport": {
+        "batchId": "navigation-fallback",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "crops": [
+          {
+            "assetId": "nav-tops",
+            "detectedRect": {
+              "left": 21,
+              "top": 21,
+              "width": 594,
+              "height": 595
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 21,
+              "top": 21,
+              "width": 594,
+              "height": 594
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-shirts",
+            "detectedRect": {
+              "left": 639,
+              "top": 21,
+              "width": 594,
+              "height": 595
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 639,
+              "top": 21,
+              "width": 594,
+              "height": 594
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-pants",
+            "detectedRect": {
+              "left": 21,
+              "top": 638,
+              "width": 594,
+              "height": 595
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 21,
+              "top": 638,
+              "width": 594,
+              "height": 594
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-dresses",
+            "detectedRect": {
+              "left": 639,
+              "top": 638,
+              "width": 594,
+              "height": 595
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 639,
+              "top": 638,
+              "width": 594,
+              "height": 594
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          }
+        ],
+        "newGenerationCalls": 0,
+        "method": "Detected magenta boundaries, bounded outer-edge cleanup, then center crop; no resizing or stretching"
+      }
+    },
+    {
+      "style": "warm",
+      "tool": "Built-in image_gen",
+      "generationCalls": 1,
+      "prompt": "warm-prompt.txt",
+      "cropReport": {
+        "batchId": "navigation-fallback",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "crops": [
+          {
+            "assetId": "nav-tops",
+            "detectedRect": {
+              "left": 18,
+              "top": 18,
+              "width": 597,
+              "height": 598
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 18,
+              "top": 18,
+              "width": 597,
+              "height": 597
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-shirts",
+            "detectedRect": {
+              "left": 639,
+              "top": 18,
+              "width": 596,
+              "height": 598
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 639,
+              "top": 19,
+              "width": 596,
+              "height": 596
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.33,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-pants",
+            "detectedRect": {
+              "left": 18,
+              "top": 638,
+              "width": 597,
+              "height": 597
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 18,
+              "top": 638,
+              "width": 597,
+              "height": 597
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          },
+          {
+            "assetId": "nav-dresses",
+            "detectedRect": {
+              "left": 639,
+              "top": 638,
+              "width": 596,
+              "height": 597
+            },
+            "boundaryTrim": {
+              "left": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0
+            },
+            "cropRect": {
+              "left": 639,
+              "top": 638,
+              "width": 596,
+              "height": 596
+            },
+            "aspect": "1:1",
+            "removedAreaPercent": 0.17,
+            "allowedRemovedAreaPercent": 35,
+            "framingReviewRequired": false,
+            "upscaled": false
+          }
+        ],
+        "newGenerationCalls": 0,
+        "method": "Detected magenta boundaries, bounded outer-edge cleanup, then center crop; no resizing or stretching"
+      }
+    }
+  ]
+}

@@ -6,6 +6,7 @@ const planSchema = z.object({
   version: z.literal(1),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
+  navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
@@ -70,10 +71,12 @@ function validatePlan(input) {
 function styleLock(style) {
   return `Shared art direction: color family ${style.palette.join(', ')}; setting family: ${style.background}; light: ${style.lighting}; photographic finish: ${style.photography}. Unify color grading and image quality. Treat the palette as available accents, not a requirement to put every color in every photo. Each panel's own background, camera and product selection take priority. Different categories may use different packaging, materials and scenes; do not turn the whole store into one imaginary product brand.`;
 }
-function buildBatches(plan) {
+function buildBatches(plan, excludedAssetIds = []) {
   const lookup = new Map(plan.assets.map(a => [a.id, a]));
   const lock = styleLock(plan.style);
-  return plan.batches.map((batch, index) => {
+  const excluded = new Set(excludedAssetIds);
+  const pending = plan.batches.map(batch => ({ ...batch, rows: batch.rows.map(row => row.filter(id => !excluded.has(id))).filter(row => row.length) })).filter(batch => batch.rows.length);
+  return pending.map((batch, index) => {
     const rowWeights = batch.rows.map(row => 1 / (row.length * aspectRatios[lookup.get(row[0]).aspect]));
     const total = rowWeights.reduce((a, b) => a + b, 0);
     const prompt = [
@@ -88,7 +91,7 @@ function buildBatches(plan) {
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',
     ].filter(Boolean).join('\n\n');
-    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? plan.batches[index - 1].id : null, styleLock: lock, prompt };
+    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, styleLock: lock, prompt };
   });
 }
 module.exports = { planSchema, validatePlan, buildBatches, aspectRatios };

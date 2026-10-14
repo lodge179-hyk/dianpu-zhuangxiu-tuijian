@@ -11,9 +11,11 @@ function runs(values) {
   }
   return spans;
 }
-async function cropBatch(bytes, input, batchId, folder) {
-  const { plan } = validatePlan(input), batch = plan.batches.find(b => b.id === batchId);
+async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
+  const { plan } = validatePlan(input), originalBatch = plan.batches.find(b => b.id === batchId);
+  const batch = compiledBatch || originalBatch;
   if (!batch) throw new Error('批次不存在');
+  if (!originalBatch || batch.id !== batchId || batch.rows.flat().some(id => !originalBatch.rows.flat().includes(id))) throw new Error('有效批次与原方案不一致');
   const normalized = await sharp(bytes, { limitInputPixels: 40000000 }).rotate().removeAlpha().png().toBuffer();
   const { data, info } = await sharp(normalized).raw().toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;

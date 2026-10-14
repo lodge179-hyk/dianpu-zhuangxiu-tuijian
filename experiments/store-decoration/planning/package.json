@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
-  "scripts": { "start": "node --env-file-if-exists=../../../.env.local server.cjs", "example": "node example.cjs" },
+  "scripts": { "start": "node --env-file-if-exists=../../../.env.local server.cjs", "example": "node example.cjs", "test": "node --test navigation-library.test.cjs" },
   "dependencies": { "@json-render/core": "0.21.0", "sharp": "0.35.4", "zod": "4.3.6" }
 }

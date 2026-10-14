@@ -6,6 +6,8 @@ const { compose } = require('./compose.cjs');
 const { cropBatch } = require('./crop.cjs');
 const { validatePlan } = require('./plan.cjs');
 const { createExample } = require('./example.cjs');
+const { navigationExamplePlan } = require('./navigation-example.cjs');
+const { assetFile, publicNavigationLibrary } = require('./navigation-library.cjs');
 const { plannerPrompt, planScreenshot, publicCatalog } = require('./planner.cjs');
 const port = Number(process.env.PLANNER_PORT || 5182);
 const root = path.resolve(process.env.PLANNER_OUTPUT_DIR || path.join(__dirname, 'output/runs'));
@@ -23,6 +25,7 @@ function makeRun(source) {
 function finish(run, compiled) {
   const auditPath = path.join(run.folder, 'planner-call.json');
   if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts;
+  run.state.filledAssets = [...new Set([...run.state.filledAssets, ...(compiled.libraryAssetIds || [])])];
   Object.assign(run.state, compiled, { status: 'ready', preview: `/runs/${run.id}/shop.html` });
   fs.writeFileSync(path.join(run.folder, 'plan.json'), JSON.stringify(compiled.plan, null, 2));
   save(run.folder, run.state); return run.state;
@@ -52,14 +55,29 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(fs.readFileSync(path.join(__dirname, 'index.html'))); }
     if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { plannerConfigured: !!(process.env.ARK_API_KEY && process.env.ARK_VISION_MODEL && process.env.ARK_RESPONSES_ENDPOINT), maxUploadMB: 30, maxGenerationBatches: 2 });
     if (req.method === 'GET' && pathname === '/api/catalog') return json(res, 200, publicCatalog());
+    if (req.method === 'GET' && pathname === '/api/navigation-library') return json(res, 200, publicNavigationLibrary());
+    const libraryFile = pathname.match(/^\/navigation-assets\/([a-z0-9-]+)\.png$/);
+    if (req.method === 'GET' && libraryFile) {
+      const file = assetFile(libraryFile[1]);
+      if (!file || !fs.existsSync(file)) return json(res, 404, { error: '导航素材不存在' });
+      res.writeHead(200, { 'Content-Type': 'image/png', 'X-Content-Type-Options': 'nosniff' });
+      return fs.createReadStream(file).pipe(res);
+    }
     if (req.method === 'GET' && pathname === '/api/planner-prompt') return json(res, 200, { prompt: plannerPrompt() });
+    if (req.method === 'POST' && pathname === '/api/navigation-example') {
+      const request = JSON.parse((await body(req, 4096)).toString('utf8'));
+      const plan = navigationExamplePlan(request.style);
+      const run = makeRun('navigation-example');
+      return json(res, 201, finish(run, compose(run.folder, plan)));
+    }
     if (req.method === 'POST' && pathname === '/api/example') {
       const run = makeRun('saved-example'), compiled = createExample(run.folder);
       run.state.filledAssets = compiled.plan.assets.map(a => a.id);
       return json(res, 201, finish(run, compiled));
     }
     if (req.method === 'POST' && pathname === '/api/import-plan') {
-      const { plan } = validatePlan(JSON.parse((await body(req, 512 * 1024)).toString('utf8')));
+      const input = JSON.parse((await body(req, 512 * 1024)).toString('utf8'));
+      const { plan } = validatePlan({ ...input, navigationLibrary: input.navigationLibrary || { style: 'auto' } });
       const run = makeRun('external-ai-plan');
       return json(res, 201, finish(run, compose(run.folder, plan)));
     }
@@ -70,7 +88,7 @@ const server = http.createServer(async (req, res) => {
       try { bytes = await body(req, 30 * 1024 * 1024); } catch (error) { planning = false; throw error; }
       const run = makeRun('screenshot');
       json(res, 202, run.state);
-      void planScreenshot(bytes, run.folder).then(({ plan }) => finish(run, compose(run.folder, plan))).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); const auditPath = path.join(run.folder, 'planner-call.json'); if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts; save(run.folder, run.state); }).finally(() => { planning = false; });
+      void planScreenshot(bytes, run.folder).then(({ plan }) => finish(run, compose(run.folder, { ...plan, navigationLibrary: plan.navigationLibrary || { style: 'auto' } }))).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); const auditPath = path.join(run.folder, 'planner-call.json'); if (fs.existsSync(auditPath)) run.state.planningRequestAttempts = JSON.parse(fs.readFileSync(auditPath, 'utf8')).requestAttempts; save(run.folder, run.state); }).finally(() => { planning = false; });
       return;
     }
     const runMatch = pathname.match(/^\/api\/runs\/([a-f0-9-]{36})$/);
@@ -82,8 +100,10 @@ const server = http.createServer(async (req, res) => {
       imageType(req); locks.add(id);
       try {
         const state = load(id); if (state.status !== 'ready') throw new Error('请先完成装修方案');
+        const compiledBatch = state.batches.find(batch => batch.id === batchId);
+        if (!compiledBatch) throw new Error('此批次无需生图或不存在，请使用当前方案显示的批次');
         const bytes = await body(req, 30 * 1024 * 1024), folder = folderFor(id);
-        const report = await cropBatch(bytes, state.plan, batchId, folder);
+        const report = await cropBatch(bytes, state.plan, batchId, folder, compiledBatch);
         state.filledAssets = [...new Set([...state.filledAssets, ...report.crops.map(c => c.assetId)])];
         state.importedBatches = [...new Set([...state.importedBatches, batchId])];
         state.cropReports = { ...(state.cropReports || {}), [batchId]: report };
