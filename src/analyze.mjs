@@ -36,27 +36,35 @@ export async function callTextModel(env, { system, user, images = [], maxTokens 
     reasoning: { effort: 'minimal' },
     input: system ? [{ role: 'system', content: [{ type: 'input_text', text: system }] }, { role: 'user', content }] : [{ role: 'user', content }],
   };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error('模型请求超时')), timeoutMs);
   let response;
   try {
     response = await fetch(env.responsesEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.apiKey}` },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: controller.signal,
     });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      throw new AppError(`模型返回 HTTP ${response.status}，已停止后续步骤以避免重复计费。`, { stage: 'model', hint: detail.slice(0, 300) });
+    }
+    const payload = await response.json();
+    const text = (payload.output || []).flatMap(i => i.content || []).filter(c => c.type === 'output_text').map(c => c.text).join('');
+    if (!json) return { text, usage: payload.usage };
+    const parsed = parseJsonLoose(text);
+    if (!parsed) throw new AppError('模型没有返回可解析的 JSON。', { stage: 'model', hint: text.slice(0, 300) });
+    return { value: parsed, text, usage: payload.usage };
   } catch (error) {
+    if (error?.name === 'AbortError' || /超时|aborted/i.test(error?.message || '')) {
+      throw new AppError('模型请求超时，已停止后续步骤以避免重复计费。', { stage: 'model', hint: error.message });
+    }
+    if (error instanceof AppError) throw error;
     throw new AppError('模型连接失败或超时。', { stage: 'model', hint: error.message });
+  } finally {
+    clearTimeout(timer);
   }
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new AppError(`模型返回 HTTP ${response.status}，已停止后续步骤以避免重复计费。`, { stage: 'model', hint: detail.slice(0, 300) });
-  }
-  const payload = await response.json();
-  const text = (payload.output || []).flatMap(i => i.content || []).filter(c => c.type === 'output_text').map(c => c.text).join('');
-  if (!json) return { text, usage: payload.usage };
-  const parsed = parseJsonLoose(text);
-  if (!parsed) throw new AppError('模型没有返回可解析的 JSON。', { stage: 'model', hint: text.slice(0, 300) });
-  return { value: parsed, text, usage: payload.usage };
 }
 
 export function parseJsonLoose(text) {

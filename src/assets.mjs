@@ -383,22 +383,27 @@ export async function generateSheet(env, prompt, sheetPath, layout, log = () => 
   }
   const size = `${layout.width}x${layout.height}`;
   log(`请求生图 ${size}`);
-  let response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error('生图请求超时')), 300_000);
+  let payload;
   try {
-    response = await fetch(env.imageEndpoint, {
+    const response = await fetch(env.imageEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.apiKey}` },
       body: JSON.stringify({ model: env.imageModel, prompt, size, response_format: 'b64_json', watermark: false, stream: false }),
-      signal: AbortSignal.timeout(300_000),
+      signal: controller.signal,
     });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      throw new AppError(`生图返回 HTTP ${response.status}，本次没有生成任何素材。`, { stage: 'generate', hint: detail.slice(0, 300) });
+    }
+    payload = await response.json();
   } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError('生图请求连接失败或超时。', { stage: 'generate', hint: error.message });
+  } finally {
+    clearTimeout(timer);
   }
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new AppError(`生图返回 HTTP ${response.status}，本次没有生成任何素材。`, { stage: 'generate', hint: detail.slice(0, 300) });
-  }
-  const payload = await response.json();
   const item = payload?.data?.[0];
   let bytes;
   if (item?.b64_json) bytes = Buffer.from(item.b64_json, 'base64');
