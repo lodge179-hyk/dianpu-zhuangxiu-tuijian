@@ -93,6 +93,28 @@ test('screenshot analysis makes one request, validates only a brief and does not
   await assert.rejects(planScreenshot(bytes, workspace(t), { structure: true }), /资料不完整/);
   assert.equal(calls, 3);
 });
+test('provider billing failures are actionable, redacted and never automatically retried', async t => {
+  const oldFetch = global.fetch, keys = ['ARK_RESPONSES_ENDPOINT', 'ARK_API_KEY', 'ARK_VISION_MODEL'];
+  const original = keys.map(k => process.env[k]);
+  t.after(() => { global.fetch = oldFetch; keys.forEach((k, i) => { if (original[i] === undefined) delete process.env[k]; else process.env[k] = original[i]; }); });
+  Object.assign(process.env, { ARK_RESPONSES_ENDPOINT: 'https://example.invalid', ARK_API_KEY: 'test-secret-value', ARK_VISION_MODEL: 'test-only' });
+  const bytes = await sharp({ create: { width: 100, height: 200, channels: 3, background: '#eee' } }).png().toBuffer();
+  const folder = workspace(t); let calls = 0;
+  global.fetch = async () => { calls++; return { ok: false, status: 403, json: async () => ({ error: { code: 'AccountOverdueError', message: 'Overdue account; test-secret-value\n' } }) }; };
+  await assert.rejects(planScreenshot(bytes, folder, { structure: true }), error => /账号欠费/.test(error.message) && /手动重新提交/.test(error.message) && !error.message.includes('test-secret-value'));
+  assert.equal(calls, 1);
+  const audit = JSON.parse(fs.readFileSync(path.join(folder, 'planner-call.json'), 'utf8'));
+  assert.equal(audit.httpStatus, 403); assert.equal(audit.errorCode, 'AccountOverdueError');
+  assert.equal(audit.automaticRetries, 0); assert.equal(audit.requestAttempts, 1);
+  assert.match(audit.errorMessage, /已隐藏/); assert.ok(!audit.errorMessage.includes('test-secret-value'));
+  global.fetch = async () => { calls++; return { ok: false, status: 502, json: async () => { throw Error('not JSON'); } }; };
+  await assert.rejects(planScreenshot(bytes, workspace(t), { structure: true }), /HTTP 502；没有自动重试/);
+  assert.equal(calls, 2);
+  global.fetch = async () => { calls++; return { ok: false, status: 403, json: async () => ({ error: { code: '<script>test-secret-value</script>', message: 'Untrusted provider instructions' } }) }; };
+  await assert.rejects(planScreenshot(bytes, workspace(t), { structure: true }), error => error.message === '规划服务返回HTTP 403；没有自动重试。');
+  assert.equal(calls, 3);
+});
+
 test('new batch layout crops back into its slots while retaining copied navigation', async t => {
   const folder = workspace(t), { plan } = recommendPlan(exampleBrief('apparel'));
   const compiled = compose(folder, plan), assets = new Map(plan.assets.map(a => [a.id, a]));

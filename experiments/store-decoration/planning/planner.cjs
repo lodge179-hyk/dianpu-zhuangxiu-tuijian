@@ -66,8 +66,20 @@ async function planScreenshot(bytes, folder, options = {}) {
   let response;
   try { response = await fetch(endpoint, { method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000), body: JSON.stringify({ model, store: false, max_output_tokens: 10000, input: [{ role: 'system', content: prompt }, { role: 'user', content }] }) }); }
   catch { audit.status = 'transport-unknown'; audit.durationMs = Date.now() - started; saveAudit(); throw new Error('规划请求未取得完整响应，是否计费未知；没有自动重试。'); }
-  audit.status = response.ok ? 'response-received' : 'http-error'; audit.durationMs = Date.now() - started; saveAudit();
-  if (!response.ok) throw new Error(`规划服务返回HTTP ${response.status}；没有自动重试。`);
+  audit.status = response.ok ? 'response-received' : 'http-error'; audit.httpStatus = response.status; audit.durationMs = Date.now() - started; saveAudit();
+  if (!response.ok) {
+    // Keep useful provider diagnostics locally without exposing credentials or
+    // trusting a provider message as user-facing instructions.
+    let failure;
+    try { failure = await response.json(); } catch {}
+    const clean = value => typeof value === 'string' ? value.replaceAll(key, '[已隐藏]').replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, 800) : '';
+    const code = clean(failure?.error?.code);
+    audit.errorCode = /^[A-Za-z0-9._-]{1,100}$/.test(code) ? code : null;
+    audit.errorMessage = clean(failure?.error?.message) || null;
+    audit.durationMs = Date.now() - started; saveAudit();
+    if (audit.errorCode === 'AccountOverdueError') throw new Error(`截图识别暂不可用：火山方舟返回账号欠费错误（HTTP ${response.status} / AccountOverdueError）。请在控制台核对余额和计费状态，处理后手动重新提交；没有自动重试。`);
+    throw new Error(`规划服务返回HTTP ${response.status}${audit.errorCode ? '（' + audit.errorCode + '）' : ''}；没有自动重试。`);
+  }
   const payload = await response.json();
   const text = payload.output?.flatMap(x => x.content || []).filter(x => x.type === 'output_text').map(x => x.text).join('') || payload.choices?.[0]?.message?.content || '';
   fs.writeFileSync(path.join(folder, 'planner-response.txt'), text);
