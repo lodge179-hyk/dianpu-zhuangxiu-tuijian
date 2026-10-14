@@ -32,6 +32,7 @@ test('one recommendation covers all known categories within module, image and ba
     assert.equal(recommendation.decisions.length, plan.modules.length);
     for (let i = 1; i <= n; i++) assert.ok(plan.modules.some(m => m.props.assetIds.includes('scene-' + i)));
     assert.equal(plan.modules.some(m => m.type.startsWith('navigation.')), n >= 4);
+    assert.equal(plan.modules.some(m => m.id === 'category-copy'), n < 4);
     assert.ok(!plan.modules.some(m => m.type === 'text.single'));
     assert.ok(recommendation.sources.length > 0);
   }

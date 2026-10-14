@@ -36,6 +36,10 @@ test('ZIP maps module order, repeated images and Chinese copy; offline preview i
   assert.notEqual(manifest.modules[1].images[0].file, manifest.modules[3].images[0].file);
   assert.match(strFromU8(files['模块对照表.csv']), /'=示例文案，保留中文/);
   const html = strFromU8(files['店铺预览/shop.html']);
+  for (let i = 0; i < state.plan.modules[1].props.labels.length; i++) {
+    assert.ok(html.includes(`data-component="${state.plan.modules[1].id}.label${i + 1}"`));
+    assert.ok(html.includes('>' + state.plan.modules[1].props.labels[i] + '</div>'));
+  }
   for (const [, source] of html.matchAll(/src="([^"]+)"/g)) {
     if (source.startsWith('data:')) continue;
     assert.ok(files['店铺预览/' + source], `Missing offline image: ${source}`);

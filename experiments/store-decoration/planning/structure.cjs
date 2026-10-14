@@ -87,7 +87,7 @@ function recommendPlan(input) {
     add('identity', 'signboard.minimal', '确认店铺身份', [], '使用极简招牌，把首屏空间留给经营内容。', '保留唯一店铺身份，不增加装饰背景。');
     const navigation = () => {
       if (brief.categories.length >= 4) add('categories', brief.categories.length === 4 ? 'navigation.four' : 'navigation.five', '识别经营品类', brief.categories.map((_, i) => `nav-${i + 1}`), '只使用已提供品类；导航图优先保持清楚易识别。', '品类少于四个时省略导航，不凑数。', '', brief.categories);
-      add('category-copy', 'text.link', '说明经营范围', [], `固定文字行列出经营品类${brief.categories.length === 4 ? '，补充四列圆图缺少文字的限制' : '，让用户直接看清经营范围'}。这里不是可点击链接。`, '若平台以后提供足够清楚的原生分类文字，可重新评估此行。', brief.categories.join(' · '));
+      else add('category-copy', 'text.link', '说明经营范围', [], '固定文字行列出经营品类，让用户直接看清经营范围。这里不是可点击链接。', '没有图文导航时保留经营范围说明。', brief.categories.join(' · '));
     };
     const hero = () => add('overview', density === 'compact' ? 'carousel.small' : 'carousel.medium', '建立主题整体印象', ['overview'], recipe.id === 'theme-first' ? '主题先出现，让用户先看到整体画面，再逐类浏览。' : '分类之后呈现整体组合，为已经辨识的品类补充联系。', '整体画面需要说明品类之间的联系，不能重复小图的单品陈列。');
     const tiles = brief.categories.map((_, i) => `scene-${i + 1}`);

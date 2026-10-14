@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=../../../.env.local server.cjs",
     "example": "node example.cjs",
-    "test": "node --test navigation-library.test.cjs download.test.cjs structure.test.cjs"
+    "test": "node --test navigation-library.test.cjs navigation-labels.test.cjs download.test.cjs structure.test.cjs"
   },
   "dependencies": {
     "@json-render/core": "0.21.0",
