@@ -11,6 +11,30 @@ function runs(values) {
   }
   return spans;
 }
+function boundarySeparators(isSeparatorColor, box, imageWidth, imageHeight) {
+  // The detected panel is inset by one pixel. Include its surrounding band,
+  // then follow only matching colors connected to that outer perimeter.
+  const left = Math.max(0, box.left - 2), top = Math.max(0, box.top - 2);
+  const right = Math.min(imageWidth, box.left + box.width + 2), bottom = Math.min(imageHeight, box.top + box.height + 2);
+  const width = right - left, height = bottom - top;
+  const mask = new Uint8Array(width * height), pending = [];
+  const visit = (x, y) => {
+    const index = y * width + x;
+    if (mask[index]) return;
+    mask[index] = 2;
+    if (isSeparatorColor(left + x, top + y)) { mask[index] = 1; pending.push(index); }
+  };
+  for (let x = 0; x < width; x++) { visit(x, 0); visit(x, height - 1); }
+  for (let y = 0; y < height; y++) { visit(0, y); visit(width - 1, y); }
+  while (pending.length) {
+    const index = pending.pop(), x = index % width, y = Math.floor(index / width);
+    for (let ny = Math.max(0, y - 1); ny <= Math.min(height - 1, y + 1); ny++) {
+      for (let nx = Math.max(0, x - 1); nx <= Math.min(width - 1, x + 1); nx++) visit(nx, ny);
+    }
+  }
+  // A similarly colored gemstone inside the panel is not separator residue.
+  return (x, y) => x >= left && x < right && y >= top && y < bottom && mask[(y - top) * width + x - left] === 1;
+}
 async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   const { plan } = validatePlan(input), originalBatch = plan.batches.find(b => b.id === batchId);
   const batch = compiledBatch || originalBatch;
@@ -19,8 +43,33 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   const normalized = await sharp(bytes, { limitInputPixels: 40000000 }).rotate().removeAlpha().png().toBuffer();
   const { data, info } = await sharp(normalized).raw().toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;
-  const magenta = (x, y) => { const i = (y * width + x) * channels; return data[i] > 170 && data[i + 2] > 170 && data[i + 1] < 130 && data[i] - data[i + 1] > 75 && data[i + 2] - data[i + 1] > 75; };
-  const rows = runs(Array.from({ length: height }, (_, y) => { let count = 0; for (let x = 0; x < width; x++) if (!magenta(x, y)) count++; return count / width > .12; }));
+  const standardMagenta = (x, y) => { const i = (y * width + x) * channels; return data[i] > 170 && data[i + 2] > 170 && data[i + 1] < 130 && data[i] - data[i + 1] > 75 && data[i + 2] - data[i + 1] > 75; };
+  let magenta = standardMagenta, calibratedSeparatorColor = null;
+  const detectRows = isSeparator => runs(Array.from({ length: height }, (_, y) => { let count = 0; for (let x = 0; x < width; x++) if (!isSeparator(x, y)) count++; return count / width > .12; }));
+  let rows = detectRows(magenta);
+  // Generated magenta can shift toward pink. Keep successful standard detection
+  // unchanged; only calibrate from a consistent outer frame when rows disagree.
+  if (rows.length !== batch.rows.length) {
+    const pixel = (x, y) => { const i = (y * width + x) * channels; return [data[i], data[i + 1], data[i + 2]]; };
+    const pink = ([r, g, b]) => r > 170 && b > 130 && g < 130 && r - g > 75 && b - g > 75;
+    const inset = Math.max(1, Math.min(4, Math.floor(Math.min(width, height) * .005)));
+    const edges = [[], [], [], []];
+    for (let x = inset; x < width - inset; x += 8) { edges[0].push(pixel(x, inset)); edges[1].push(pixel(x, height - 1 - inset)); }
+    for (let y = inset; y < height - inset; y += 8) { edges[2].push(pixel(inset, y)); edges[3].push(pixel(width - 1 - inset, y)); }
+    if (edges.every(edge => edge.length && edge.filter(pink).length / edge.length >= .9)) {
+      const samples = edges.flat().filter(pink);
+      const reference = [0, 1, 2].map(channel => samples.map(rgb => rgb[channel]).sort((a, b) => a - b)[Math.floor(samples.length / 2)]);
+      const nearFrame = rgb => pink(rgb) && rgb.every((value, channel) => Math.abs(value - reference[channel]) <= 40);
+      // Each edge must support the same measured color, not merely contain pink objects.
+      if (edges.every(edge => edge.filter(nearFrame).length / edge.length >= .9)) {
+        const calibrated = (x, y) => standardMagenta(x, y) || nearFrame(pixel(x, y));
+        const candidateRows = detectRows(calibrated);
+        if (candidateRows.length === batch.rows.length) {
+          magenta = calibrated; rows = candidateRows; calibratedSeparatorColor = reference;
+        }
+      }
+    }
+  }
   if (rows.length !== batch.rows.length) throw new Error(`识别到${rows.length}行，方案需要${batch.rows.length}行。请使用本批次完整总图，保留洋红色分隔带。`);
   const panels = [];
   rows.forEach(([y0, y1], rowIndex) => {
@@ -32,19 +81,20 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   const prepared = [];
   for (const panel of panels) {
     const asset = plan.assets.find(a => a.id === panel.id), ratio = aspectRatios[asset.aspect], box = panel.rect;
+    const separator = boundarySeparators(magenta, box, width, height);
     // Generated separators can end a pixel or two unevenly. Trim only contaminated
-    // outer edges within a small limit; interior separator pixels still fail below.
+    // outer edges within a small limit; connected separator residue still fails below.
     const clean = { ...box }, boundaryTrim = { left: 0, top: 0, right: 0, bottom: 0 };
     const edgeLimit = Math.max(2, Math.min(8, Math.ceil(Math.min(box.width, box.height) * .01)));
     for (let pass = 0; pass < edgeLimit; pass++) {
       const dirty = { left: false, top: false, right: false, bottom: false };
       for (let x = clean.left; x < clean.left + clean.width; x++) {
-        dirty.top ||= magenta(x, clean.top);
-        dirty.bottom ||= magenta(x, clean.top + clean.height - 1);
+        dirty.top ||= separator(x, clean.top);
+        dirty.bottom ||= separator(x, clean.top + clean.height - 1);
       }
       for (let y = clean.top; y < clean.top + clean.height; y++) {
-        dirty.left ||= magenta(clean.left, y);
-        dirty.right ||= magenta(clean.left + clean.width - 1, y);
+        dirty.left ||= separator(clean.left, y);
+        dirty.right ||= separator(clean.left + clean.width - 1, y);
       }
       if (!Object.values(dirty).some(Boolean)) break;
       if (dirty.left) { clean.left++; clean.width--; boundaryTrim.left++; }
@@ -65,7 +115,7 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
     if (removed > cropLimit && (!padded || paddingFraction > .55 || outputWidth * outputHeight > 40000000)) throw new Error(`${panel.id} 比例偏差过大，无法在保留画面的前提下适配；本批次暂不填入。`);
     const extracted = padded ? clean : rect;
     let separators = 0;
-    for (let y = extracted.top; y < extracted.top + extracted.height; y++) for (let x = extracted.left; x < extracted.left + extracted.width; x++) if (magenta(x, y)) separators++;
+    for (let y = extracted.top; y < extracted.top + extracted.height; y++) for (let x = extracted.left; x < extracted.left + extracted.width; x++) if (separator(x, y)) separators++;
     if (separators) throw new Error(`${panel.id} 内仍有分隔色，未写入素材。`);
     let pipeline = sharp(normalized).extract(extracted);
     if (padded) {
@@ -79,6 +129,7 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   for (const item of prepared) fs.writeFileSync(path.join(folder, 'assets', `${item.report.assetId}.png`), item.buffer);
   fs.writeFileSync(path.join(folder, `${batchId}-source.png`), normalized);
   const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop or bounded background padding; no resizing or stretching' };
+  if (calibratedSeparatorColor) report.calibratedSeparatorColor = calibratedSeparatorColor;
   fs.writeFileSync(path.join(folder, `${batchId}-crop-report.json`), JSON.stringify(report, null, 2));
   return report;
 }

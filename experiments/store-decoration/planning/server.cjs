@@ -12,6 +12,7 @@ const { materialsZip, shopPng, attachmentHeader } = require('./download.cjs');
 const { plannerPrompt, publicCatalog } = require('./planner.cjs');
 const { limits, recognitionPrompt, productWorkflow, generateRemaining, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
 const { publicSettings, redact, writeJson } = require('./qwen-provider.cjs');
+const { createVisualProfile, visualProfileFor } = require('./visual-profile.cjs');
 const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
 const { fillStructureExample } = require('./structure-example.cjs');
 let port = Number(process.env.PLANNER_PORT || 5182);
@@ -22,9 +23,13 @@ const json = (res, code, value) => { res.writeHead(code, { 'Content-Type': 'appl
 const folderFor = id => { if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('任务编号无效'); return path.join(root, id); };
 const save = (folder, state) => writeJson(folder, 'state.json', state);
 const load = id => JSON.parse(fs.readFileSync(path.join(folderFor(id), 'state.json'), 'utf8'));
-function makeRun(source) {
+function makeRun(source, visualProfile) {
   const id = randomUUID(), folder = folderFor(id); fs.mkdirSync(folder);
   const state = { id, source, status: 'planning', createdAt: new Date().toISOString(), filledAssets: [], importedBatches: [], imageGenerationCallsByThisTool: 0, planningRequestAttempts: 0 };
+  if (source === 'product-screenshots') {
+    state.generationMode = visualProfile ? visualProfile.id : 'general';
+    if (visualProfile) state.visualProfile = visualProfile;
+  }
   save(folder, state); return { id, folder, state };
 }
 function finish(run, compiled) {
@@ -112,13 +117,16 @@ const server = http.createServer(async (req, res) => {
       if (planning) return json(res, 409, { error: '已有一个截图正在规划，请等待完成，避免重复调用。' });
       if (!publicSettings().configured) return json(res, 503, { error: '请配置百炼 DASHSCOPE_API_KEY 以及火山 ARK_API_KEY 和原来的 Seedream 5 Pro。未发起调用。' });
       planning = true;
-      let images;
+      let images, visualProfile;
       try {
-        if (/^application\/json/.test(req.headers['content-type'] || '')) images = JSON.parse((await body(req, 42 * 1024 * 1024)).toString('utf8')).images;
+        if (/^application\/json/.test(req.headers['content-type'] || '')) {
+          const request = JSON.parse((await body(req, 42 * 1024 * 1024)).toString('utf8'));
+          images = request.images; visualProfile = createVisualProfile(request.generationMode);
+        }
         else { imageType(req); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
         if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
       } catch (error) { planning = false; throw error; }
-      let run; try { run = makeRun('product-screenshots'); } catch (error) { planning = false; throw error; } locks.add(run.id);
+      let run; try { run = makeRun('product-screenshots', visualProfile); } catch (error) { planning = false; throw error; } locks.add(run.id);
       json(res, 202, run.state);
       void productWorkflow(run, images, save).catch(error => { run.state.status = 'failed'; run.state.error = safeError(error); save(run.folder, run.state); }).finally(() => { planning = false; locks.delete(run.id); });
       return;
@@ -200,7 +208,7 @@ const server = http.createServer(async (req, res) => {
         state.cropReports = { ...(state.cropReports || {}), [batchId]: report };
         delete state.generationError;
         if (state.workflow) state.workflow = { ...state.workflow, stage: state.plan.assets.every(a => state.filledAssets.includes(a.id)) ? 'complete' : 'planned', label: '已手动填入素材' };
-        return json(res, 200, finish({ id, folder, state }, compose(folder, state.plan)));
+        return json(res, 200, finish({ id, folder, state }, compose(folder, state.plan, { visualProfile: visualProfileFor(state) })));
       } finally { locks.delete(id); }
     }
     const fileMatch = pathname.match(/^\/runs\/([a-f0-9-]{36})\/(shop\.html|input\.jpg|input-[1-6]\.jpg|plan\.json|recognition\.json|style-research\.json|search-sources\.json|generation-batches\.json|[a-z][a-z0-9_-]*-(?:prompt\.txt|source\.png|crop-report\.json)|assets\/[a-z][a-z0-9_-]*\.png)$/);

@@ -5,7 +5,7 @@ const { validatePlan, buildBatches } = require('./plan.cjs');
 const { resolveNavigation, assetFile } = require('./navigation-library.cjs');
 const black = path.join(__dirname, '../a10-black-module-review/black.png');
 
-function compose(folder, input) {
+function compose(folder, input, { visualProfile = null } = {}) {
   const validated = validatePlan(input), { plan } = validated;
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
   // A run retains its selected library version and copied files across uploads.
@@ -38,7 +38,7 @@ function compose(folder, input) {
   const layout = { width: result.width, height: result.height, moduleCount: result.moduleCount, components: result.components, photos: bindings };
   fs.writeFileSync(path.join(folder, 'layout.json'), JSON.stringify(layout, null, 2));
   const libraryAssetIds = navigationLibrary.matched.map(m => m.assetId);
-  const batches = buildBatches(plan, libraryAssetIds);
+  const batches = buildBatches(plan, libraryAssetIds, visualProfile);
   for (const batch of batches) fs.writeFileSync(path.join(folder, `${batch.id}-prompt.txt`), batch.prompt);
   fs.writeFileSync(path.join(folder, 'generation-batches.json'), JSON.stringify(batches, null, 2));
   return { ...validated, metrics: { ...validated.metrics, libraryAssets: libraryAssetIds.length, generatedAssets: plan.assets.length - libraryAssetIds.length, generationCalls: batches.length }, navigationLibrary, libraryAssetIds, layout: { width: result.width, height: result.height }, batches };

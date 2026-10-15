@@ -9,7 +9,10 @@ function parseModel(schema, value, label) {
   if (!result.success) throw Error(`${label}的必要内容不完整：${result.error.issues.slice(0, 3).map(i => i.path.join('.') || '整体结构').join('、')}。已保留结果，可从本阶段继续。`);
   return result.data;
 }
-const product = z.object({ description: z.string().min(1).max(180), imageIndex: z.number().int().min(1).max(6) });
+const product = z.object({
+  description: z.string().min(1).max(180).describe('商品可见外观；仅此字段填写描述文字'),
+  imageIndex: z.number().int().min(1).max(6).describe('必填：商品来源截图编号，取自输入 attachments 的 imageIndex，不是商品顺序'),
+}).describe('一件商品必须是包含 description 和 imageIndex 的 JSON 对象，不能是字符串');
 // A product belongs to its enclosing group; there is no second category name to disagree with it.
 const recognitionRequestSchema = z.object({ sufficient: z.boolean(), groups: z.array(z.object({ name: z.string().min(1).max(20), products: z.array(product).min(1).max(16) })).max(5), observations: z.array(z.string().max(180)).max(8), uncertainties: z.array(z.string().max(180)).max(8), missing: z.array(z.string().max(180)).max(5) });
 const recognitionSchema = z.object({ sufficient: z.boolean(), categories: z.array(z.string().min(1).max(20)).max(5), products: z.array(product.extend({ category: z.string().min(1).max(20) })).max(80), observations: z.array(z.string()).max(8), uncertainties: z.array(z.string()).max(8), missing: z.array(z.string()).max(5) });
@@ -18,7 +21,11 @@ function validateRecognition(value, count) {
   const categories = [], products = [], seen = new Set();
   const names = new Map();
   // Legacy flat responses use product labels as the evidence; only labels with actual products survive.
-  const source = Array.isArray(value.groups) ? value.groups.flatMap(g => list(g?.products).map(p => ({ ...p, category: g?.name }))) : list(value.products);
+  const source = Array.isArray(value.groups) ? value.groups.flatMap((g, groupIndex) => list(g?.products).map((p, productIndex) => {
+    // Reject malformed products before object spread can turn a string into indexed characters.
+    if (!p || typeof p !== 'object' || Array.isArray(p)) throw Error(`商品识别格式不完整：第 ${groupIndex + 1} 组第 ${productIndex + 1} 件商品必须包含描述和来源图片编号（description、imageIndex），不能只返回文字。已保存响应，未猜测对应图片；可沿用已有资料重新识别。`);
+    return { ...p, category: g?.name };
+  })) : list(value.products);
   for (const item of source) {
     if (!item || typeof item !== 'object') throw Error('商品识别缺少商品资料，已保留结果。');
     const rawName = clean(item.category, 20), identity = key(rawName);

@@ -73,7 +73,7 @@ function validatePlan(input) {
 function styleLock(style) {
   return `Shared art direction: color family ${style.palette.join(', ')}; setting family: ${style.background}; light: ${style.lighting}; photographic finish: ${style.photography}. Unify color grading and image quality. Treat the palette as available accents, not a requirement to put every color in every photo. Each panel's own background, camera and product selection take priority. Different categories may use different packaging, materials and scenes; do not turn the whole store into one imaginary product brand.`;
 }
-function buildBatches(plan, excludedAssetIds = []) {
+function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
   const lookup = new Map(plan.assets.map(a => [a.id, a]));
   const lock = styleLock(plan.style);
   const excluded = new Set(excludedAssetIds);
@@ -81,7 +81,7 @@ function buildBatches(plan, excludedAssetIds = []) {
   return pending.map((batch, index) => {
     const rowWeights = batch.rows.map(row => 1 / (row.length * aspectRatios[lookup.get(row[0]).aspect]));
     const total = rowWeights.reduce((a, b) => a + b, 0);
-    const prompt = plan.imageMode === 'category-inspired' ? productBatchPrompt(plan, batch, lookup, rowWeights, total, index) : [
+    const prompt = plan.imageMode === 'category-inspired' ? productBatchPrompt(plan, batch, lookup, rowWeights, total, index, visualProfile) : [
       'Create ONE asset sheet for an art-directed store campaign. Each panel is an independent finished visual in the medium specified by its brief, not a website or UI. Do not default every panel to a product packshot.',
       lock,
       plan.artDirection ? `Page concept: ${plan.artDirection.concept}. Narrative and visual hierarchy: ${plan.artDirection.narrative}. Shared anchors: ${plan.artDirection.anchors.join('; ')}. The page focal asset is ${plan.artDirection.focalAssetId}; give supporting visuals quieter or closer framing instead of making every panel compete as a hero. Follow each panel brief; do not repeat the same subject just to create unity.` : '',
@@ -96,7 +96,7 @@ function buildBatches(plan, excludedAssetIds = []) {
     return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, styleLock: lock, prompt };
   });
 }
-function productBatchPrompt(plan, batch, lookup, weights, total, index) {
+function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {
   return [
     '生成一张可裁剪的装修素材总图。每格是一张独立完整图片，不是网页截图。商品为已确认品类的相似或同类型示意商品，无须复刻上传的具体 SKU。不得加入品牌标识、价格、功效、认证、文字或界面元素。',
     `整套视觉方向：${plan.artDirection.concept}。主次：${plan.artDirection.narrative}。贯穿要素：${plan.artDirection.anchors.join('；')}。`,
@@ -106,6 +106,7 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index) {
     ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => { const a = lookup.get(id); return `第 ${j + 1} 格（仅供定位，不绘制编号），比例 ${a.aspect}：${a.prompt}`; }).join('\n')),
     '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。每格有自己的不透明背景，物体及阴影不跨格。画面内禁止出现该分隔色。',
     '主体保留适应比例修正的安全边距。导航图片主体集中在中央 65%，适应圆形裁剪。只生成图片内容，标题和导航文字由程序排版。',
+    visualProfile ? '本任务的珠宝摄影要求（仅约束画面，不改变分格、分隔带、素材数量及裁切规格；商品表现与以下要求不一致时遵循这些要求）：\n' + visualProfile.rules.join('\n') : '',
   ].filter(Boolean).join('\n\n');
 }
 module.exports = { planSchema, validatePlan, buildBatches, aspectRatios };
