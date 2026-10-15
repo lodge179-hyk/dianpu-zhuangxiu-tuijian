@@ -62,6 +62,20 @@ test('invalid evidence, omitted categories, repeated visuals and overspending st
   ];
   for (const [change, message] of cases) { const f = fixture(['上衣', '裤装', '外套', '针织']); change(f); assert.throws(() => validateContent(f.content, f.recognition), message); }
 });
+test('an atmosphere signboard does not exempt story visuals from product evidence', () => {
+  const f = fixture(['项链', '耳饰', '戒指']);
+  f.content.signboard = 'atmosphere';
+  f.content.sections[0].kind = 'story';
+  f.content.sections[0].visuals[0].evidenceIds = [];
+  const original = structuredClone(f.content);
+  assert.throws(() => compileContent(f.brief, f.content, f.recognition), /第1段的第1张正文画面未引用已识别商品/);
+  assert.deepEqual(f.content, original, 'invalid evidence is neither invented nor silently removed');
+  f.content.sections[0].visuals[0].evidenceIds = ['product-1'];
+  const result = compileContent(f.brief, f.content, f.recognition);
+  assert.equal(result.plan.assets.filter(a => a.direction.role === 'atmosphere').length, 1);
+  assert.equal(result.content.sections.length, f.content.sections.length);
+  assert.ok(result.tasks.some(t => t.id === 'section-1-1' && t.category === '项链'));
+});
 test('every hero format, optional signboard and navigation placement stay within the actual sheet geometry', () => {
   for (const heroFormat of ['wide', 'balanced', 'portrait']) for (const signboard of ['minimal', 'atmosphere']) for (const navigationPlacement of ['before-hero', 'after-hero']) {
     const f = fixture(['上衣', '裤装', '外套', '针织']);
