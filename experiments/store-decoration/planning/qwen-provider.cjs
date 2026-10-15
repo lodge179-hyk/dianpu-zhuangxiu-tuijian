@@ -9,7 +9,8 @@ function settings(env = process.env) {
 }
 function publicSettings() {
   const c = settings();
-  return { configured: !!c.key, visionModel: c.vision, searchModel: c.search, imageModel: c.image, provider: '阿里云百炼', oldProviderDisabled: true };
+  const image = require('./ark-image-provider.cjs').publicImageSettings();
+  return { configured: !!c.key && image.imageConfigured, plannerConfigured: !!c.key, visionModel: c.vision, searchModel: c.search, planningProvider: '阿里云百炼', ...image };
 }
 function redact(text) {
   let value = String(text);
@@ -44,8 +45,8 @@ function parseJson(text, folder, stage) {
 }
 async function call(folder, stage, model, payload, { textOnly = false, timeout = 240000, fetcher = fetch } = {}) {
   const config = settings();
-  if (!config.key) throw Error('尚未配置 DASHSCOPE_API_KEY，无法调用千问。旧火山模型已停用。');
-  if (!/^qwen[\w.\-]*$/.test(model)) throw Error('此流程仅允许已配置的千问模型，不会调用旧火山模型。');
+  if (!config.key) throw Error('尚未配置 DASHSCOPE_API_KEY，无法调用千问规划。');
+  if (!/^qwen[\w.\-]*$/.test(model)) throw Error('识别与文字规划仅允许已配置的千问模型。');
   const record = { stage, model, startedAt: new Date().toISOString(), requestAttempts: 1, automaticRetries: 0, status: 'started', usage: null };
   const auditFile = `${stage}-call.json`, started = Date.now();
   writeJson(folder, auditFile, record);
@@ -112,34 +113,16 @@ function batchSize(plan, batch) {
   const width = Math.floor(Math.sqrt(2048 * 2048 / ratio) / 16) * 16;
   return `${width}*${Math.floor(width * ratio / 16) * 16}`;
 }
-async function imageBytes(url, fetcher = fetch) {
+async function imageBytes(url, fetcher = fetch, provider = 'dashscope') {
   const data = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(url || '');
   if (data) { const bytes = Buffer.from(data[2], 'base64'); if (bytes.length > 30 * 1024 * 1024) throw Error('生成图片超过 30MB。'); return bytes; }
   let parsed; try { parsed = new URL(url); } catch { throw Error('生图返回的图片地址无效，未下载。'); }
-  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.port && parsed.port !== '443' || !/(^|\.)(aliyuncs\.com|alicdn\.com)$/.test(parsed.hostname)) throw Error('生成图片地址不是受支持的百炼资源地址，未下载。');
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.port && parsed.port !== '443' || !(provider === 'volcengine' ? /(^|\.)(volces\.com|byteimg\.com)$/ : /(^|\.)(aliyuncs\.com|alicdn\.com)$/).test(parsed.hostname)) throw Error('生成图片地址不是受支持的生图服务资源地址，未下载。');
   const response = await fetcher(url, { redirect: 'error', signal: AbortSignal.timeout(90000) });
   if (!response.ok) throw Error(`图片已生成，但下载返回 HTTP ${response.status}；可以继续下载，无须重新生图。`);
   const chunks = []; let length = 0;
   for await (const part of response.body) { length += part.length; if (length > 30 * 1024 * 1024) { await response.body.cancel?.().catch(() => {}); throw Error('生成图片超过 30MB。'); } chunks.push(part); }
   return Buffer.concat(chunks);
-}
-async function generateSheet(folder, plan, batch, attempt, { fetcher } = {}) {
-  const content = [{ text: batch.prompt }];
-  if (batch.referenceBatchId) {
-    const file = path.join(folder, `${batch.referenceBatchId}-source.png`);
-    if (!fs.existsSync(file)) throw Error('上一批总图尚未成功填入，暂不能生成本批。');
-    const reference = await sharp(file).resize({ width: 1800, height: 2400, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer();
-    content.unshift({ image: 'data:image/jpeg;base64,' + reference.toString('base64') });
-  }
-  const stage = `${batch.id}-attempt-${attempt}`, parameters = { n: 1, size: batchSize(plan, batch), prompt_extend: false, watermark: false };
-  fs.writeFileSync(path.join(folder, `${stage}-prompt.txt`), batch.prompt);
-  writeJson(folder, `${stage}-settings.json`, { model: settings().image, parameters, referenceBatchId: batch.referenceBatchId, productReferences: '商品为品类示意，不要求复刻输入 SKU' });
-  const payload = await call(folder, stage, settings().image, { input: { messages: [{ role: 'user', content }] }, parameters }, { timeout: 600000, fetcher });
-  const output = payload.output?.choices?.[0]?.message?.content;
-  const image = Array.isArray(output) ? output.find(c => c?.image)?.image : null;
-  if (!image) throw Error('生图接口没有返回图片，未重试。');
-  writeJson(folder, `${stage}-image.json`, { url: image, receivedAt: new Date().toISOString() });
-  return recoverSheet(folder, batch, attempt, { fetcher });
 }
 async function recoverSheet(folder, batch, attempt, { fetcher } = {}) {
   if (!Number.isInteger(attempt) || attempt < 1) return null;
@@ -147,7 +130,8 @@ async function recoverSheet(folder, batch, attempt, { fetcher } = {}) {
   if (fs.existsSync(file)) return fs.readFileSync(file);
   if (!fs.existsSync(manifest)) return null;
   try {
-    const bytes = await imageBytes(JSON.parse(fs.readFileSync(manifest, 'utf8')).url, fetcher);
+    const saved = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+    const bytes = await imageBytes(saved.url, fetcher, saved.provider);
     let normalized;
     try { normalized = await sharp(bytes, { limitInputPixels: 40000000 }).rotate().png().toBuffer(); }
     catch { throw Error('已取得生图地址，但下载内容不是可用图片或尺寸超限；地址已保留，可继续下载，无须立即重新生图。'); }
@@ -155,4 +139,4 @@ async function recoverSheet(folder, batch, attempt, { fetcher } = {}) {
     return normalized;
   } catch (error) { error.phase = 'download'; throw error; }
 }
-module.exports = { settings, publicSettings, redact, writeJson, parseJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, generateSheet, recoverSheet, imageBytes };
+module.exports = { settings, publicSettings, redact, writeJson, parseJson, askJson, searchWeb, searchSources, publicSourceUrl, batchSize, recoverSheet, imageBytes };

@@ -1,3 +1,4 @@
+require('./test-network-guard.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -14,8 +15,8 @@ function workspace(t) {
   const root = path.resolve(__dirname, 'output'); fs.mkdirSync(root, { recursive: true });
   const folder = fs.mkdtempSync(path.join(root, 'product-test-'));
   t.after(() => { if (!path.resolve(folder).startsWith(root + path.sep)) throw Error('Unsafe cleanup'); fs.rmSync(folder, { recursive: true, force: true }); });
-  const old = process.env.DASHSCOPE_API_KEY; process.env.DASHSCOPE_API_KEY = 'test-secret-no-real-requests';
-  t.after(() => { if (old === undefined) delete process.env.DASHSCOPE_API_KEY; else process.env.DASHSCOPE_API_KEY = old; });
+  const config = { DASHSCOPE_API_KEY: 'test-secret-no-real-requests', ARK_API_KEY: 'test-ark-no-real-requests', ARK_IMAGE_MODEL: 'doubao-seedream-5-0-pro-260628' };
+  for (const [key, value] of Object.entries(config)) { const old = process.env[key]; process.env[key] = value; t.after(() => { if (old === undefined) delete process.env[key]; else process.env[key] = old; }); }
   return { id: randomUUID(), folder, state: { status: 'planning', filledAssets: [], importedBatches: [], planningRequestAttempts: 0, imageGenerationCallsByThisTool: 0 } };
 }
 const save = (folder, state) => fs.writeFileSync(path.join(folder, 'state.json'), JSON.stringify(state));
@@ -37,16 +38,19 @@ function mockProvider(run, options = {}) {
   const research = { concept: '清透的数码日常', reason: '结合搜索主题提出画面设计，实际效果待验证', style: { palette: ['#124578', '#CCEEDD'], background: '明亮工作空间与抽象色面', lighting: '清晰自然光', photography: '按用途切换场景与局部视角' }, anchors: ['蓝绿关系'], selectedSources: [{ sourceId: options.fakeSource ? 'source-99' : 'source-1', application: '来源主题是数码展示，建议使用主体留白组织新画面，未观察原网页图片' }] };
   const fetcher = async (url, init) => {
     const body = JSON.parse(init.body); calls.push({ url, body });
-    assert.match(body.model, /^qwen/); assert.ok(!/ark|volces|doubao/i.test(url));
     const response = data => new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
-    if (body.model.startsWith('qwen-image')) {
+    if (body.model === 'doubao-seedream-5-0-pro-260628') {
       imageCalls++;
       if (options.failImage === imageCalls) return new Response(JSON.stringify({ code: 'ServiceUnavailable', message: 'test-secret-no-real-requests' }), { status: 503 });
-      const batch = run.state.batches.find(b => b.prompt === body.input.messages[0].content.find(c => c.text)?.text);
+      assert.ok(url.endsWith('/api/v3/images/generations'));
+      assert.equal(body.response_format, 'b64_json'); assert.equal(body.stream, false);
+      assert.equal(body.parameters, undefined); assert.equal(body.sequential_image_generation, undefined);
+      const batch = run.state.batches.find(b => b.prompt === body.prompt);
       assert.ok(batch, 'sent prompt must equal the reviewable batch prompt');
       const bytes = options.badSheet ? Buffer.from((await screenshot()).data.split(',')[1], 'base64') : await sheet(run.state.plan, batch);
-      return response({ request_id: 'mock-image', output: { choices: [{ message: { content: [{ image: 'data:image/png;base64,' + bytes.toString('base64') }] } }] } });
+      return response({ data: [{ b64_json: bytes.toString('base64') }], usage: { generated_images: 1 } });
     }
+    assert.match(body.model, /^qwen/);
     const textOnly = url.includes('/text-generation/'), input = JSON.parse(textOnly ? body.input.messages[1].content : body.input.messages[1].content[0].text);
     if (!textOnly) assert.deepEqual(body.parameters.response_format, { type: 'json_object' });
     else assert.equal(body.parameters.response_format, undefined);
@@ -59,7 +63,11 @@ function mockProvider(run, options = {}) {
       assert.deepEqual(input.sources, [{ id: 'source-1', ...source }]);
       assert.ok(!JSON.stringify(body).includes('fabricated.example.com'));
       value = research;
-    } else if (input.tasks) value = {
+    } else if (input.contentPlanning) value = {
+      narrative: '整体主题、品类内容与可见细节按顺序展开', reason: '每个品类独立展示，再补充不同的信息', signboard: 'minimal', heroFormat: 'balanced', heroSubject: '围绕已知商品形成一个有层次的整体组合', navigation: true, navigationPlacement: 'after-hero',
+      sections: [...categories.map((c, i) => ({ kind: 'category', purpose: c + '的展示', reason: '展示已知品类的外观与使用情境', hierarchy: 'equal', heading: i === 0 ? '不同款式的日常' : '', visuals: [{ evidenceIds: [input.evidence.find(p => p.category === c).id], subject: c + '的独立场景与轮廓' }] })), { kind: 'detail', purpose: '可见外观细节', reason: '补充场景图看不清楚的外观信息', hierarchy: 'equal', heading: '近看外观', visuals: [{ evidenceIds: [input.evidence[0].id], subject: categories[0] + '局部可见纹理与轮廓' }] }]
+    };
+    else if (input.tasks) value = {
       artDirection: { concept: research.concept, narrative: '主视觉到品类场景', anchors: research.anchors, focalAssetId: 'overview' },
       assets: input.tasks.map((a, i) => ({ id: a.id, aspect: a.aspect, subject: a.category + '示意商品', composition: '按图片用途组织画面，主体留出安全边距', prompt: `${a.category}同类型示意商品，画面用途为${a.role}，放置于蓝绿色协调空间中，保持自然光、主体留白以及清楚的外形，每张按用途组织视角，不绘制任何文字或商标。`, direction: { role: a.role, camera: i % 2 ? 'top-down' : 'eye-level', background: '蓝绿空间', accents: '银色局部', treatment: i % 2 ? 'still-life' : 'environment' } }))
     };
@@ -72,17 +80,17 @@ test('multiple product screenshots create one generic plan, exact prompts, crops
   const run = workspace(t), mock = mockProvider(run);
   const result = await productWorkflow(run, [await screenshot(), await screenshot(1800)], save, mock);
   assert.equal(result.workflow.stage, 'complete'); assert.equal(result.inputs.length, 2);
-  assert.equal(result.planningRequestAttempts, 4); assert.equal(result.imageGenerationCallsByThisTool, 1);
+  assert.equal(result.planningRequestAttempts, 5); assert.equal(result.imageGenerationCallsByThisTool, 1);
   assert.equal(result.plan.imageMode, 'category-inspired'); assert.equal(result.plan.navigationLibrary, undefined);
   assert.equal(result.libraryAssetIds.length, 0); assert.equal(result.filledAssets.length, result.plan.assets.length);
   assert.ok(!result.plan.modules.some(m => m.type.startsWith('navigation.'))); assert.equal(result.candidates, undefined);
   assert.ok(!/护肤|梳妆|美妆|beige/i.test(result.batches[0].prompt));
-  assert.equal(mock.calls.length, 5); assert.equal(mock.calls[0].body.input.messages[1].content.filter(c => c.image).length, 4);
+  assert.equal(mock.calls.length, 6); assert.equal(mock.calls[0].body.input.messages[1].content.filter(c => c.image).length, 4);
   assert.equal(result.research.selectedSources[0].url, 'https://www.example.com/products');
   const actual = fs.readFileSync(path.join(run.folder, result.batches[0].id + '-attempt-1-prompt.txt'), 'utf8');
   assert.equal(actual, result.batches[0].prompt);
   const imageRequest = mock.calls.at(-1).body;
-  assert.equal(imageRequest.parameters.prompt_extend, false); assert.equal(imageRequest.parameters.n, 1);
+  assert.equal(imageRequest.response_format, 'b64_json'); assert.equal(imageRequest.model, 'doubao-seedream-5-0-pro-260628'); assert.equal(imageRequest.parameters, undefined);
   const [w, h] = batchSize(result.plan, result.batches[0]).split('*').map(Number); assert.ok(w * h <= 2048 * 2048);
   const files = unzipSync(await materialsZip(run.folder, result));
   assert.ok(files['店铺预览/shop.html']); assert.ok(!Object.keys(files).some(f => /input-|response|research|secret/.test(f)));
@@ -111,15 +119,15 @@ test('second batch failure preserves the first batch; explicit continuation gene
   const run = workspace(t), mock = mockProvider(run, { categories: ['耳机', '键盘', '鼠标', '音箱', '相机'], failImage: 2 });
   await productWorkflow(run, [await screenshot()], save, mock);
   assert.equal(run.state.workflow.stage, 'generation-failed'); assert.equal(run.state.batches.length, 2);
-  assert.equal(mock.calls.length, 6); assert.equal(run.state.imageGenerationCallsByThisTool, 2);
+  assert.equal(mock.calls.length, 7); assert.equal(run.state.imageGenerationCallsByThisTool, 2);
   const first = run.state.batches[0], preserved = fs.readFileSync(path.join(run.folder, 'assets', first.rows[0][0] + '.png'));
   assert.deepEqual(run.state.filledAssets, first.rows.flat()); assert.ok(!run.state.generationError.includes('test-secret'));
   await generateRemaining(run, save, mock);
-  assert.equal(mock.calls.length, 7); assert.equal(run.state.workflow.stage, 'complete');
+  assert.equal(mock.calls.length, 8); assert.equal(run.state.workflow.stage, 'complete');
   assert.deepEqual(run.state.generationAttempts, { [first.id]: 1, [run.state.batches[1].id]: 2 });
   assert.deepEqual(fs.readFileSync(path.join(run.folder, 'assets', first.rows[0][0] + '.png')), preserved);
-  assert.ok(mock.calls.at(-1).body.input.messages[0].content.some(c => c.image));
-  await generateRemaining(run, save, mock); assert.equal(mock.calls.length, 7);
+  assert.ok(mock.calls.at(-1).body.image.startsWith('data:image/jpeg;base64,'));
+  await generateRemaining(run, save, mock); assert.equal(mock.calls.length, 8);
 });
 
 test('a malformed generated sheet is retained for review and never automatically regenerated', async t => {
@@ -127,7 +135,7 @@ test('a malformed generated sheet is retained for review and never automatically
   await productWorkflow(run, [await screenshot()], save, mock);
   assert.equal(run.state.workflow.stage, 'generation-failed'); assert.equal(run.state.filledAssets.length, 0);
   const id = run.state.batches[0].id; assert.equal(run.state.generatedSheets[id], 1);
-  assert.ok(fs.existsSync(path.join(run.folder, id + '-attempt-1-source.png'))); assert.equal(mock.calls.length, 5);
+  assert.ok(fs.existsSync(path.join(run.folder, id + '-attempt-1-source.png'))); assert.equal(mock.calls.length, 6);
 });
 
 test('source selection retains later results, deduplicates valid citations and rejects invented IDs or URLs', t => {
@@ -150,12 +158,12 @@ test('a legacy failed-link run resumes from cached evidence without repeating re
   const original = fs.readFileSync(inputFile), originalSources = fs.readFileSync(sourcesFile);
   assert.ok(cachedResearch(run));
   await resumeResearch(run, save, { ...mock, generate: false });
-  assert.equal(mock.calls.length, 2); assert.ok(mock.calls.every(c => !c.url.includes('/text-generation/')));
-  assert.equal(run.state.status, 'ready'); assert.equal(run.state.planningRequestAttempts, 4); assert.equal(run.state.previousErrors.length, 1);
+  assert.equal(mock.calls.length, 3); assert.ok(mock.calls.every(c => !c.url.includes('/text-generation/')));
+  assert.equal(run.state.status, 'ready'); assert.equal(run.state.planningRequestAttempts, 5); assert.equal(run.state.previousErrors.length, 1);
   assert.deepEqual(fs.readFileSync(inputFile), original); assert.deepEqual(fs.readFileSync(sourcesFile), originalSources);
   assert.equal(fs.readFileSync(path.join(run.folder, 'research-response.txt'), 'utf8'), oldResponse);
   assert.equal(cachedResearch(run), null);
-  await assert.rejects(resumeResearch(run, save, mock), /无法继续/); assert.equal(mock.calls.length, 2);
+  await assert.rejects(resumeResearch(run, save, mock), /无法继续/); assert.equal(mock.calls.length, 3);
 });
 
 test('native-provider errors and malformed JSON are recorded without retry or leaking credentials', async t => {
@@ -186,8 +194,8 @@ test('continuation reuses a complete saved style with broken quote escaping and 
   fs.writeFileSync(path.join(run.folder, 'style-attempt-1-response.txt'), raw);
   fs.writeFileSync(path.join(run.folder, 'style-attempt-1-call.json'), JSON.stringify({ status: 'completed', finishReason: 'stop' }));
   await resumeResearch(run, save, { ...mock, generate: false });
-  assert.equal(mock.calls.length, 1); assert.equal(run.state.reusedStyleAttempt, 1); assert.equal(run.state.styleSelectionAttempts, 1);
-  assert.equal(run.state.planningRequestAttempts, 4); assert.equal(run.state.research.reason, research.reason);
+  assert.equal(mock.calls.length, 2); assert.equal(run.state.reusedStyleAttempt, 1); assert.equal(run.state.styleSelectionAttempts, 1);
+  assert.equal(run.state.planningRequestAttempts, 5); assert.equal(run.state.research.reason, research.reason);
   assert.equal(fs.readFileSync(path.join(run.folder, 'style-attempt-1-response.txt'), 'utf8'), raw);
 });
 
@@ -232,12 +240,12 @@ test('minimal image design preserves fixed geometry, accepts optional metadata v
   assert.throws(() => applyDesign(plan, { assets: plan.assets.map(a => ({ ...a, prompt: undefined })) }), /画面提示词/);
 });
 
-for (const failingStage of ['recognition', 'research', 'style', 'design']) test(`explicit continuation after ${failingStage} failure reuses earlier stages without overwriting audits`, async t => {
+for (const failingStage of ['recognition', 'research', 'style', 'content', 'design']) test(`explicit continuation after ${failingStage} failure reuses earlier stages without overwriting audits`, async t => {
   const run = workspace(t), mock = mockProvider(run); let failed = false, requestCount = 0;
   const fetcher = async (url, init) => {
     requestCount++;
     const b = JSON.parse(init.body), input = JSON.parse(url.includes('/text-generation/') ? b.input.messages[1].content : b.input.messages[1].content[0].text);
-    const stage = url.includes('/text-generation/') ? 'research' : input.tasks ? 'design' : input.sources ? 'style' : 'recognition';
+    const stage = url.includes('/text-generation/') ? 'research' : input.tasks ? 'design' : input.contentPlanning ? 'content' : input.sources ? 'style' : 'recognition';
     if (!failed && stage === failingStage) { failed = true; return new Response('{"code":"ServiceUnavailable"}', { status: 503 }); }
     return mock.fetcher(url, init);
   };
@@ -245,11 +253,11 @@ for (const failingStage of ['recognition', 'research', 'style', 'design']) test(
   const initial = requestCount; Object.assign(run.state, { status: 'failed', error: '模拟中断' });
   assert.ok(cachedResearch(run));
   await resumeResearch(run, save, { fetcher, generate: false });
-  assert.equal(run.state.status, 'ready'); assert.equal(requestCount, 5); assert.equal(mock.calls.length, 4);
+  assert.equal(run.state.status, 'ready'); assert.equal(requestCount, 6); assert.equal(mock.calls.length, 5);
   const prefix = failingStage === 'style' ? 'style-attempt-1' : failingStage;
   assert.equal(JSON.parse(fs.readFileSync(path.join(run.folder, prefix + '-call.json'))).status, 'failed');
   assert.equal(JSON.parse(fs.readFileSync(path.join(run.folder, failingStage + '-attempt-2-call.json'))).status, 'completed');
-  assert.equal(initial, ['recognition', 'research', 'style', 'design'].indexOf(failingStage) + 1);
+  assert.equal(initial, ['recognition', 'research', 'style', 'content', 'design'].indexOf(failingStage) + 1);
 });
 
 test('completed raw recognition survives interruption before parsed state was saved', async t => {
@@ -257,8 +265,25 @@ test('completed raw recognition survives interruption before parsed state was sa
   await askJson(run.folder, 'recognition', 'test', {}, mock);
   Object.assign(run.state, { inputs: prepared.inputs, status: 'failed', workflow: { stage: 'recognizing' }, error: '模拟进程中断', planningRequestAttempts: 1 });
   await resumeResearch(run, save, { ...mock, generate: false });
-  assert.equal(mock.calls.length, 4); assert.equal(run.state.status, 'ready');
+  assert.equal(mock.calls.length, 5); assert.equal(run.state.status, 'ready');
   assert.ok(!fs.existsSync(path.join(run.folder, 'recognition-attempt-2-call.json')));
+});
+
+test('saved content and design resume without calls, but changed structure invalidates only the design cache', async t => {
+  const run = workspace(t), mock = mockProvider(run);
+  await productWorkflow(run, [await screenshot()], save, { ...mock, generate: false });
+  const original = structuredClone(run.state.plan);
+  delete run.state.plan; run.state.status = 'failed'; run.state.error = '模拟保存中断';
+  await resumeResearch(run, save, { ...mock, generate: false });
+  assert.equal(mock.calls.length, 5); assert.deepEqual(run.state.plan, original);
+  const file = path.join(run.folder, 'content-response.txt'), content = JSON.parse(fs.readFileSync(file, 'utf8'));
+  content.heroSubject = '改变整体构图，不改变已确认商品范围'; fs.writeFileSync(file, JSON.stringify(content));
+  delete run.state.plan; run.state.status = 'failed'; run.state.error = '模拟结构调整';
+  await resumeResearch(run, save, { ...mock, generate: false });
+  assert.equal(mock.calls.length, 6);
+  assert.ok(fs.existsSync(path.join(run.folder, 'design-attempt-2-call.json')));
+  assert.ok(!fs.existsSync(path.join(run.folder, 'content-attempt-2-call.json')));
+  assert.equal(run.state.imageGenerationCallsByThisTool, 0);
 });
 
 test('transient image download failure resumes the saved URL without regenerating', async t => {
@@ -266,9 +291,9 @@ test('transient image download failure resumes the saved URL without regeneratin
   const fetcher = async (url, init) => {
     if (!init?.body) { downloads++; return downloads === 1 ? new Response('', { status: 503 }) : new Response(imageBytesSaved); }
     const result = await mock.fetcher(url, init);
-    if (!JSON.parse(init.body).model.startsWith('qwen-image')) return result;
-    generations++; const body = await result.json(), part = body.output.choices[0].message.content[0];
-    imageBytesSaved = Buffer.from(part.image.split(',')[1], 'base64'); part.image = 'https://assets.aliyuncs.com/test.png';
+    if (!JSON.parse(init.body).model.startsWith('doubao-seedream')) return result;
+    generations++; const body = await result.json(), part = body.data[0];
+    imageBytesSaved = Buffer.from(part.b64_json, 'base64'); delete part.b64_json; part.url = 'https://assets.volces.com/test.png';
     return new Response(JSON.stringify(body));
   };
   await productWorkflow(run, [await screenshot()], save, { fetcher });
@@ -283,7 +308,7 @@ test('bad grid continuation uses saved sheet; only explicit regeneration request
   await productWorkflow(run, [await screenshot()], save, bad);
   const before = run.state.plan.assets.map(a => fs.readFileSync(path.join(run.folder, 'assets', a.id + '.png')));
   await generateRemaining(run, save, bad);
-  assert.equal(bad.calls.length, 5); assert.equal(run.state.generationFailure.kind, 'crop');
+  assert.equal(bad.calls.length, 6); assert.equal(run.state.generationFailure.kind, 'crop');
   run.state.plan.assets.forEach((a, i) => assert.deepEqual(fs.readFileSync(path.join(run.folder, 'assets', a.id + '.png')), before[i]));
   const good = mockProvider(run); await generateRemaining(run, save, { ...good, regenerate: true });
   assert.equal(good.calls.length, 1); assert.equal(run.state.workflow.stage, 'complete'); assert.equal(run.state.imageGenerationCallsByThisTool, 2);
@@ -321,7 +346,7 @@ test('proportion drift keeps the full image with bounded padding; wrong grids or
 });
 
 test('missing provider objects, missing images and corrupt downloads stop with useful errors and no replay', async t => {
-  const { generateSheet, recoverSheet } = require('./qwen-provider.cjs');
+  const { generateSheet, recoverSheet } = require('./ark-image-provider.cjs');
   const run = workspace(t), mock = mockProvider(run);
   await assert.rejects(askJson(run.folder, 'null', 'test', {}, { fetcher: async () => new Response('null') }), /有效的响应对象/);
   await productWorkflow(run, [await screenshot()], save, { ...mock, generate: false });
@@ -350,7 +375,7 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
   await new Promise(resolve => provider.listen(0, '127.0.0.1', resolve));
   let child, browser;
   const start = async () => {
-    child = spawn(process.execPath, ['server.cjs'], { cwd: __dirname, windowsHide: true, env: { ...process.env, PLANNER_PORT: '0', PLANNER_OUTPUT_DIR: runsRoot, PLANNER_DASHSCOPE_BASE_URL: 'http://127.0.0.1:' + provider.address().port }, stdio: ['ignore', 'pipe', 'pipe'] });
+    child = spawn(process.execPath, ['--require', './test-network-guard.cjs', 'server.cjs'], { cwd: __dirname, windowsHide: true, env: { ...process.env, PLANNER_PORT: '0', PLANNER_OUTPUT_DIR: runsRoot, ARK_IMAGE_ENDPOINT: 'http://127.0.0.1:' + provider.address().port + '/api/v3/images/generations', PLANNER_DASHSCOPE_BASE_URL: 'http://127.0.0.1:' + provider.address().port }, stdio: ['ignore', 'pipe', 'pipe'] });
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => reject(Error('server startup timeout')), 10000);
       child.once('error', e => { clearTimeout(timeout); reject(e); });
@@ -364,7 +389,7 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
     const post = (route, data = {}) => fetch(address + route, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     const read = async () => (await fetch(address + '/api/runs/' + latestId)).json();
     const waitReady = async () => { for (let i = 0; i < 200; i++) { const state = await read(); if (!['planning', 'generating'].includes(state.status)) return state; await new Promise(r => setTimeout(r, 50)); } throw Error('workflow timeout'); };
-    const config = await (await fetch(address + '/api/config')).json(); assert.equal(config.oldProviderDisabled, true); assert.ok(!JSON.stringify(config).includes(process.env.DASHSCOPE_API_KEY));
+    const config = await (await fetch(address + '/api/config')).json(); assert.equal(config.imageProvider, '火山引擎'); assert.equal(config.imageModel, 'doubao-seedream-5-0-pro-260628'); assert.equal(config.imageConfigured, true); assert.ok(!JSON.stringify(config).includes(process.env.DASHSCOPE_API_KEY));
     assert.equal((await post('/api/legacy-plan')).status, 410);
     assert.equal((await post('/api/plan', { images: [] })).status, 400);
     held = new Promise(resolve => { release = resolve; });
@@ -374,11 +399,11 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
     assert.equal((await post('/api/plan', { images: inputs })).status, 409);
     assert.equal((await post('/api/runs/' + latestId + '/download/materials.zip')).status, 409);
     release(); held = null;
-    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 6);
+    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 7);
     assert.equal(state.filledAssets.length, 10); assert.equal(state.libraryAssetIds.length, 0);
     assert.equal((await fetch(address + '/runs/' + latestId + '/input-2.jpg')).status, 200);
     assert.equal((await fetch(address + '/runs/' + latestId + '/research-call.json')).status, 404);
-    assert.equal((await post('/api/runs/' + latestId + '/generate')).status, 200); assert.equal(mock.calls.length, 6);
+    assert.equal((await post('/api/runs/' + latestId + '/generate')).status, 200); assert.equal(mock.calls.length, 7);
     const zip = await post('/api/runs/' + latestId + '/download/materials.zip'); assert.equal(zip.status, 200);
     assert.ok((await zip.json()).bytes > 1000);
 
@@ -395,7 +420,7 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
       assert.ok(stateReads >= 2); assert.equal(uiPosts, 0, 'polling reconnect must not submit another paid task');
       await page.unroute(address + '/api/runs/' + latestId);
       assert.match(await page.locator('#pipeline').innerText(), /耳机.*键盘.*鼠标.*音箱/);
-      await page.locator('#pipeline details').last().locator('summary').click();
+      await page.getByText('查看本次联网参考', { exact: true }).click();
       assert.equal(await page.locator('#pipeline a').getAttribute('href'), 'https://www.example.com/products');
       await page.locator('#batches .batch').first().locator('summary').click();
       assert.equal(await page.locator('#batches pre').first().innerText(), state.batches[0].prompt);
@@ -436,7 +461,7 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
     } else assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 202);
     assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 409);
     release(); held = null;
-    state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 3);
+    state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 4);
     assert.ok(mock.calls.every(c => !c.url.includes('/text-generation/')));
     assert.deepEqual(fs.readFileSync(path.join(runsRoot, latestId, 'recognition.json')), preservedRecognition);
     assert.equal((await post('/api/runs/' + latestId + '/resume-research')).status, 400);

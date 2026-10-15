@@ -63,7 +63,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return json(res, 403, { error: '来源不允许' });
     const url = new URL(req.url, `http://127.0.0.1:${port}`), pathname = decodeURIComponent(url.pathname);
     if (req.method === 'GET' && pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(fs.readFileSync(path.join(__dirname, 'index.html'))); }
-    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, plannerConfigured: publicSettings().configured, maxGenerationBatches: 2 });
+    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, maxGenerationBatches: 2 });
     if (req.method === 'GET' && pathname === '/api/catalog') return json(res, 200, publicCatalog());
     if (req.method === 'GET' && pathname === '/api/navigation-library') return json(res, 200, publicNavigationLibrary());
     const libraryFile = pathname.match(/^\/navigation-assets\/([a-z0-9-]+)\.png$/);
@@ -107,10 +107,10 @@ const server = http.createServer(async (req, res) => {
       const run = makeRun('external-ai-plan');
       return json(res, 201, finish(run, compose(run.folder, plan)));
     }
-    if (req.method === 'POST' && pathname === '/api/legacy-plan') return json(res, 410, { error: '旧火山模型入口已停用，请使用商品截图新流程。' });
+    if (req.method === 'POST' && pathname === '/api/legacy-plan') return json(res, 410, { error: '旧版截图规划入口已停用，请使用商品截图新流程。' });
     if (req.method === 'POST' && pathname === '/api/plan') {
       if (planning) return json(res, 409, { error: '已有一个截图正在规划，请等待完成，避免重复调用。' });
-      if (!publicSettings().configured) return json(res, 503, { error: '请配置本机百炼 DASHSCOPE_API_KEY。旧火山模型不会作为回退。' });
+      if (!publicSettings().configured) return json(res, 503, { error: '请配置百炼 DASHSCOPE_API_KEY 以及火山 ARK_API_KEY 和原来的 Seedream 5 Pro。未发起调用。' });
       planning = true;
       let images;
       try {
@@ -127,7 +127,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && resumeMatch) {
       const id = resumeMatch[1];
       if (planning || locks.has(id)) return json(res, 409, { error: '已有任务正在执行，请等待完成。' });
-      if (!publicSettings().configured) return json(res, 503, { error: '请先配置本机百炼密钥，未发起调用。' });
+      if (!publicSettings().configured) return json(res, 503, { error: '请检查百炼规划与火山生图配置，未发起调用。' });
       const run = { id, folder: folderFor(id), state: load(id) };
       if (!cachedResearch(run)) throw Error('本任务没有可复用的输入，无法继续。');
       planning = true; locks.add(id);
@@ -140,7 +140,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && generateMatch) {
       const id = generateMatch[1];
       if (planning || locks.has(id)) return json(res, 409, { error: '已有任务正在执行，请等待完成。' });
-      if (!publicSettings().configured) return json(res, 503, { error: '请先配置本机百炼密钥，未发起生图。' });
+      if (!publicSettings().imageConfigured) return json(res, 503, { error: publicSettings().imageConfigurationError + '，未发起生图。' });
       const state = load(id);
       if (state.status !== 'ready' || state.plan?.imageMode !== 'category-inspired') throw Error('只有新商品截图流程的已规划任务可以继续生图。');
       if (state.plan.assets.every(a => state.filledAssets.includes(a.id))) return json(res, 200, state);

@@ -2,10 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 const { z } = require('zod');
-const { recommendPlan } = require('./structure.cjs');
+const { contentPrompt, evidenceFor, compileContent } = require('./content-plan.cjs');
 const { compose } = require('./compose.cjs');
 const { cropBatch } = require('./crop.cjs');
-const { askJson, searchWeb, publicSourceUrl, writeJson, generateSheet, recoverSheet, redact } = require('./qwen-provider.cjs');
+const { askJson, searchWeb, publicSourceUrl, writeJson, redact } = require('./qwen-provider.cjs');
+const { generateSheet, recoverSheet } = require('./ark-image-provider.cjs');
 const { nextStage, cachedStage } = require('./stage-cache.cjs');
 
 const limits = { maxImages: 6, maxImageMB: 10, maxTotalMB: 30 };
@@ -155,17 +156,34 @@ async function selectStyleAndDesign(run, prepared, sources, save, { fetcher, gen
   }
   run.state.research = { ...research, basis: '基于商品及搜索来源标题提出的设计方案；未读取网页正文或外站图片', sources }; writeJson(run.folder, 'style-research.json', run.state.research);
   const brief = { version: 1, shop: { name: '商品装修参考', category: recognition.categories.join('、').slice(0, 100), observations: recognition.observations, uncertainties: [...recognition.uncertainties.slice(0, 8), '图片为同类型商品示意，不要求复刻上传 SKU'] }, categories: recognition.categories, theme: research.concept, style: research.style, navigationStyle: 'auto', featuredCategory: null };
-  const skeleton = recommendPlan(brief, { creative: true }); delete skeleton.plan.navigationLibrary;
+  setStage(run, 'planning-content', '正在规划整页内容、主次与模块安排', save);
+  let skeleton = reuseSavedStyle ? cachedStage(run.folder, 'content', value => compileContent(brief, value, recognition))?.value : null;
+  if (!skeleton) {
+    const stage = nextStage(run.folder, 'content'); run.state.planningRequestAttempts++; save(run.folder, run.state);
+    const outlined = await askJson(run.folder, stage.name, contentPrompt(), { contentPlanning: true, categories: recognition.categories, evidence: evidenceFor(recognition), research, assetBudget: 12, maxBatches: 2 }, { fetcher });
+    skeleton = compileContent(brief, outlined.value, recognition);
+  }
+  run.state.contentPlan = skeleton.content;
+  writeJson(run.folder, 'content-plan.json', skeleton.content);
+  writeJson(run.folder, 'structure-plan.json', skeleton.plan);
+  save(run.folder, run.state);
   setStage(run, 'designing', '正在为已选模块设计一套画面并编写生图提示词', save);
-  const tasks = skeleton.plan.assets.map(a => ({ id: a.id, aspect: a.aspect, role: a.direction.role, category: /^(nav|scene)-/.test(a.id) ? recognition.categories[Number(a.id.split('-')[1]) - 1] : a.id === 'detail' ? recognition.categories[0] : recognition.categories.join('、'), safeArea: a.direction.role === 'category' ? '主体中央65%，圆形裁剪' : '主体留边，适应比例修正' }));
-  let plan = reuseSavedStyle ? cachedStage(run.folder, 'design', value => applyDesign(skeleton.plan, value))?.value : null;
+  const tasks = skeleton.tasks;
+  // A design is reusable only for the exact structure it was requested for.
+  const { stages } = require('./stage-cache.cjs');
+  const previousDesign = stages(run.folder, 'design')[0];
+  let sameStructure = false;
+  if (reuseSavedStyle && previousDesign) {
+    try { sameStructure = JSON.parse(fs.readFileSync(path.join(run.folder, previousDesign.name + '-input.json'), 'utf8')).structureSignature === skeleton.signature; } catch {}
+  }
+  let plan = sameStructure ? cachedStage(run.folder, 'design', value => applyDesign(skeleton.plan, value))?.value : null;
   if (!plan) {
     const stage = nextStage(run.folder, 'design'); run.state.planningRequestAttempts++; save(run.folder, run.state);
-    const designed = await askJson(run.folder, stage.name, designPrompt(), { recognition, research, attachments: attached, tasks, pageOrder: skeleton.plan.modules.map(m => ({ purpose: m.purpose, assetIds: m.props.assetIds })) }, { images: prepared.visionImages.map(i => i.data), fetcher });
+    const designed = await askJson(run.folder, stage.name, designPrompt(), { recognition, research, attachments: attached, structureSignature: skeleton.signature, tasks, pageOrder: skeleton.plan.modules.map(m => ({ purpose: m.purpose, assetIds: m.props.assetIds })) }, { images: prepared.visionImages.map(i => i.data), fetcher });
     plan = applyDesign(skeleton.plan, designed.value);
   }
   run.state.plan = plan;
-  run.state.recommendation = { ...skeleton.recommendation, method: 'product-images-web-style', sources: research.selectedSources.map(s => ({ name: s.title, url: s.url })), reason: skeleton.recommendation.reason + ' 图片内容由 AI 结合商品截图和联网风格单独设计。' };
+  run.state.recommendation = { ...skeleton.recommendation, sources: research.selectedSources.map(s => ({ name: s.title, url: s.url })) };
   compile(run); run.state.status = 'ready'; setStage(run, 'planned', '画面方案已完成', save);
   if (generate) return generateRemaining(run, save, { fetcher });
   return run.state;
