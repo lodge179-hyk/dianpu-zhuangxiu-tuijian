@@ -38,12 +38,26 @@ test('content hierarchy and purpose select different fixed components, without r
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(r.plan.modules.find(m => m.type === 'showcase.two').props.titles.every(t => t.endsWith('示意')));
 });
-test('invalid evidence, omitted categories, repeated visuals, title padding and overspending stop before image design', () => {
+test('optional headings are capped without changing content, assets, batches or the original response', () => {
+  for (const count of [0, 1, 2, 3, 5]) {
+    const f = fixture(['上衣', '裤装', '外套', '针织']);
+    f.content.sections.forEach((s, i) => { s.heading = i < count ? '段落' + (i + 1) : ''; });
+    const original = structuredClone(f.content), expected = structuredClone(f.content);
+    expected.sections.forEach((s, i) => { if (i >= 2) s.heading = ''; });
+    const result = compileContent(f.brief, f.content, f.recognition);
+    const baseline = compileContent(f.brief, expected, f.recognition);
+    assert.deepEqual(result, baseline);
+    assert.deepEqual(f.content, original);
+    assert.deepEqual(result.content.sections.map(({ heading, ...section }) => section), original.sections.map(({ heading, ...section }) => section));
+    assert.equal(result.plan.modules.filter(m => m.type === 'text.single').length, Math.min(count, 2));
+  }
+});
+
+test('invalid evidence, omitted categories, repeated visuals and overspending stop before image design', () => {
   const cases = [
     [f => f.content.sections[0].visuals[0].evidenceIds = ['product-99'], /未知商品证据/],
     [f => f.content.sections.splice(1, 1), /遗漏/],
     [f => f.content.sections[1].visuals[0].subject = f.content.sections[0].visuals[0].subject, /重复/],
-    [f => f.content.sections.forEach(s => s.heading = '标题'), /两个段落标题/],
     [f => { for (const [i, s] of f.content.sections.entries()) s.visuals.push({ evidenceIds: ['product-1'], subject: '额外内容' + i }); }, /超过12张/],
   ];
   for (const [change, message] of cases) { const f = fixture(['上衣', '裤装', '外套', '针织']); change(f); assert.throws(() => validateContent(f.content, f.recognition), message); }

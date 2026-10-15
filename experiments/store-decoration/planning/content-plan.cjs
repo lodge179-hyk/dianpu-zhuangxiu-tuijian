@@ -38,7 +38,8 @@ function validateContent(value, recognition) {
   const usedCategories = new Set(), subjects = new Set();
   let count = 1 + (content.signboard === 'atmosphere' ? 1 : 0) + (content.navigation ? recognition.categories.length : 0), headings = 0;
   for (const section of content.sections) {
-    if (section.heading && ++headings > 2) throw Error('内容规划超过两个段落标题，不能用文字凑模块数。');
+    // Headings are optional presentation copy; excess headings must not discard valid content.
+    if (section.heading && ++headings > 2) section.heading = '';
     for (const visual of section.visuals) {
       count++;
       for (const id of visual.evidenceIds) {
