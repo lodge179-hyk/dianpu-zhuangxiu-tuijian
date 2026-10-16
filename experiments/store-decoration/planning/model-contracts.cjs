@@ -21,12 +21,17 @@ function validateRecognition(value, count) {
   const categories = [], products = [], seen = new Set();
   const names = new Map();
   // Legacy flat responses use product labels as the evidence; only labels with actual products survive.
-  const source = Array.isArray(value.groups) ? value.groups.flatMap((g, groupIndex) => list(g?.products).map((p, productIndex) => {
-    // Reject malformed products before object spread can turn a string into indexed characters.
-    if (!p || typeof p !== 'object' || Array.isArray(p)) throw Error(`商品识别格式不完整：第 ${groupIndex + 1} 组第 ${productIndex + 1} 件商品必须包含描述和来源图片编号（description、imageIndex），不能只返回文字。已保存响应，未猜测对应图片；可沿用已有资料重新识别。`);
-    return { ...p, category: g?.name };
-  })) : list(value.products);
-  for (const item of source) {
+  const source = Array.isArray(value.groups) ? value.groups.flatMap((g, groupIndex) => {
+    // Malformed groups must not silently disappear while valid products continue.
+    if (!g || typeof g !== 'object' || Array.isArray(g) || !Array.isArray(g.products)) throw Error(`商品识别格式不完整：第 ${groupIndex + 1} 组必须包含商品列表（products 数组），不能是文字或缺少列表。已保存响应，未跳过该组；可沿用已有资料重新识别。`);
+    return g.products.map((p, productIndex) => {
+      // Reject malformed products before object spread can turn a string into indexed characters.
+      if (!p || typeof p !== 'object' || Array.isArray(p)) throw Error(`商品识别格式不完整：第 ${groupIndex + 1} 组第 ${productIndex + 1} 件商品必须包含描述和来源图片编号（description、imageIndex），不能只返回文字。已保存响应，未猜测对应图片；可沿用已有资料重新识别。`);
+      if (typeof p.description !== 'string' || !p.description.trim()) throw Error(`商品识别格式不完整：第 ${groupIndex + 1} 组第 ${productIndex + 1} 件商品缺少有效描述（description），描述必须放在该商品对象内。已保存响应，可沿用已有资料重新识别。`);
+      return { ...p, category: g.name };
+    });
+  }) : list(value.products);
+  for (const [productIndex, item] of source.entries()) {
     if (!item || typeof item !== 'object') throw Error('商品识别缺少商品资料，已保留结果。');
     const rawName = clean(item.category, 20), identity = key(rawName);
     if (!identity) throw Error('商品识别缺少分类名称，已保留结果。');
@@ -34,7 +39,7 @@ function validateRecognition(value, count) {
     let imageIndex = item.imageIndex;
     if (typeof imageIndex === 'string' && /^\s*\d+\s*$/.test(imageIndex)) imageIndex = Number(imageIndex);
     if (imageIndex === undefined && count === 1) imageIndex = 1;
-    if (!Number.isInteger(imageIndex) || imageIndex < 1 || imageIndex > count) throw Error(`商品证据图片编号应为 1 至 ${count}，收到 ${String(imageIndex).slice(0, 20)}；未猜测对应图片。`);
+    if (!Number.isInteger(imageIndex) || imageIndex < 1 || imageIndex > count) throw Error(`商品证据图片编号应为 1 至 ${count}，第 ${productIndex + 1} 件商品收到 ${String(imageIndex).slice(0, 20)}；未猜测对应图片。已保存响应，可沿用已有资料重新识别。`);
     const entry = { category: names.get(identity), description: clean(item.description, 180), imageIndex };
     const signature = identity + '|' + key(entry.description);
     if (!seen.has(signature)) { products.push(entry); seen.add(signature); }
@@ -65,13 +70,21 @@ function validateResearch(value, sources) {
 }
 const designSchema = z.object({ artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3) }), assets: z.array(z.object({ id: z.string(), prompt: z.string().min(20).max(1600), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']) })).min(1).max(12) });
 function applyDesign(skeleton, value) {
-  const items = list(value?.assets), byId = new Map();
+  // A schema is valid JSON, but is not a set of completed image briefs.
+  if (!Array.isArray(value?.assets)) {
+    if (value && typeof value === 'object' && ('$schema' in value || value.properties?.assets || value.properties?.artDirection)) {
+      throw Error('画面设计模型返回了格式说明（JSON Schema），没有实际图片设计。原始响应已保存，可从画面设计继续；尚未生图，无须重新上传商品图片。');
+    }
+    throw Error('画面设计响应缺少有效的图片设计列表（assets 数组）。原始响应已保存，可从画面设计继续；尚未生图，无须重新上传商品图片。');
+  }
+  const items = value.assets, byId = new Map();
   for (const a of items) {
     const id = typeof a?.id === 'string' ? a.id.trim().toLowerCase() : '';
     if (!skeleton.assets.some(t => t.id === id) || byId.has(id)) throw Error('画面设计包含未知或重复素材编号，已保留响应。');
     byId.set(id, a);
   }
-  if (byId.size !== skeleton.assets.length) throw Error('画面设计缺少素材，已保留完成内容，可从画面设计继续。');
+  const missing = skeleton.assets.filter(task => !byId.has(task.id)).map(task => task.id);
+  if (missing.length) throw Error(`画面设计缺少素材描述：应有 ${skeleton.assets.length} 张，收到 ${byId.size} 张，缺少 ${missing.join('、')}。已保留响应，可从画面设计继续；尚未生图，无须重新上传商品图片。`);
   const art = value.artDirection || {};
   const assets = skeleton.assets.map(task => {
     const a = byId.get(task.id), d = a.direction || {};

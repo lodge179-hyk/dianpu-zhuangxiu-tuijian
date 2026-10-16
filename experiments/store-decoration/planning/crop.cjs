@@ -44,13 +44,14 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   const { data, info } = await sharp(normalized).raw().toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;
   const standardMagenta = (x, y) => { const i = (y * width + x) * channels; return data[i] > 170 && data[i + 2] > 170 && data[i + 1] < 130 && data[i] - data[i + 1] > 75 && data[i + 2] - data[i + 1] > 75; };
-  let magenta = standardMagenta, calibratedSeparatorColor = null;
+  let magenta = standardMagenta, calibratedSeparatorColor = null, separatorCalibrationSource = null;
+  const pixel = (x, y) => { const i = (y * width + x) * channels; return [data[i], data[i + 1], data[i + 2]]; };
   const detectRows = isSeparator => runs(Array.from({ length: height }, (_, y) => { let count = 0; for (let x = 0; x < width; x++) if (!isSeparator(x, y)) count++; return count / width > .12; }));
+  const detectColumns = ([y0, y1], isSeparator) => runs(Array.from({ length: width }, (_, x) => { let count = 0; for (let y = y0; y < y1; y++) if (!isSeparator(x, y)) count++; return count / (y1 - y0) > .97; }));
   let rows = detectRows(magenta);
   // Generated magenta can shift toward pink. Keep successful standard detection
   // unchanged; only calibrate from a consistent outer frame when rows disagree.
   if (rows.length !== batch.rows.length) {
-    const pixel = (x, y) => { const i = (y * width + x) * channels; return [data[i], data[i + 1], data[i + 2]]; };
     const pink = ([r, g, b]) => r > 170 && b > 130 && g < 130 && r - g > 75 && b - g > 75;
     const inset = Math.max(1, Math.min(4, Math.floor(Math.min(width, height) * .005)));
     const edges = [[], [], [], []];
@@ -70,10 +71,32 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
       }
     }
   }
+  // Some sheets omit the outer frame and use rose-pink internal dividers.
+  // Calibrate only from narrow, full-width bands matching every planned row gap.
+  // Use perimeter-connected pixels so similarly colored gems remain content.
+  if (rows.length !== batch.rows.length && batch.rows.length > 1) {
+    const rose = ([r, g, b]) => r > 150 && b > 75 && g < 100 && r - g > 90 && b - g > 50;
+    const sampleXs = Array.from({ length: Math.ceil(width / 8) }, (_, i) => i * 8);
+    const bands = runs(Array.from({ length: height }, (_, y) => sampleXs.filter(x => rose(pixel(x, y))).length / sampleXs.length >= .9));
+    const maxBandHeight = Math.max(6, Math.ceil(width * .06));
+    if (bands.length === batch.rows.length - 1 && bands.every(([y0, y1]) => y0 > 0 && y1 < height && y1 - y0 <= maxBandHeight)) {
+      const bandSamples = bands.map(([y0, y1]) => sampleXs.map(x => pixel(x, Math.floor((y0 + y1) / 2))));
+      const samples = bandSamples.flat().filter(rose);
+      const reference = [0, 1, 2].map(channel => samples.map(rgb => rgb[channel]).sort((a, b) => a - b)[Math.floor(samples.length / 2)]);
+      const nearBand = rgb => rose(rgb) && rgb.every((value, channel) => Math.abs(value - reference[channel]) <= 60);
+      if (bandSamples.every(sample => sample.filter(nearBand).length / sample.length >= .9)) {
+        const calibrated = boundarySeparators((x, y) => standardMagenta(x, y) || nearBand(pixel(x, y)), { left: 0, top: 0, width, height }, width, height);
+        const candidateRows = detectRows(calibrated);
+        if (candidateRows.length === batch.rows.length && candidateRows.every((row, i) => detectColumns(row, calibrated).length === batch.rows[i].length)) {
+          magenta = calibrated; rows = candidateRows; calibratedSeparatorColor = reference; separatorCalibrationSource = 'internal-bands';
+        }
+      }
+    }
+  }
   if (rows.length !== batch.rows.length) throw new Error(`识别到${rows.length}行，方案需要${batch.rows.length}行。请使用本批次完整总图，保留洋红色分隔带。`);
   const panels = [];
   rows.forEach(([y0, y1], rowIndex) => {
-    const cols = runs(Array.from({ length: width }, (_, x) => { let count = 0; for (let y = y0; y < y1; y++) if (!magenta(x, y)) count++; return count / (y1 - y0) > .97; }));
+    const cols = detectColumns([y0, y1], magenta);
     if (cols.length !== batch.rows[rowIndex].length) throw new Error(`第${rowIndex + 1}行识别到${cols.length}张，需要${batch.rows[rowIndex].length}张；未猜测裁剪位置。`);
     cols.forEach(([x0, x1], columnIndex) => panels.push({ id: batch.rows[rowIndex][columnIndex], rect: { left: x0 + 1, top: y0 + 1, width: x1 - x0 - 2, height: y1 - y0 - 2 } }));
   });
@@ -130,6 +153,7 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
   fs.writeFileSync(path.join(folder, `${batchId}-source.png`), normalized);
   const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop or bounded background padding; no resizing or stretching' };
   if (calibratedSeparatorColor) report.calibratedSeparatorColor = calibratedSeparatorColor;
+  if (separatorCalibrationSource) report.separatorCalibrationSource = separatorCalibrationSource;
   fs.writeFileSync(path.join(folder, `${batchId}-crop-report.json`), JSON.stringify(report, null, 2));
   return report;
 }
