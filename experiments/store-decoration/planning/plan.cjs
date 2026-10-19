@@ -1,6 +1,9 @@
 const { z } = require('zod');
 const { catalog, entries } = require('./catalog.cjs');
+const { usesProductVisualMethod } = require('./visual-profile.cjs');
+const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
+const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
 const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
 const planSchema = z.object({
   version: z.literal(1),
@@ -11,7 +14,7 @@ const planSchema = z.object({
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -93,16 +96,34 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',
     ].filter(Boolean).join('\n\n');
-    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, styleLock: lock, prompt };
+    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, ...(usesGenerationReferences(visualProfile) ? { visualReferences: batchVisualReferences(plan, batch, visualProfile) } : {}), ...(usesReferenceBackground(visualProfile) ? { backgroundGuidance: visualProfile.visualSkill.backgroundGuidance } : {}), styleLock: lock, prompt };
   });
 }
 function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {
   // Versioned profiles keep saved tasks on their original generation instructions.
-  if (visualProfile?.id === 'jewelry' && visualProfile.version >= 9) {
+  const focusedDigital = visualProfile?.id === 'digital' && visualProfile.version >= 2;
+  const sharedMethod = usesProductVisualMethod(visualProfile);
+  const general = sharedMethod && visualProfile.id === 'general';
+  const referenceBackground = usesReferenceBackground(visualProfile);
+  const plannedReference = visualProfile?.visualSkill?.backgroundGuidance === 'planned-reference-v1';
+  if (sharedMethod || (visualProfile?.id === 'jewelry' && visualProfile.version >= 9) || focusedDigital) {
     return [
-      '生成一张可裁剪的静物摄影素材总图。每格是一张按自身描述独立构图的完整照片，不是同一个场景的连续切片，也不是网页截图。',
-      `全套共享视觉语言：${plan.artDirection.anchors.join('；')}。协调色板：${plan.style.palette.join('、')}，不必每格用尽，不据此改变商品本色。各格的场景、承托、背景材质、光位和构图分别按该格描述实现。`,
-      index ? '所附上一批总图仅参考色彩关系、白平衡、反差与表面质感；本批商品、布景、机位和构图以各格描述为准，不照搬参考图的背景或格子排布。' : '',
+      general
+        ? '生成一张可裁剪的装修素材总图。每格按自身描述独立构图、完整表达指定商品，不是同一个场景的连续切片，也不是网页截图。'
+        : '生成一张可裁剪的静物摄影素材总图。每格是一张按自身描述独立构图的完整照片，不是同一个场景的连续切片，也不是网页截图。',
+      // New profiles resolve shared art direction into each asset during design, without reimposing global backgrounds here.
+      plannedReference
+        ? '各格执行该格已定的商品、场景、构图和明暗安排，指定案例只辅助实现本格借鉴说明中的视觉关系。不要把一张案例的完整台面、明暗比例或布景复制到所有格子；整套以色彩呼应和表面质感协调，丰富场景与清楚浏览保持各自的视觉强度。'
+        : referenceBackground
+        ? '各格执行自身商品与构图描述，并保留指定案例及借鉴说明中的背景明暗面积、过渡、表面与阴影/倒影关系。全套以商品表面表现、色彩呼应和摄影品质协调，不要求每格同一底色、明暗比例、台面或光位。商品本色不随背景换色。'
+        : `全套共享视觉语言：${plan.artDirection.anchors.join('；')}。协调色板：${plan.style.palette.join('、')}，不必每格用尽，不据此改变商品本色。各格的场景、承托、背景材质、光位和构图分别按该格描述实现。`,
+      index ? (plannedReference
+        ? '上一批总图只辅助保持商品表面表现及色彩联系，不改变本批各格已定的场景、构图、主体尺度或明暗节奏。'
+        : referenceBackground
+        ? '上一批总图只辅助保持商品本色与表面表现；本批背景明暗面积、过渡、纹理及光影关系以各格指定案例和借鉴说明为准，不被上一批背景、色温或反差覆盖。'
+        : '所附上一批总图仅参考色彩关系、白平衡、反差与表面质感；本批商品、布景、机位和构图以各格描述为准，不照搬参考图的背景或格子排布。') : '',
+      focusedDigital ? '保留各格描述的商品主要轮廓、比例、颜色和可见部件位置，同款外观保持一致；不添加未描述的部件、内部结构或性能效果。屏幕只用抽象色彩或反射，不画系统界面或参数。' : '',
+      sharedMethod ? visualProfile.imageRules || '' : '',
       `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
       ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {
         const a = lookup.get(id);
@@ -111,7 +132,9 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index, visualPr
         return `第 ${j + 1} 格（仅供定位，不绘制编号），比例 ${a.aspect}：${a.prompt}${safeArea ? '\n' + safeArea : ''}`;
       }).join('\n')),
       '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。每格有自己的不透明背景，物体及阴影不跨格。画面内禁止出现该分隔色。',
-      '按各格比例完成构图，主体保留适应比例修正的安全边距。商品是既定经营方向内的示意设计，无须复刻原SKU。不绘制人物、文字、编号、标识、水印或界面元素。',
+      general
+        ? '按各格比例完成构图，主体保留适应比例修正的安全边距。商品是既定经营方向内的示意设计，无须复刻原SKU。不绘制文字、编号、标识、水印或界面元素。'
+        : '按各格比例完成构图，主体保留适应比例修正的安全边距。商品是既定经营方向内的示意设计，无须复刻原SKU。不绘制人物、文字、编号、标识、水印或界面元素。',
     ].filter(Boolean).join('\n\n');
   }
   const jewelryPlanning = visualProfile?.id === 'jewelry' && visualProfile.version >= 2;

@@ -95,7 +95,7 @@ async function api(url,options={}){const response=await fetch(url,options);const
 function reveal(id){const node=$(id);node.replaceChildren();node.classList.remove('hidden');return node;}
 function showWorkflow(state){
  const area=$('pipeline'),info=$('workflow-details');area.replaceChildren();info.replaceChildren();if(!state.workflow)return;
- if(state.visualProfile){const detail=el('details');detail.id='visual-profile-details';detail.append(el('summary','本任务采用的'+(state.visualProfile.id==='footwear'?'鞋履':state.visualProfile.id==='digital'?'数码':'珠宝')+'规则'),el('p',state.visualProfile.basis,'muted'));for(const rule of state.visualProfile.rules)detail.append(el('p',rule));detail.append(el('small','规则版本 '+state.visualProfile.version,'muted'));info.append(detail);}
+ if(state.visualProfile){const detail=el('details');detail.id='visual-profile-details';detail.append(el('summary','本任务采用的'+(state.visualProfile.id==='general'?'通用':state.visualProfile.id==='footwear'?'鞋履':state.visualProfile.id==='digital'?'数码':'珠宝')+'规则'),el('p',state.visualProfile.basis,'muted'));for(const rule of state.visualProfile.rules)detail.append(el('p',rule));detail.append(el('small','规则版本 '+state.visualProfile.version,'muted'));info.append(detail);}
  const labels=[['recognizing','识别商品'],['researching','联网检索'],['selecting-style','选择风格'],['planning-content','规划内容'],['designing','设计画面'],['generating','生成图片'],['cropping','裁剪组装'],['complete','等待验收']];
  const index=state.workflow.stage==='generation-failed'&&state.generationFailure?(state.generationFailure.kind==='crop'?6:5):labels.findIndex(([id])=>id===state.workflow.stage),groups=el('div',undefined,'workflow-groups');for(const [start,end,label] of [[0,2,'理解商品'],[3,5,'方案与素材'],[6,7,'组装与检查']]){const done=index>end,active=index>=start&&index<=end;groups.append(el('span',(done?'✓ ':active?'● ':'○ ')+label,'workflow-group '+(active?'active':done?'done':'')));}area.append(groups);
  const stopped=state.status==='failed'||state.workflow.stage==='generation-failed',stageLabel=state.workflow.stage==='generation-failed'&&state.generationFailure?.kind==='download'?'素材下载':labels[index]?.[1];
@@ -104,7 +104,13 @@ function showWorkflow(state){
  const facts=el('div',undefined,'workflow-facts');area.append(facts);
  if(state.recognition){facts.append(el('p','识别品类：'+(state.recognition.categories.join('、')||'尚不清楚')));const details=el('details');details.append(el('summary','查看商品理解'));for(const p of state.recognition.products)details.append(el('p',p.category+'：'+p.description));for(const text of state.recognition.uncertainties)details.append(el('p',text,'muted'));info.append(details);}
  if(state.research){facts.append(el('strong','选定风格：'+state.research.concept));const details=el('details');details.append(el('summary','风格依据与联网参考'),el('p',state.research.reason));for(const source of state.research.selectedSources){const a=el('a',source.title);a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';details.append(a,el('p',source.application));}details.append(el('small',state.research.basis,'muted'));info.append(details);}
- if(state.contentPlan){const details=el('details');details.append(el('summary','查看整页内容规划'),el('p',state.contentPlan.narrative));for(const section of state.contentPlan.sections)details.append(el('strong',section.purpose),el('p',section.reason),el('p',section.visuals.map(v=>v.subject).join('；'),'muted'));info.append(details);}
+ if(state.contentPlan){
+  const content=state.contentPlan,details=el('details');details.append(el('summary','查看整页内容规划'),el('p',content.narrative));
+  const showVisual=(subject,visual)=>{details.append(el('p',subject,'muted'));if(visual){details.append(el('p',visual.picture),el('p','画面变化：'+visual.difference,'muted'),el('p','参考借鉴：'+visual.visualReference.borrow,'muted'));}};
+  if(content.pageDirection){details.append(el('strong','整页视觉安排'),el('p',content.pageDirection.adaptation),el('p',content.pageDirection.rhythm),el('strong','首屏主视觉'));showVisual(content.heroSubject,content.heroVisualPlan);}
+  for(const section of content.sections){details.append(el('strong',section.purpose),el('p',section.reason));if(content.pageDirection)for(const visual of section.visuals)showVisual(visual.subject,visual.visualPlan);else details.append(el('p',section.visuals.map(v=>v.subject).join('；'),'muted'));}
+  info.append(details);
+ }
 }
 function renderState(state){
  current=state;localStorage.setItem('store-planning-run',state.id);clearTimeout(poll);

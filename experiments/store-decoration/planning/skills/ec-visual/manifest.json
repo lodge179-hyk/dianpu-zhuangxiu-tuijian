@@ -1,0 +1,12 @@
+{
+  "id": "ec-visual-project-v1",
+  "repository": "https://github.com/oldred-byte/ec-visual-skill",
+  "revision": "fead6fa34679a920ed67c7119e2df526ed2d139c",
+  "license": "MIT",
+  "integration": "Original documents are supplied as design reference material to existing planning calls. Project output contracts, product boundaries, image budgets, program typography and sheet/crop workflow take precedence. No upstream approval, extra generation, review or retry loop is enabled.",
+  "stages": {
+    "style": ["SKILL.md", "references/reference-analysis.md", "references/visual-dna.md", "references/color-adaptation.md"],
+    "content": ["references/visual-proof-grammar.md", "references/message-picture-patterns.md"],
+    "design": ["references/visual-proof-grammar.md", "references/color-adaptation.md"]
+  }
+}

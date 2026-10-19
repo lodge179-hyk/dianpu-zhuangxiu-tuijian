@@ -1,5 +1,7 @@
 const { z } = require('zod');
+const { usesPageDirection } = require('./page-direction.cjs');
 const { planSchema, validatePlan } = require('./plan.cjs');
+const { usesGenerationReferences } = require('./visual-skill.cjs');
 const clean = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : v;
 const key = v => typeof v === 'string' ? v.normalize('NFKC').replace(/\s+/g, '').toLowerCase() : '';
 const list = v => Array.isArray(v) ? v : [];
@@ -57,6 +59,9 @@ function color(v) {
 const researchSchema = z.object({ concept: z.string().min(1).max(100), reason: z.string().min(1).max(400), style: planSchema.shape.style, anchors: z.array(z.string().min(1).max(120)).min(1).max(3), selectedSources: z.array(z.object({ sourceId: z.string(), application: z.string().min(1).max(300) })).min(1).max(3) });
 function validateResearch(value, sources) {
   if (!sources.length) throw Error('联网检索没有返回可核实的来源，已停止。');
+  if (value && typeof value === 'object' && typeof value.concept !== 'string' && ('$schema' in value || value.properties?.concept || value.properties?.style)) {
+    throw Error('风格设计模型返回了字段格式说明（JSON Schema），没有实际风格方案。原始响应已保存，可点击“沿用已有资料继续”从风格阶段重新请求；尚未生图，无须重新上传商品图片。');
+  }
   const selected = [], ids = new Set();
   for (const item of list(value?.selectedSources)) {
     const id = typeof item?.sourceId === 'string' ? item.sourceId.trim().toLowerCase() : '';
@@ -68,8 +73,8 @@ function validateResearch(value, sources) {
   result.selectedSources = result.selectedSources.map(item => ({ ...sources.find(s => s.id === item.sourceId), application: item.application }));
   return result;
 }
-const designSchema = z.object({ artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3) }), assets: z.array(z.object({ id: z.string(), prompt: z.string().min(20).max(1600), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']) })).min(1).max(12) });
-function applyDesign(skeleton, value) {
+const designSchema = z.object({ artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3) }), assets: z.array(z.object({ id: z.string(), visualReference: planSchema.shape.assets.element.shape.visualReference, prompt: z.string().min(20).max(1600), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']) })).min(1).max(12) });
+function applyDesign(skeleton, value, { visualProfile = null } = {}) {
   // A schema is valid JSON, but is not a set of completed image briefs.
   if (!Array.isArray(value?.assets)) {
     if (value && typeof value === 'object' && ('$schema' in value || value.properties?.assets || value.properties?.artDirection)) {
@@ -90,7 +95,13 @@ function applyDesign(skeleton, value) {
     const a = byId.get(task.id), d = a.direction || {};
     const prompt = parseModel(z.string().trim().min(20).max(1600), clean(a.prompt, 1600), `画面提示词 ${task.id}`);
     const choose = (value, allowed, fallback) => allowed.includes(value) ? value : fallback;
-    return { ...task, subject: clean(a.subject || task.subject, 180), composition: clean(a.composition || prompt, 300), prompt, direction: { role: task.direction.role, camera: choose(a.camera || d.camera, ['wide', 'eye-level', 'top-down', 'macro'], task.direction.camera), treatment: choose(a.treatment || d.treatment, ['environment', 'human-use', 'still-life', 'texture', 'graphic'], task.direction.treatment), background: clean(d.background || skeleton.style.background, 180), accents: clean(d.accents || skeleton.style.palette.join('、'), 120) } };
+    let visualReference;
+    if (usesGenerationReferences(visualProfile)) {
+      const ref = usesPageDirection(visualProfile) && task.visualReference ? task.visualReference : a.visualReference;
+      visualReference = parseModel(planSchema.shape.assets.element.shape.visualReference.unwrap(), { id: clean(ref?.id, 40), borrow: clean(ref?.borrow, 120), avoid: clean(ref?.avoid, 120) }, `画面 ${task.id} 的视觉参考`);
+      if (!visualProfile.visualSkill.referenceIds.includes(visualReference.id)) throw Error(`画面 ${task.id} 引用了本任务之外的案例编号；已保留响应，未自行换图。`);
+    }
+    return { ...task, ...(visualReference ? { visualReference } : {}), subject: clean(a.subject || task.subject, 180), composition: clean(a.composition || prompt, 300), prompt, direction: { role: task.direction.role, camera: choose(a.camera || d.camera, ['wide', 'eye-level', 'top-down', 'macro'], task.direction.camera), treatment: choose(a.treatment || d.treatment, ['environment', 'human-use', 'still-life', 'texture', 'graphic'], task.direction.treatment), background: clean(d.background || skeleton.style.background, 180), accents: clean(d.accents || skeleton.style.palette.join('、'), 120) } };
   });
   // Geometry, role, and focal position are program-owned, not fields an AI needs to repeat correctly.
   return validatePlan({ ...skeleton, imageMode: 'category-inspired', artDirection: { concept: clean(art.concept || skeleton.artDirection.concept, 120), narrative: clean(art.narrative || skeleton.artDirection.narrative, 400), anchors: lines(art.anchors?.length ? art.anchors : skeleton.artDirection.anchors, 3, 120), focalAssetId: 'overview' }, assets }).plan;

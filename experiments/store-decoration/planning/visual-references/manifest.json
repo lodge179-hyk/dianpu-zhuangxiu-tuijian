@@ -1,0 +1,32 @@
+{
+  "provenance": "User-provided visual examples and selected official brand images, with source recorded per entry. Images retain their original rights and are not covered by the skill MIT license. Use only as visual reference inputs, not exported shop assets.",
+  "references": [
+    {"id":"jewelry-page-rhythm-v1","file":"jewelry-contrast.webp","source":"珠宝案例/huaban-6542776564.webp（用户提供的完整长页，未核实品牌官网来源）","view":"full","focus":"整页目标：宽幅主题图起头，正文有环境的大静物与清楚的小商品图交替，左右主次换位，底部以轻背景商品组收束。借鉴大小、疏密和明暗关系，不照搬红色、原商品、促销、表单、品牌或具体道具；仅规划阶段使用。"},
+    {"id":"jewelry-editorial-v1","file":"jewelry-contrast.webp","source":"珠宝案例/huaban-6542776564.webp（用户提供的长页静物区域）","view":"crop","crop":{"left":0.07,"top":0.275,"width":0.38,"height":0.16},"focus":"一高一低的立体承托与垂落曲线形成空间层次，深色主体轮廓由侧向亮部与渐变背景分离。参考尺度、疏密与投影，具体承托和颜色由本店主题决定，不复制原饰品、瓶形、文字或品牌。"},
+    {"id":"piaget-possession-v2","file":"piaget-possession.jpg","source":"https://www.piaget.com/us-en/jewelry/possession","imageUrl":"https://img.piaget.com/mixed-grid-image-m-2xl-9/o-dpr-2/7aa12d50b6c229148ab5689ddce24a36a75cb43f.jpg","view":"full","focus":"单图摄影参考：深浅分界、链条曲线与集中焦点，定向投影和表面反射形成空间；规划者按本图用途选择借鉴部分，不要求所有画面保留这套背景。商品类型、颜色与外观按本店方案，不复制原款或品牌，不推断贵金属材质。"},
+    {"id":"piaget-rose-v2","file":"piaget-rose.jpg","source":"https://www.piaget.com/us-en/jewelry/piaget-rose","imageUrl":"https://img.piaget.com/mixed-grid-image-m-2xl-9/o-dpr-2/0b6a9bbf2fe4feaae86f39d199c830d4e7046075.jpg","view":"full","focus":"单图摄影参考：斜向近景、光滑反射与粗糙表面的反差，定向光揭示结构。可借鉴尺度及光影，不把花瓣、金色或戒指品类移植到其他主体；规划者决定使用范围，不要求每图同底同光。"},
+    {"id":"digital-material","file":"digital-material.jpg","source":"数码案例/91cccf27030c06605c97792eb6b2c7ca.jpg","view":"full","focus":"观察商品颜色、高光和纹理如何在安静背景前形成强烈主体；不继承手机品类、品牌、价格或文案。"},
+    {"id":"digital-scale","file":"digital-scale.jpg","source":"数码案例/ad16a457feb2bda718d8c6e503446cfc.jpg","view":"full","focus":"观察大比例前景、斜向关系和主次尺度；不继承产品组合、品牌或悬浮方式。"},
+    {"id":"footwear-diagonal","file":"footwear-diagonal.webp","source":"鞋子案例/huaban-5139905853.webp","view":"hero","focus":"观察简洁背景与大比例斜向主体的反差；不继承鞋款、配色、文字或功能宣称。"},
+    {"id":"footwear-pair","file":"footwear-pair.webp","source":"鞋子案例/huaban-6720594868.webp","view":"hero","focus":"观察错位成对的方向、前后与轮廓关系；不继承品牌、鞋款或页面控件。"},
+    {"id":"jewelry-contrast","file":"jewelry-contrast.webp","source":"珠宝案例/huaban-6542776564.webp","view":"hero","focus":"观察暗底与明亮主体、曲线与留白的关系；不继承红色布景、金色商品、品牌、文字或固定台座。"},
+    {"id":"piaget-possession-v1","file":"piaget-possession.jpg","source":"https://www.piaget.com/us-en/jewelry/possession","imageUrl":"https://img.piaget.com/mixed-grid-image-m-2xl-9/o-dpr-2/7aa12d50b6c229148ab5689ddce24a36a75cb43f.jpg","view":"full","focus":"伯爵官网静物：深浅环境分界、清楚链条和集中吊坠焦点，定向投影与表面反射形成空间。借鉴光色与焦点，不复制项链、金色材质、蓝色装饰或悬挂方式。"},
+    {"id":"piaget-rose-v1","file":"piaget-rose.jpg","source":"https://www.piaget.com/us-en/jewelry/piaget-rose","imageUrl":"https://img.piaget.com/mixed-grid-image-m-2xl-9/o-dpr-2/0b6a9bbf2fe4feaae86f39d199c830d4e7046075.jpg","view":"full","focus":"伯爵官网静物：斜向近景集中展示起伏结构，光滑反射与粗糙背景形成表面反差，单一主光建立深浅层次。只借鉴构图及光线，不复制花形戒指、金色、宝石或品牌，不把饰品升级为贵金属商品。"},
+    {"id":"xiaomi-scale-v1","file":"digital-scale.jpg","source":"数码案例/ad16a457feb2bda718d8c6e503446cfc.jpg（用户提供的小米宣传图，未核实淘宝店来源）","view":"crop","crop":{"left":0,"top":0,"width":1,"height":0.66},"focus":"小米宣传图的商品画面：大尺度斜向主体与小配角，明亮背景仍有清楚轮廓和体积。只借鉴尺度、透视及层次，不复制品牌、商品组合或丝带。"},
+    {"id":"realme-light-v1","file":"digital-material.jpg","source":"数码案例/91cccf27030c06605c97792eb6b2c7ca.jpg（用户提供的realme宣传图）","view":"crop","crop":{"left":0,"top":0.38,"width":1,"height":0.47},"focus":"realme宣传图的商品画面：定向光突出橙、黑、白表面和边缘，暗背景保留材质层次。只借鉴光线和表面表现，不改变实际商品颜色、部件或品牌。"},
+    {"id":"footwear-diagonal-v1","file":"footwear-diagonal.webp","source":"鞋子案例/huaban-5139905853.webp（用户提供的设计案例，非已核实品牌官网）","view":"crop","crop":{"left":0.39,"top":0.016,"width":0.4,"height":0.093},"focus":"鞋履案例主鞋局部：大比例斜向鞋身，简单浅底与清楚色块、投影。只借鉴尺度和朝向，不复制商标、鞋型或配色。"},
+    {"id":"footwear-pair-v1","file":"footwear-pair.webp","source":"鞋子案例/huaban-6720594868.webp（用户提供的设计案例，非已核实品牌官网）","view":"crop","crop":{"left":0.45,"top":0.01,"width":0.44,"height":0.185},"focus":"鞋履案例成对主视觉：俯视与侧向错位，让鞋口和侧面形成有主次的结构关系；不复制商标、鞋型、海军蓝或悬浮方式。"}
+  ],
+  "modes": {
+    "general": ["digital-material", "footwear-diagonal", "jewelry-contrast"],
+    "jewelry": ["jewelry-contrast", "digital-material"],
+    "digital": ["digital-material", "digital-scale"],
+    "footwear": ["footwear-diagonal", "footwear-pair"]
+  },
+  "generationModes": {
+    "general": ["piaget-possession-v1", "xiaomi-scale-v1", "footwear-diagonal-v1"],
+    "jewelry": ["piaget-possession-v1", "piaget-rose-v1"],
+    "digital": ["xiaomi-scale-v1", "realme-light-v1"],
+    "footwear": ["footwear-diagonal-v1", "footwear-pair-v1"]
+  }
+}

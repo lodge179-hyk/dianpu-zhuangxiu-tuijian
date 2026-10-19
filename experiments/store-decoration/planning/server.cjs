@@ -123,7 +123,7 @@ const server = http.createServer(async (req, res) => {
           const request = JSON.parse((await body(req, 42 * 1024 * 1024)).toString('utf8'));
           images = request.images; visualProfile = createVisualProfile(request.generationMode);
         }
-        else { imageType(req); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
+        else { imageType(req); visualProfile = createVisualProfile('general'); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
         if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
       } catch (error) { planning = false; throw error; }
       let run; try { run = makeRun('product-screenshots', visualProfile); } catch (error) { planning = false; throw error; } locks.add(run.id);
