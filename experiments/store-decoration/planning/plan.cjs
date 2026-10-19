@@ -3,12 +3,15 @@ const { catalog, entries } = require('./catalog.cjs');
 const { usesProductVisualMethod } = require('./visual-profile.cjs');
 const { usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contract.cjs');
 const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
+const { pageDesignSchema, storySchema } = require('./narrative-contract.cjs');
+const { moduleGeometry } = require('./narrative-layout.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
 const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
 const planSchema = z.object({
   version: z.literal(1),
   imageMode: z.literal('category-inspired').optional(),
+  pageDesign: pageDesignSchema.optional(),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
   navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
@@ -18,8 +21,8 @@ const planSchema = z.object({
     collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240) }).strict()).min(1).max(12),
   }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
-  modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
+  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -36,7 +39,9 @@ function validatePlan(input) {
     for (const asset of plan.assets) if (!asset.designIds?.length || asset.designIds.some(ref => !designs.has(ref))) throw Error(`素材 ${asset.id} 缺少有效款式引用，未自行补写外观。`);
   }
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
-  if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw new Error('店铺必须以唯一一个招牌开始');
+  if (plan.pageDesign) {
+    if (plan.modules.some(m => !m.story)) throw Error('叙事页面的模块缺少图文设计数据');
+  } else if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw new Error('店铺必须以唯一一个招牌开始');
   const spec = { modules: plan.modules.map(({ id, type, props }) => ({ id, type, props })) };
   if (!catalog.validate(spec).success) throw new Error('方案未通过组件目录校验');
   const assets = new Map(plan.assets.map(a => [a.id, a])), used = new Set(), warnings = [];
@@ -52,12 +57,20 @@ function validatePlan(input) {
     m.props.assetIds.forEach((assetId, index) => {
       const asset = assets.get(assetId); if (!asset) throw new Error(`${m.id} 引用了不存在的素材 ${assetId}`);
       used.add(assetId);
-      const ratio = aspectRatios[asset.aspect], slot = entry.slots[index];
+      const ratio = aspectRatios[asset.aspect], slot = plan.pageDesign ? { aspect: ratio } : entry.slots[index];
       const removed = 1 - Math.min(ratio / slot.aspect, slot.aspect / ratio);
       if (removed > .35) warnings.push(`${m.id} 第${index + 1}张使用 ${assetId}，适配槽位约裁去${Math.round(removed * 100)}%面积，需留意构图。`);
     });
   }
   for (const asset of plan.assets) if (!used.has(asset.id)) throw new Error(`素材 ${asset.id} 没有对应模块，避免无用途生图`);
+  if (plan.pageDesign) {
+    const assignedImages = plan.modules.flatMap(m => m.props.assetIds);
+    unique(assignedImages, '叙事页面图片');
+    for (const module of plan.modules) {
+      const geometry = moduleGeometry(module, assets);
+      if (!Number.isFinite(geometry.height) || geometry.height <= 0 || geometry.images.some(image => image.rect.some(value => !Number.isFinite(value)))) throw Error('叙事模块尺寸无效');
+    }
+  }
   const categoryAssets = new Set(plan.modules.filter(m => m.type.startsWith('navigation.')).flatMap(m => m.props.assetIds));
   for (const m of plan.modules.filter(m => /^(poster|carousel)\./.test(m.type))) {
     m.props.assetIds.forEach((assetId, index) => {
@@ -126,12 +139,13 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index, visualPr
   if (usesCampaignIdentity(visualProfile)) return [
     '生成一张可裁剪的珠宝店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；保持人物佩戴、环境静物、新款浏览的内容变化，不拼贴参考照片，不画网页。',
     campaignStyleLock(plan),
+    plan.pageDesign ? '【本批在整页中的作用】以下是模型已选定的章节与模块顺序，不能把每格都变成独立卖货海报：\n' + plan.modules.map(m => `${m.story.chapter} / ${m.story.layout}：${m.story.message}；衔接：${m.story.transition}；使用素材：${m.props.assetIds.join('、') || '仅排版文字'}`).join('\n') : '',
     index ? '本批延续同一全套摄影基准与全局约定。上一批成图用于对照实际调色、高光和颗粒，不照搬款式、镜头或布局；保留本批的明确变化。' : '',
     `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
     ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {
       const asset = lookup.get(id);
       const designs = asset.designIds.map(ref => plan.campaign.collection.find(item => item.id === ref));
-      return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n本格实际入画款式（由创作方案提供，编号不入画）：${designs.map(item => `${item.id} ${item.category}：${item.appearance}`).join('；')}。同一编号的轮廓、连接与配色保持一致，未列入本格的款式不增加。${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
+      return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n${asset.layoutBrief || ''}\n本格实际入画款式（由创作方案提供，编号不入画）：${designs.map(item => `${item.id} ${item.category}：${item.appearance}`).join('；')}。同一编号的轮廓、连接与配色保持一致，未列入本格的款式不增加。${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
     }).join('\n')),
     '每格独立构图，不是同一照片切片；相邻画面通过共享色彩、材质和光质连成店铺，不能只因款式不同就另换摄影风格。人物为原创成年人，饰品与人体接触自然。',
     '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。分隔带内只填纯色，每格有自己的不透明背景，物体及阴影不跨格，画面内禁用分隔色。',

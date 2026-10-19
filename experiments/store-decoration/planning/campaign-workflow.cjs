@@ -6,6 +6,8 @@ const { planSchema, validatePlan } = require('./plan.cjs');
 const { compileContent, evidenceFor } = require('./content-plan.cjs');
 const { applyDesign } = require('./model-contracts.cjs');
 const { campaignPrompt, usesCampaignIdentity } = require('./campaign-contract.cjs');
+const { usesNarrativePage } = require('./narrative-contract.cjs');
+const { compileNarrative } = require('./narrative-plan.cjs');
 const { prepareVisualReferences } = require('./visual-skill.cjs');
 const { askJson, writeJson } = require('./qwen-provider.cjs');
 const { stages, nextStage, cachedStage } = require('./stage-cache.cjs');
@@ -39,7 +41,9 @@ function compileCreative(value, recognition, profile) {
     version: 1, shop: { name: '商品装修参考', category: recognition.categories.join('、').slice(0, 100), observations: [], uncertainties: recognition.uncertainties },
     categories: recognition.categories, theme: creative.concept, style: creative.style, navigationStyle: 'auto', featuredCategory: null,
   };
-  const skeleton = compileContent(brief, creative.content, recognition, { visualProfile: profile });
+  const skeleton = usesNarrativePage(profile)
+    ? compileNarrative(brief, creative.content, recognition, profile)
+    : compileContent(brief, creative.content, recognition, { visualProfile: profile });
   return { creative: { ...creative, content: skeleton.content }, skeleton };
 }
 
@@ -75,12 +79,12 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
     writeJson(run.folder, 'structure-plan.json', skeleton.plan);
     save(run.folder, run.state);
   };
-  setStage(run, 'planning-content', '正在看案例，统一创作款式、整页与画面提示词', save);
+  setStage(run, 'planning-content', usesNarrativePage(profile) ? '正在组织章节与模块，设计整页图文' : '正在看案例，统一创作款式、整页与画面提示词', save);
   const draft = (reuse ? cachedStage(run.folder, 'content', parse)?.value : null) || await call('content', context, false);
   writeJson(run.folder, 'creative-draft.json', draft.creative);
   saveCreative(draft);
 
-  setStage(run, 'designing', usesCampaignIdentity(profile) ? '正在修订整页的一致性、视觉焦点与画面变化' : '正在进行一次整套修订：款式变化、人物佩戴与案例运用', save);
+  setStage(run, 'designing', usesNarrativePage(profile) ? '正在修订内容衔接、图文表达与视觉一致性' : usesCampaignIdentity(profile) ? '正在修订整页的一致性、视觉焦点与画面变化' : '正在进行一次整套修订：款式变化、人物佩戴与案例运用', save);
   const draftSignature = createHash('sha256').update(JSON.stringify({ creative: draft.creative, businessScope, profile })).digest('hex');
   const previous = reuse ? stages(run.folder, 'design')[0] : null;
   let reviewed = null;
@@ -92,7 +96,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   }
   reviewed ||= await call('design', {
     ...context, draftSignature, draft: draft.creative,
-    pageOrder: draft.skeleton.plan.modules.map(m => ({ purpose: m.purpose, assetIds: m.props.assetIds })),
+    pageOrder: draft.skeleton.plan.modules.map(m => ({ purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}) })),
     currentSlots: draft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
     reviewScope: '这些槽位描述初稿显示方式，不冻结创意。可以修正款式、图片数量、顺序与组件组合，返回完整终稿；仍遵守12张和两批预算。只评审计划和参考，不声称看过尚未生成的成图。',
   }, true);
@@ -111,7 +115,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
     const taskDesigns = new Map(skeleton.tasks.map(task => [task.id, task.visualPlan.designIds]));
     plan = validatePlan({
       ...plan,
-      campaign: { reference: creative.content.heroVisualPlan.visualReference, collection: creative.content.collection },
+      campaign: { reference: usesNarrativePage(profile) ? creative.content.reference : creative.content.heroVisualPlan.visualReference, collection: creative.content.collection },
       assets: plan.assets.map(asset => ({ ...asset, designIds: taskDesigns.get(asset.id) })),
     }).plan;
   }
@@ -120,7 +124,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   saveCreative(reviewed);
   run.state.reviewSummary = creative.revisionSummary;
   run.state.plan = plan;
-  run.state.recommendation = { ...skeleton.recommendation, name: '经营方向与视觉案例驱动的整页创作', sources: [] };
+  run.state.recommendation = { ...skeleton.recommendation, name: usesNarrativePage(profile) ? '章节叙事与视觉一致性驱动的整页创作' : '经营方向与视觉案例驱动的整页创作', sources: [] };
   save(run.folder, run.state);
 }
 

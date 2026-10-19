@@ -3,6 +3,7 @@ const path = require('path');
 const { renderPage } = require('../a9-component-library/lib/index.cjs');
 const { validatePlan, buildBatches } = require('./plan.cjs');
 const { resolveNavigation, assetFile } = require('./navigation-library.cjs');
+const { renderNarrativePage } = require('./narrative-layout.cjs');
 const black = path.join(__dirname, '../a10-black-module-review/black.png');
 
 function compose(folder, input, { visualProfile = null } = {}) {
@@ -31,7 +32,11 @@ function compose(folder, input, { visualProfile = null } = {}) {
     else content = { images: m.props.assetIds.map((id, i) => ({ src: image(id), ...(m.type.startsWith('navigation.') ? { label: m.props.labels[i] } : {}) })) };
     return { id: m.id, type: m.type, label: m.purpose, content, options: {} };
   }) };
-  const result = renderPage(page);
+  const result = plan.pageDesign ? renderNarrativePage(plan) : renderPage(page);
+  if (plan.pageDesign) {
+    page.pageDesign = plan.pageDesign;
+    page.modules.forEach((module, index) => { module.story = plan.modules[index].story; });
+  }
   fs.writeFileSync(path.join(folder, 'page.json'), JSON.stringify(page, null, 2));
   fs.writeFileSync(path.join(folder, 'shop.html'), result.html);
   const bindings = plan.modules.flatMap(m => result.photos.filter(p => p.moduleId === m.id).map((p, i) => ({ ...p, assetId: m.props.assetIds[i] })));
