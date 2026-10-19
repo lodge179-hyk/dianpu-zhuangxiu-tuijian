@@ -9,7 +9,7 @@ const { chapterSchema, storefrontTypes } = require('./storefront-contract.cjs');
 const { artworkSchema, artworkGeometry } = require('./slot-artwork.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
-const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
+const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '483:224': 483 / 224, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
 const planSchema = z.object({
   version: z.literal(1),
   imageMode: z.literal('category-inspired').optional(),
@@ -25,7 +25,7 @@ const planSchema = z.object({
   }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), narrative: chapterSchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -34,18 +34,40 @@ function validatePlan(input) {
   if (!parsed.success) throw new Error('方案格式不合格：' + parsed.error.issues.slice(0, 6).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const plan = parsed.data;
   const platformSlots = plan.delivery === 'platform-slots-v1';
+  // Store identity is required platform structure, not an optional AI chapter.
+  // This adds no image slot and preserves all existing asset IDs and batches.
+  if (platformSlots) {
+    const signIndex = plan.modules.findIndex(m => m.type.startsWith('signboard.'));
+    if (signIndex < 0) {
+      if (plan.modules.length >= 24) throw Error('需要为必备店铺招牌保留一个模块位置。');
+      const usedIds = new Set(plan.modules.map(m => m.id));
+      let signId = 'identity', suffix = 1;
+      while (usedIds.has(signId)) signId = `identity-${suffix++}`;
+      plan.modules.unshift({ id: signId, type: 'signboard.minimal', purpose: '店铺身份',
+        narrative: { chapter: '店铺身份', message: '展示店铺名称与头像', transition: '' },
+        props: { assetIds: [], text: '', labels: [], titles: [] } });
+    } else if (signIndex > 0) {
+      plan.modules.unshift(plan.modules.splice(signIndex, 1)[0]);
+    }
+  }
   if (plan.imageMode && (!plan.artDirection || plan.assets.some(a => !a.prompt || !a.direction))) throw new Error('商品装修方案缺少 AI 画面设计或最终提示词');
   const unique = (list, label) => { if (new Set(list).size !== list.length) throw new Error(`${label}编号重复`); };
   unique(plan.modules.map(m => m.id), '模块'); unique(plan.assets.map(a => a.id), '素材'); unique(plan.batches.map(b => b.id), '批次');
+  const allowsEmptyDesigns = asset => {
+    if (!platformSlots || asset.direction?.role !== 'atmosphere') return false;
+    const uses = plan.modules.filter(m => m.props.assetIds.includes(asset.id));
+    return uses.length > 0 && uses.every(m => ['signboard.default', 'signboard.classic'].includes(m.type));
+  };
+  for (const asset of plan.assets) if (asset.designIds?.length === 0 && !allowsEmptyDesigns(asset)) throw Error(`素材 ${asset.id} 不是独立招牌背景，款式引用不能为空。`);
   if (plan.campaign) {
     unique(plan.campaign.collection.map(item => item.id), '款式');
     const designs = new Set(plan.campaign.collection.map(item => item.id));
-    for (const asset of plan.assets) if (!asset.designIds?.length || asset.designIds.some(ref => !designs.has(ref))) throw Error(`素材 ${asset.id} 缺少有效款式引用，未自行补写外观。`);
+    for (const asset of plan.assets) if (!asset.designIds || (!asset.designIds.length && !allowsEmptyDesigns(asset)) || asset.designIds.some(ref => !designs.has(ref))) throw Error(`素材 ${asset.id} 缺少有效款式引用，未自行补写外观。`);
   }
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
   if (platformSlots) {
     if (!plan.pageDesign || plan.modules.some(m => !m.narrative || m.story || !storefrontTypes.includes(m.type))) throw Error('可上传叙事方案缺少章节或使用了非原生模块。');
-    if (signs.length > 1 || (signs.length && plan.modules[0] !== signs[0])) throw Error('店铺招牌只能在开头出现一次。');
+    if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw Error('店铺必须以唯一一个招牌开始。');
   } else if (plan.pageDesign) {
     if (plan.modules.some(m => !m.story)) throw Error('叙事页面的模块缺少图文设计数据');
   } else if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw new Error('店铺必须以唯一一个招牌开始');
@@ -158,7 +180,10 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index, visualPr
     ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {
       const asset = lookup.get(id);
       const designs = asset.designIds.map(ref => plan.campaign.collection.find(item => item.id === ref));
-      return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n${asset.layoutBrief || ''}\n本格实际入画款式（由创作方案提供，编号不入画）：${designs.map(item => `${item.id} ${item.category}：${item.appearance}`).join('；')}。同一编号的轮廓、连接与配色保持一致，未列入本格的款式不增加。${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
+      const designBrief = designs.length
+        ? `本格实际入画款式（由创作方案提供，编号不入画）：${designs.map(item => `${item.id} ${item.category}：${item.appearance}`).join('；')}。同一编号的轮廓、连接与配色保持一致，未列入本格的款式不增加。`
+        : '本格为不展示商品的招牌氛围背景，只落实本格光影、色彩与材质设计，不添加商品或从其他格借用款式。';
+      return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n${asset.layoutBrief || ''}\n${designBrief}${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
     }).join('\n')),
     '每格独立构图，不是同一照片切片；相邻画面通过共享色彩、材质和光质连成店铺，不能只因款式不同就另换摄影风格。人物为原创成年人，饰品与人体接触自然。',
     '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。分隔带内只填纯色，每格有自己的不透明背景，物体及阴影不跨格，画面内禁用分隔色。',

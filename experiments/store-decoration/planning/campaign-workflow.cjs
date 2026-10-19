@@ -29,7 +29,7 @@ function creativeRecognition(recognition) {
     observations: [], uncertainties: ['示意设计，不证明真实材质、品质或功能，不要求复刻上传SKU'],
   };
 }
-function compileCreative(value, recognition, profile) {
+function compileCreative(value, recognition, profile, { draft = false } = {}) {
   const parsed = creativeSchema.safeParse(value);
   if (!parsed.success) throw Error('整页创作内容不完整：' + parsed.error.issues.map(i => i.path.join('.')).join('、') + '。已保存响应，可从本阶段继续。');
   const creative = parsed.data;
@@ -41,9 +41,18 @@ function compileCreative(value, recognition, profile) {
     version: 1, shop: { name: '商品装修参考', category: recognition.categories.join('、').slice(0, 100), observations: [], uncertainties: recognition.uncertainties },
     categories: recognition.categories, theme: creative.concept, style: creative.style, navigationStyle: 'auto', featuredCategory: null,
   };
-  const skeleton = usesNarrativePage(profile)
-    ? compileNarrative(brief, creative.content, recognition, profile)
-    : compileContent(brief, creative.content, recognition, { visualProfile: profile });
+  let skeleton;
+  try {
+    skeleton = usesNarrativePage(profile)
+      ? compileNarrative(brief, creative.content, recognition, profile)
+      : compileContent(brief, creative.content, recognition, { visualProfile: profile });
+  } catch (error) {
+    if (draft && profile.pageComposition === 'platform-slots-v1' && error.code === 'STOREFRONT_IMAGE_BUDGET' && error.reviewDraft) {
+      const { content, ...reviewContext } = error.reviewDraft;
+      return { creative: { ...creative, content }, reviewContext };
+    }
+    throw error;
+  }
   return { creative: { ...creative, content: skeleton.content }, skeleton };
 }
 
@@ -57,30 +66,41 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
     attachmentRoles: '附图均为视觉案例，不是商品原图；摄影案例用于画面表现，整页案例用于浏览节奏。经营方向仅来自 businessScope。',
     assetBudget: 12, maxBatches: 2,
   };
-  const parse = value => compileCreative(value, recognition, profile);
+  const parse = (value, base) => compileCreative(value, recognition, profile, { draft: base === 'content' });
+  const validationFailures = new Map();
+  const cachedCreative = base => cachedStage(run.folder, base, value => {
+    try { return parse(value, base); }
+    catch (error) {
+      // Feed the actual failure into the existing user-requested continuation.
+      // No extra call, automatic retry, or program-selected creative changes.
+      if (profile.pageComposition === 'platform-slots-v1') validationFailures.set(base, { error: error.message });
+      throw error;
+    }
+  });
   const call = async (base, input, review) => {
     const stage = nextStage(run.folder, base);
     run.state.planningRequestAttempts++; save(run.folder, run.state);
     // Only the campaign's nested creative responses opt out of provider JSON
     // mode. askJson still parses JSON and compileCreative validates the full plan.
-    const result = await askJson(run.folder, stage.name, campaignPrompt(profile, { review }), input, { images: visual.images, jsonMode: false, fetcher });
-    return parse(result.value);
+    const request = validationFailures.has(base) ? { ...input, validationFeedback: validationFailures.get(base) } : input;
+    const result = await askJson(run.folder, stage.name, campaignPrompt(profile, { review }), request, { images: visual.images, jsonMode: false, fetcher });
+    return parse(result.value, base);
   };
   const saveCreative = result => {
     const { creative, skeleton } = result;
-    run.state.contentPlan = skeleton.content;
+    run.state.contentPlan = creative.content;
     run.state.research = {
       concept: creative.concept, reason: creative.reason, style: creative.style, anchors: creative.anchors,
       selectedSources: [], sources: [], visualSkill: profile.visualSkill, visualReferences: visual.references, pageReferences: visual.pageReferences,
       basis: '实际读取所附整页、人物佩戴和静物案例，依据AI提炼的经营边界统一创作；本流程不执行网页检索。效果待用户生图验收。',
     };
     writeJson(run.folder, 'style-research.json', run.state.research);
-    writeJson(run.folder, 'content-plan.json', skeleton.content);
-    writeJson(run.folder, 'structure-plan.json', skeleton.plan);
+    writeJson(run.folder, 'content-plan.json', creative.content);
+    if (skeleton) writeJson(run.folder, 'structure-plan.json', skeleton.plan);
     save(run.folder, run.state);
   };
   setStage(run, 'planning-content', usesNarrativePage(profile) ? '正在组织章节与模块，设计整页图文' : '正在看案例，统一创作款式、整页与画面提示词', save);
-  const draft = (reuse ? cachedStage(run.folder, 'content', parse)?.value : null) || await call('content', context, false);
+  const draft = (reuse ? cachedCreative('content')?.value : null) || await call('content', context, false);
   writeJson(run.folder, 'creative-draft.json', draft.creative);
   saveCreative(draft);
 
@@ -91,13 +111,15 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   if (previous) {
     try {
       const input = JSON.parse(fs.readFileSync(path.join(run.folder, previous.name + '-input.json'), 'utf8'));
-      if (input.draftSignature === draftSignature) reviewed = cachedStage(run.folder, 'design', parse)?.value || null;
+      if (input.draftSignature === draftSignature) reviewed = cachedCreative('design')?.value || null;
     } catch {}
   }
   reviewed ||= await call('design', {
     ...context, draftSignature, draft: draft.creative,
-    pageOrder: draft.skeleton.plan.modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}), ...(m.narrative ? { narrative: m.narrative } : {}) })),
-    currentSlots: draft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
+    ...(draft.reviewContext || {
+      pageOrder: draft.skeleton.plan.modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}), ...(m.narrative ? { narrative: m.narrative } : {}) })),
+      currentSlots: draft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
+    }),
     reviewScope: '这些槽位描述初稿显示方式，不冻结创意。可以修正款式、图片数量、顺序与组件组合，返回完整终稿；仍遵守12张和两批预算。只评审计划和参考，不声称看过尚未生成的成图。',
   }, true);
 
@@ -128,4 +150,4 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   save(run.folder, run.state);
 }
 
-module.exports = { planJewelryCampaign };
+module.exports = { planJewelryCampaign, compileCreative };

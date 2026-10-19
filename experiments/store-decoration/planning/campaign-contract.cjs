@@ -87,13 +87,19 @@ const campaignProfile = {
   stages: { recognition: recognitionInstructions, style: '全页摄影基准、图文色彩与字体气质共同确定。', content: '先规划章节主张、模块分工与顺序，再设计图文和不同款式。', design: '一次修订叙事是否实际落在模块和画面中，同时保留一致性与亮点。' },
 };
 
-const campaignVisualSchema = z.preprocess(value => fieldAliases(value, { picture: 'description' }), z.object({
+const campaignVisualFields = z.object({
   picture: z.string().trim().min(20).max(600),
   difference: z.string().trim().min(1).max(160),
   designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6),
   camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']),
   treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']),
   visualReference: referenceSchema,
+});
+const campaignVisualSchema = z.preprocess(value => fieldAliases(value, { picture: 'description' }), campaignVisualFields);
+// Only storefront signboards use this variant; ordinary product visuals retain
+// their required design reference. Empty arrays explicitly mean no product.
+const campaignBackdropSchema = z.preprocess(value => fieldAliases(value, { picture: 'description' }), campaignVisualFields.extend({
+  designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6),
 }));
 function campaignContentSchema(base) {
   return pageContentSchema(base, campaignVisualSchema).extend({
@@ -148,4 +154,4 @@ function campaignPrompt(profile, { review = false } = {}) {
   ].filter(Boolean).join('\n\n');
 }
 
-module.exports = { usesJewelryCampaign, usesCampaignIdentity, campaignProfile, businessScopeSchema, campaignRecognitionPrompt, attachBusinessScope, campaignContentSchema, campaignVisualSchema, campaignVisuals, validateCampaignReferences, campaignPrompt };
+module.exports = { usesJewelryCampaign, usesCampaignIdentity, campaignProfile, businessScopeSchema, campaignRecognitionPrompt, attachBusinessScope, campaignContentSchema, campaignVisualSchema, campaignBackdropSchema, campaignVisuals, validateCampaignReferences, campaignPrompt };
