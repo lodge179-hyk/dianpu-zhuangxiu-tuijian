@@ -18,7 +18,7 @@ function usesGenerationReferences(profile) {
   return usesVisualSkill(profile) && profile.visualSkill.generationReferences === 'visual-reference-v1';
 }
 function usesReferenceBackground(profile) {
-  return usesGenerationReferences(profile) && ['reference-background-v1', 'planned-reference-v1', 'campaign-reference-v1'].includes(profile.visualSkill.backgroundGuidance);
+  return usesGenerationReferences(profile) && ['reference-background-v1', 'planned-reference-v1', 'campaign-reference-v1', 'campaign-identity-v1'].includes(profile.visualSkill.backgroundGuidance);
 }
 const generationReferenceInstructions = [
   '【视觉案例进入生图】visualReferences 是本阶段实际附带的精选案例，附件编号与商品截图分开说明；它们只提供视觉表现，不是经营商品。每张 assets 必须额外返回 visualReference: {id, borrow, avoid}：id 从 visualReferences 选一张；borrow 在120字内写明实际看见并要保留的背景亮暗区域位置与面积关系、过渡方向、表面纹理，以及适用的阴影或倒影，不能只写高级感、强对比、精准布光；avoid 在120字内指出不能继承的具体商品、品牌、文字或道具。',
@@ -102,6 +102,13 @@ function batchVisualReferences(plan, batch, profile) {
   if (!usesGenerationReferences(profile)) return [];
   const available = new Map(referenceMetadata(profile).map(ref => [ref.id, ref]));
   const chosen = new Map();
+  if (profile.visualSkill.backgroundGuidance === 'campaign-identity-v1') {
+    const selection = plan.campaign?.reference;
+    if (!selection || !available.has(selection.id)) throw Error('整页摄影基准不在本任务参考中，尚未生图，未自行换图。');
+    const { attachment, ...ref } = available.get(selection.id);
+    // Insert first, even if this batch has no hero. All batches see the same pixels.
+    chosen.set(selection.id, { ...ref, campaign: { borrow: selection.borrow, avoid: selection.avoid }, uses: [] });
+  }
   for (const [rowIndex, row] of batch.rows.entries()) for (const [columnIndex, assetId] of row.entries()) {
     const selection = plan.assets.find(asset => asset.id === assetId)?.visualReference;
     if (!selection || !available.has(selection.id)) throw Error(`素材 ${assetId} 缺少本任务有效的视觉参考，已停止，未自行选图。`);
@@ -125,7 +132,7 @@ async function prepareGenerationReferences(folder, references = []) {
       fs.writeFileSync(file, Buffer.from(data.slice(data.indexOf(',') + 1), 'base64'));
     }
     images.push('data:image/jpeg;base64,' + fs.readFileSync(file).toString('base64'));
-    records.push({ attachment: index + 1, id: ref.id, file: relative, source: ref.source, uses: selection.uses });
+    records.push({ attachment: index + 1, id: ref.id, file: relative, source: ref.source, uses: selection.uses, ...(selection.campaign ? { campaign: selection.campaign } : {}) });
   }
   return { images, records };
 }

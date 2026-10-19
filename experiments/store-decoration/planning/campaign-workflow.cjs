@@ -2,10 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const { createHash } = require('crypto');
 const { z } = require('zod');
-const { planSchema } = require('./plan.cjs');
+const { planSchema, validatePlan } = require('./plan.cjs');
 const { compileContent, evidenceFor } = require('./content-plan.cjs');
 const { applyDesign } = require('./model-contracts.cjs');
-const { campaignPrompt } = require('./campaign-contract.cjs');
+const { campaignPrompt, usesCampaignIdentity } = require('./campaign-contract.cjs');
 const { prepareVisualReferences } = require('./visual-skill.cjs');
 const { askJson, writeJson } = require('./qwen-provider.cjs');
 const { stages, nextStage, cachedStage } = require('./stage-cache.cjs');
@@ -80,7 +80,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   writeJson(run.folder, 'creative-draft.json', draft.creative);
   saveCreative(draft);
 
-  setStage(run, 'designing', '正在进行一次整套修订：款式变化、人物佩戴与案例运用', save);
+  setStage(run, 'designing', usesCampaignIdentity(profile) ? '正在修订整页的一致性、视觉焦点与画面变化' : '正在进行一次整套修订：款式变化、人物佩戴与案例运用', save);
   const draftSignature = createHash('sha256').update(JSON.stringify({ creative: draft.creative, businessScope, profile })).digest('hex');
   const previous = reuse ? stages(run.folder, 'design')[0] : null;
   let reviewed = null;
@@ -98,13 +98,23 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   }, true);
 
   const { creative, skeleton } = reviewed;
-  const plan = applyDesign(skeleton.plan, {
+  let plan = applyDesign(skeleton.plan, {
     artDirection: { concept: creative.concept, narrative: creative.content.narrative, anchors: creative.anchors },
     assets: skeleton.tasks.map(task => ({
       id: task.id, prompt: task.visualPlan.picture, camera: task.visualPlan.camera,
       treatment: task.visualPlan.treatment, visualReference: task.visualPlan.visualReference,
     })),
   }, { visualProfile: profile });
+  if (usesCampaignIdentity(profile)) {
+    // Carry the AI's existing hero reference and collection through to generation.
+    // No extra model fields, inferred product features or newly generated master image.
+    const taskDesigns = new Map(skeleton.tasks.map(task => [task.id, task.visualPlan.designIds]));
+    plan = validatePlan({
+      ...plan,
+      campaign: { reference: creative.content.heroVisualPlan.visualReference, collection: creative.content.collection },
+      assets: plan.assets.map(asset => ({ ...asset, designIds: taskDesigns.get(asset.id) })),
+    }).plan;
+  }
   // Publish the generation-ready plan only after the full reviewed result is valid.
   writeJson(run.folder, 'creative-final.json', creative);
   saveCreative(reviewed);

@@ -1,7 +1,7 @@
 const { z } = require('zod');
 const { catalog, entries } = require('./catalog.cjs');
 const { usesProductVisualMethod } = require('./visual-profile.cjs');
-const { usesJewelryCampaign } = require('./campaign-contract.cjs');
+const { usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contract.cjs');
 const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
@@ -13,9 +13,13 @@ const planSchema = z.object({
   summary: z.string().min(1).max(300),
   navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
+  campaign: z.object({
+    reference: visualReferenceSchema,
+    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240) }).strict()).min(1).max(12),
+  }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -26,6 +30,11 @@ function validatePlan(input) {
   if (plan.imageMode && (!plan.artDirection || plan.assets.some(a => !a.prompt || !a.direction))) throw new Error('商品装修方案缺少 AI 画面设计或最终提示词');
   const unique = (list, label) => { if (new Set(list).size !== list.length) throw new Error(`${label}编号重复`); };
   unique(plan.modules.map(m => m.id), '模块'); unique(plan.assets.map(a => a.id), '素材'); unique(plan.batches.map(b => b.id), '批次');
+  if (plan.campaign) {
+    unique(plan.campaign.collection.map(item => item.id), '款式');
+    const designs = new Set(plan.campaign.collection.map(item => item.id));
+    for (const asset of plan.assets) if (!asset.designIds?.length || asset.designIds.some(ref => !designs.has(ref))) throw Error(`素材 ${asset.id} 缺少有效款式引用，未自行补写外观。`);
+  }
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
   if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw new Error('店铺必须以唯一一个招牌开始');
   const spec = { modules: plan.modules.map(({ id, type, props }) => ({ id, type, props })) };
@@ -77,9 +86,22 @@ function validatePlan(input) {
 function styleLock(style) {
   return `Shared art direction: color family ${style.palette.join(', ')}; setting family: ${style.background}; light: ${style.lighting}; photographic finish: ${style.photography}. Unify color grading and image quality. Treat the palette as available accents, not a requirement to put every color in every photo. Each panel's own background, camera and product selection take priority. Different categories may use different packaging, materials and scenes; do not turn the whole store into one imaginary product brand.`;
 }
+function campaignStyleLock(plan) {
+  return [
+    '【全套摄影约定：适用于每一格，优先于局部参考的风格】',
+    `整页主题：${plan.artDirection.concept}。浏览节奏：${plan.artDirection.narrative}。`,
+    `统一色板：${plan.style.palette.join('、')}。环境与色彩分工：${plan.style.background}`,
+    `共同布光与白平衡：${plan.style.lighting}`,
+    `共同影调与后期质感：${plan.style.photography}`,
+    `跨图视觉联系：${plan.artDirection.anchors.join('；')}`,
+    '整页如同一次有创意的品牌拍摄：色板不是给所有图片刷同一底色，也不改变商品本色。明部、暗部、人物服装及环境局部均属于这套视觉语言；不同镜头仍有同一光质、材质关系与调色。局部构图参考不可引入另一套色温或布景。',
+    '保留强弱节奏：主视觉通过尺度、姿态或局部反差形成最醒目的焦点；辅助图改变景别、款式、构图与留白，保留鲜明的支撑画面和安静的浏览图。不要每格都争当主视觉，也不要统一成无层次的素底小商品。',
+  ].join('\n');
+}
 function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
   const lookup = new Map(plan.assets.map(a => [a.id, a]));
-  const lock = styleLock(plan.style);
+  if (usesCampaignIdentity(visualProfile) && !plan.campaign) throw Error('整页摄影基准未写入方案，尚未生图；请从画面设计继续。');
+  const lock = usesCampaignIdentity(visualProfile) ? campaignStyleLock(plan) : styleLock(plan.style);
   const excluded = new Set(excludedAssetIds);
   const pending = plan.batches.map(batch => ({ ...batch, rows: batch.rows.map(row => row.filter(id => !excluded.has(id))).filter(row => row.length) })).filter(batch => batch.rows.length);
   return pending.map((batch, index) => {
@@ -101,6 +123,20 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
   });
 }
 function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {
+  if (usesCampaignIdentity(visualProfile)) return [
+    '生成一张可裁剪的珠宝店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；保持人物佩戴、环境静物、新款浏览的内容变化，不拼贴参考照片，不画网页。',
+    campaignStyleLock(plan),
+    index ? '本批延续同一全套摄影基准与全局约定。上一批成图用于对照实际调色、高光和颗粒，不照搬款式、镜头或布局；保留本批的明确变化。' : '',
+    `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
+    ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {
+      const asset = lookup.get(id);
+      const designs = asset.designIds.map(ref => plan.campaign.collection.find(item => item.id === ref));
+      return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n本格实际入画款式（由创作方案提供，编号不入画）：${designs.map(item => `${item.id} ${item.category}：${item.appearance}`).join('；')}。同一编号的轮廓、连接与配色保持一致，未列入本格的款式不增加。${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
+    }).join('\n')),
+    '每格独立构图，不是同一照片切片；相邻画面通过共享色彩、材质和光质连成店铺，不能只因款式不同就另换摄影风格。人物为原创成年人，饰品与人体接触自然。',
+    '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。分隔带内只填纯色，每格有自己的不透明背景，物体及阴影不跨格，画面内禁用分隔色。',
+    '按各格比例构图并给饰品留安全边距。商品为示意设计，不绘制文字、编号、品牌、水印或界面，不增加未提供的真实材质与性能宣称。',
+  ].filter(Boolean).join('\n\n');
   if (usesJewelryCampaign(visualProfile)) return [
     '生成一张可裁剪的珠宝广告摄影素材总图。每格是按自身描述构图的完整照片，人物佩戴、环境静物及商品浏览各有画面，不是同一场景的连续切片，也不是网页截图。',
     '每格的具体款式、人物、环境和明暗以该格提示为准。整套以色彩关系和摄影品质呼应，不把同一款式、台面或背景套给所有图片。',
