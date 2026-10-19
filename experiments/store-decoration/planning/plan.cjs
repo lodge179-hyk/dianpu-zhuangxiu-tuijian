@@ -5,6 +5,8 @@ const { usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contra
 const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
 const { pageDesignSchema, storySchema } = require('./narrative-contract.cjs');
 const { moduleGeometry } = require('./narrative-layout.cjs');
+const { chapterSchema, storefrontTypes } = require('./storefront-contract.cjs');
+const { artworkSchema, artworkGeometry } = require('./slot-artwork.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
 const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
@@ -12,6 +14,7 @@ const planSchema = z.object({
   version: z.literal(1),
   imageMode: z.literal('category-inspired').optional(),
   pageDesign: pageDesignSchema.optional(),
+  delivery: z.literal('platform-slots-v1').optional(),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
   navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
@@ -21,8 +24,8 @@ const planSchema = z.object({
     collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240) }).strict()).min(1).max(12),
   }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
-  modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
+  modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), narrative: chapterSchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
+  assets: z.array(z.object({ id, artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).min(1).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
   batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
 }).strict();
 
@@ -30,6 +33,7 @@ function validatePlan(input) {
   const parsed = planSchema.safeParse(input);
   if (!parsed.success) throw new Error('方案格式不合格：' + parsed.error.issues.slice(0, 6).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const plan = parsed.data;
+  const platformSlots = plan.delivery === 'platform-slots-v1';
   if (plan.imageMode && (!plan.artDirection || plan.assets.some(a => !a.prompt || !a.direction))) throw new Error('商品装修方案缺少 AI 画面设计或最终提示词');
   const unique = (list, label) => { if (new Set(list).size !== list.length) throw new Error(`${label}编号重复`); };
   unique(plan.modules.map(m => m.id), '模块'); unique(plan.assets.map(a => a.id), '素材'); unique(plan.batches.map(b => b.id), '批次');
@@ -39,7 +43,10 @@ function validatePlan(input) {
     for (const asset of plan.assets) if (!asset.designIds?.length || asset.designIds.some(ref => !designs.has(ref))) throw Error(`素材 ${asset.id} 缺少有效款式引用，未自行补写外观。`);
   }
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
-  if (plan.pageDesign) {
+  if (platformSlots) {
+    if (!plan.pageDesign || plan.modules.some(m => !m.narrative || m.story || !storefrontTypes.includes(m.type))) throw Error('可上传叙事方案缺少章节或使用了非原生模块。');
+    if (signs.length > 1 || (signs.length && plan.modules[0] !== signs[0])) throw Error('店铺招牌只能在开头出现一次。');
+  } else if (plan.pageDesign) {
     if (plan.modules.some(m => !m.story)) throw Error('叙事页面的模块缺少图文设计数据');
   } else if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw new Error('店铺必须以唯一一个招牌开始');
   const spec = { modules: plan.modules.map(({ id, type, props }) => ({ id, type, props })) };
@@ -57,7 +64,12 @@ function validatePlan(input) {
     m.props.assetIds.forEach((assetId, index) => {
       const asset = assets.get(assetId); if (!asset) throw new Error(`${m.id} 引用了不存在的素材 ${assetId}`);
       used.add(assetId);
-      const ratio = aspectRatios[asset.aspect], slot = plan.pageDesign ? { aspect: ratio } : entry.slots[index];
+      const ratio = aspectRatios[asset.aspect], slot = plan.pageDesign && !platformSlots ? { aspect: ratio } : entry.slots[index];
+      if (platformSlots && asset.artwork) {
+        if (Math.abs(asset.artwork.width - slot.width) > .01 || Math.abs(asset.artwork.height - slot.height) > .01) throw Error('图片排字规格与真实组件槽位不一致。');
+        if (entry.family === 'navigation') throw Error('导航圆形图片不能叠加设计文案。');
+        artworkGeometry(asset.artwork);
+      }
       const removed = 1 - Math.min(ratio / slot.aspect, slot.aspect / ratio);
       if (removed > .35) warnings.push(`${m.id} 第${index + 1}张使用 ${assetId}，适配槽位约裁去${Math.round(removed * 100)}%面积，需留意构图。`);
     });
@@ -66,7 +78,7 @@ function validatePlan(input) {
   if (plan.pageDesign) {
     const assignedImages = plan.modules.flatMap(m => m.props.assetIds);
     unique(assignedImages, '叙事页面图片');
-    for (const module of plan.modules) {
+    for (const module of platformSlots ? [] : plan.modules) {
       const geometry = moduleGeometry(module, assets);
       if (!Number.isFinite(geometry.height) || geometry.height <= 0 || geometry.images.some(image => image.rect.some(value => !Number.isFinite(value)))) throw Error('叙事模块尺寸无效');
     }
@@ -139,7 +151,8 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index, visualPr
   if (usesCampaignIdentity(visualProfile)) return [
     '生成一张可裁剪的珠宝店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；保持人物佩戴、环境静物、新款浏览的内容变化，不拼贴参考照片，不画网页。',
     campaignStyleLock(plan),
-    plan.pageDesign ? '【本批在整页中的作用】以下是模型已选定的章节与模块顺序，不能把每格都变成独立卖货海报：\n' + plan.modules.map(m => `${m.story.chapter} / ${m.story.layout}：${m.story.message}；衔接：${m.story.transition}；使用素材：${m.props.assetIds.join('、') || '仅排版文字'}`).join('\n') : '',
+    plan.pageDesign ? '【本批在整页中的作用】以下是模型已选定的章节与模块顺序，不能把每格都变成独立卖货海报：\n' + plan.modules.map(m => { const story = m.narrative || m.story; return `${story.chapter} / ${m.narrative ? m.type : story.layout}：${story.message}；衔接：${story.transition}；使用素材：${m.props.assetIds.join('、') || '原生店铺身份'}`; }).join('\n') : '',
+    plan.delivery === 'platform-slots-v1' ? '成品图片会逐张上传到真实装修组件。整页与模块外底色为白色；图片内部可以保留有表现力的光影和背景。各格按指定排字安全区构图，设计文字稍后写入该格PNG，不绘制文字，也不依赖图外网页排版。' : '',
     index ? '本批延续同一全套摄影基准与全局约定。上一批成图用于对照实际调色、高光和颗粒，不照搬款式、镜头或布局；保留本批的明确变化。' : '',
     `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
     ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {

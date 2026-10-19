@@ -6,6 +6,7 @@ const { contentBatches, evidenceFor } = require('./content-plan.cjs');
 const { frameTypes, moduleGeometry } = require('./narrative-layout.cjs');
 
 function compileNarrative(brief, value, recognition, profile) {
+  if (profile.pageComposition === 'platform-slots-v1') return require('./storefront-plan.cjs').compileStorefront(brief, value, recognition, profile);
   const result = narrativeContentSchema(campaignVisualSchema).safeParse(value);
   if (!result.success) throw Error('整页叙事方案不完整：' + result.error.issues.slice(0, 4).map(i => i.path.join('.')).join('、') + '。已保存响应，可从本阶段继续。');
   const content = result.data, evidence = new Map(evidenceFor(recognition, profile).map(item => [item.id, item]));

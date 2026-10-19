@@ -3,6 +3,7 @@ const path = require('path');
 const sharp = require('sharp');
 const { aspectRatios, validatePlan } = require('./plan.cjs');
 const { entries } = require('./catalog.cjs');
+const { bakeArtwork } = require('./slot-artwork.cjs');
 function runs(values) {
   const spans = []; let start = null;
   for (let i = 0; i <= values.length; i++) {
@@ -145,10 +146,16 @@ async function cropBatch(bytes, input, batchId, folder, compiledBatch) {
       const horizontal = outputWidth - clean.width, vertical = outputHeight - clean.height;
       pipeline = pipeline.extend({ left: Math.floor(horizontal / 2), right: Math.ceil(horizontal / 2), top: Math.floor(vertical / 2), bottom: Math.ceil(vertical / 2), background: plan.style.palette[0] });
     }
-    const buffer = await pipeline.png().toBuffer();
-    prepared.push({ buffer, report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: extracted, aspect: asset.aspect, fitMethod: padded ? 'contain-with-background' : 'center-crop', paddingAreaPercent: padded ? +(paddingFraction * 100).toFixed(2) : 0, removedAreaPercent: +((padded ? 1 - clean.width * clean.height / (box.width * box.height) : removed) * 100).toFixed(2), allowedRemovedAreaPercent: cropLimit * 100, framingReviewRequired: padded || removed > .3, upscaled: false } });
+    const rawBuffer = await pipeline.png().toBuffer();
+    const baked = plan.delivery === 'platform-slots-v1' && !!asset.artwork;
+    const buffer = baked ? await bakeArtwork(rawBuffer, asset.artwork) : rawBuffer;
+    prepared.push({ buffer, ...(baked ? { rawBuffer } : {}), report: { assetId: panel.id, detectedRect: box, boundaryTrim, cropRect: extracted, aspect: asset.aspect, fitMethod: padded ? 'contain-with-background' : 'center-crop', paddingAreaPercent: padded ? +(paddingFraction * 100).toFixed(2) : 0, removedAreaPercent: +((padded ? 1 - clean.width * clean.height / (box.width * box.height) : removed) * 100).toFixed(2), allowedRemovedAreaPercent: cropLimit * 100, framingReviewRequired: padded || removed > .3, upscaled: false, ...(baked ? { copyBaked: true } : {}) } });
   }
   fs.mkdirSync(path.join(folder, 'assets'), { recursive: true });
+  if (prepared.some(item => item.rawBuffer)) {
+    fs.mkdirSync(path.join(folder, 'source-assets'), { recursive: true });
+    for (const item of prepared) if (item.rawBuffer) fs.writeFileSync(path.join(folder, 'source-assets', `${item.report.assetId}.png`), item.rawBuffer);
+  }
   for (const item of prepared) fs.writeFileSync(path.join(folder, 'assets', `${item.report.assetId}.png`), item.buffer);
   fs.writeFileSync(path.join(folder, `${batchId}-source.png`), normalized);
   const report = { batchId, sourceDimensions: [width, height], crops: prepared.map(x => x.report), newGenerationCalls: 0, method: 'Detected magenta boundaries, bounded outer-edge cleanup, then center crop or bounded background padding; no resizing or stretching' };

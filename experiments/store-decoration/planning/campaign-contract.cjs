@@ -79,9 +79,9 @@ const cohesiveDesignMethod = [
   '上传图只限定经营方向，不是摄影案例。先设计一组不同示意款式，再分配图片；不同款可以共享装饰语言，但不靠反复展示同一图案维持统一。同款佩戴与静物对照遵守同一份 collection 外观，不能每张重造；不复制案例身份、商品、品牌或文字，不推断贵金属、宝石等级或客群。',
 ];
 const campaignProfile = {
-  id: 'jewelry', version: 20, name: '珠宝 · 叙事创作', pageComposition: 'narrative-v1',
+  id: 'jewelry', version: 21, name: '珠宝 · 叙事创作', pageComposition: 'platform-slots-v1',
   visualMethod: 'product-visual-v1', pageDirection: 'jewelry-page-v1', creativeWorkflow: 'jewelry-campaign-v1',
-  basis: 'AI先确定章节主张、模块分工和阅读顺序，再统一设计图文与款式并修订一次。程序按模型选择渲染海报、图文、双图、橱窗和过渡，贯通摄影基准、文字位置及入画款式；效果由用户验收。',
+  basis: 'AI先决定章节主张，再从真实装修组件中选择数量、顺序与组合；共享摄影基准，设计文字合入各槽位PNG。预览使用同一成品图和原生组件，模块外白底；效果由用户验收。',
   methodSources: ['skills/ec-visual/references/visual-dna.md', 'skills/ec-visual/references/message-picture-patterns.md'],
   rules: cohesiveDesignMethod.map(rule => rule.replace('heroVisualPlan.visualReference', 'content.reference')),
   stages: { recognition: recognitionInstructions, style: '全页摄影基准、图文色彩与字体气质共同确定。', content: '先规划章节主张、模块分工与顺序，再设计图文和不同款式。', design: '一次修订叙事是否实际落在模块和画面中，同时保留一致性与亮点。' },

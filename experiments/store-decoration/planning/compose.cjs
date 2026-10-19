@@ -32,10 +32,15 @@ function compose(folder, input, { visualProfile = null } = {}) {
     else content = { images: m.props.assetIds.map((id, i) => ({ src: image(id), ...(m.type.startsWith('navigation.') ? { label: m.props.labels[i] } : {}) })) };
     return { id: m.id, type: m.type, label: m.purpose, content, options: {} };
   }) };
-  const result = plan.pageDesign ? renderNarrativePage(plan) : renderPage(page);
+  const customNarrative = plan.pageDesign && plan.delivery !== 'platform-slots-v1';
+  const result = customNarrative ? renderNarrativePage(plan) : renderPage(page);
   if (plan.pageDesign) {
     page.pageDesign = plan.pageDesign;
-    page.modules.forEach((module, index) => { module.story = plan.modules[index].story; });
+    page.delivery = plan.delivery;
+    page.modules.forEach((module, index) => {
+      if (customNarrative) module.story = plan.modules[index].story;
+      else module.narrative = plan.modules[index].narrative;
+    });
   }
   fs.writeFileSync(path.join(folder, 'page.json'), JSON.stringify(page, null, 2));
   fs.writeFileSync(path.join(folder, 'shop.html'), result.html);

@@ -2,7 +2,7 @@ const { z } = require('zod');
 const { referenceSchema } = require('./page-direction.cjs');
 
 function usesNarrativePage(profile) {
-  return profile?.id === 'jewelry' && profile.version >= 20 && profile.pageComposition === 'narrative-v1';
+  return profile?.id === 'jewelry' && profile.version >= 20 && ['narrative-v1', 'platform-slots-v1'].includes(profile.pageComposition);
 }
 const hex = z.string().regex(/^#[\da-fA-F]{6}$/);
 const pageDesignSchema = z.object({
@@ -43,6 +43,7 @@ function narrativeContentSchema(visualSchema) {
 }
 
 function narrativePrompt(profile, { review = false } = {}) {
+  if (profile.pageComposition === 'platform-slots-v1') return require('./storefront-contract.cjs').storefrontPrompt(profile, { review });
   return [
     review
       ? '你是整页叙事与艺术指导，依据所附真实案例、经营资料和 draft，完成一次完整修订。先读实际浏览顺序，再检查画面。可以增删、移动或重组模块，返回完整终稿，不请求下一轮。'

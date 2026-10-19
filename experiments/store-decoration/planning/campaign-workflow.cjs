@@ -96,7 +96,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   }
   reviewed ||= await call('design', {
     ...context, draftSignature, draft: draft.creative,
-    pageOrder: draft.skeleton.plan.modules.map(m => ({ purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}) })),
+    pageOrder: draft.skeleton.plan.modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}), ...(m.narrative ? { narrative: m.narrative } : {}) })),
     currentSlots: draft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
     reviewScope: '这些槽位描述初稿显示方式，不冻结创意。可以修正款式、图片数量、顺序与组件组合，返回完整终稿；仍遵守12张和两批预算。只评审计划和参考，不声称看过尚未生成的成图。',
   }, true);
