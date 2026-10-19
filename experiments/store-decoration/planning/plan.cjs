@@ -3,6 +3,7 @@ const { catalog, entries } = require('./catalog.cjs');
 const { usesProductVisualMethod } = require('./visual-profile.cjs');
 const { usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contract.cjs');
 const { usesDigitalCampaign } = require('./digital-campaign.cjs');
+const { usesCategoryCampaign } = require('./category-campaign.cjs');
 const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
 const { pageDesignSchema, storySchema } = require('./narrative-contract.cjs');
 const { moduleGeometry } = require('./narrative-layout.cjs');
@@ -167,13 +168,14 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',
     ].filter(Boolean).join('\n\n');
-    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, ...(usesGenerationReferences(visualProfile) ? { visualReferences: batchVisualReferences(plan, batch, visualProfile) } : {}), ...(usesReferenceBackground(visualProfile) ? { backgroundGuidance: visualProfile.visualSkill.backgroundGuidance } : {}), ...(usesDigitalCampaign(visualProfile) ? { campaignDomain: 'digital' } : {}), styleLock: lock, prompt };
+    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, ...(usesGenerationReferences(visualProfile) ? { visualReferences: batchVisualReferences(plan, batch, visualProfile) } : {}), ...(usesReferenceBackground(visualProfile) ? { backgroundGuidance: visualProfile.visualSkill.backgroundGuidance } : {}), ...(usesDigitalCampaign(visualProfile) || usesCategoryCampaign(visualProfile) ? { campaignDomain: visualProfile.id } : {}), styleLock: lock, prompt };
   });
 }
 function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {
   const digitalCampaign = usesDigitalCampaign(visualProfile);
+  const category = usesCategoryCampaign(visualProfile) ? visualProfile.generationInstructions : null;
   if (usesCampaignIdentity(visualProfile)) return [
-    digitalCampaign ? '生成一张可裁剪的数码店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；按计划呈现产品主视觉、使用关系、可见细节和外观选择，不把整页拍成同一张科技展台。不拼贴案例，不画网页，不把案例中的手机、耳机或键盘加入本店未经营品类。' : '生成一张可裁剪的珠宝店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；保持人物佩戴、环境静物、新款浏览的内容变化，不拼贴参考照片，不画网页。',
+    category ? category.intro : digitalCampaign ? '生成一张可裁剪的数码店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；按计划呈现产品主视觉、使用关系、可见细节和外观选择，不把整页拍成同一张科技展台。不拼贴案例，不画网页，不把案例中的手机、耳机或键盘加入本店未经营品类。' : '生成一张可裁剪的珠宝店铺广告摄影素材总图。所有画面属于同一视觉企划，每格是完整照片；保持人物佩戴、环境静物、新款浏览的内容变化，不拼贴参考照片，不画网页。',
     campaignStyleLock(plan),
     plan.pageDesign ? '【本批在整页中的作用】以下是模型已选定的章节与模块顺序，不能把每格都变成独立卖货海报：\n' + plan.modules.map(m => { const story = m.narrative || m.story; return `${story.chapter} / ${m.narrative ? m.type : story.layout}：${story.message}；衔接：${story.transition}；使用素材：${m.props.assetIds.join('、') || '原生店铺身份'}`; }).join('\n') : '',
     plan.delivery === 'platform-slots-v1' ? '成品图片会逐张上传到真实装修组件。整页与模块外底色为白色；图片内部可以保留有表现力的光影和背景。各格按指定排字安全区构图，设计文字稍后写入该格PNG，不绘制文字，也不依赖图外网页排版。' : '',
@@ -187,9 +189,9 @@ function productBatchPrompt(plan, batch, lookup, weights, total, index, visualPr
         : '本格为不展示商品的招牌氛围背景，只落实本格光影、色彩与材质设计，不添加商品或从其他格借用款式。';
       return `第 ${j + 1} 格（仅定位，不绘制编号），比例 ${asset.aspect}，${id === plan.artDirection.focalAssetId ? '整页主视觉' : '配合主视觉的' + asset.direction.role}：${asset.prompt}\n${asset.layoutBrief || ''}\n${designBrief}${asset.direction.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
     }).join('\n')),
-    digitalCampaign ? '每格独立构图，相邻画面通过同一色彩、表面反射和光质连成店铺；使用场景和产品静物属于同一次拍摄。人物为原创成年人，握持、按键操作或佩戴符合该产品外形，部件连续，不悬空穿插；有无人物及景别按本格计划，不强塞佩戴。' : '每格独立构图，不是同一照片切片；相邻画面通过共享色彩、材质和光质连成店铺，不能只因款式不同就另换摄影风格。人物为原创成年人，饰品与人体接触自然。',
+    category ? '每格独立构图，相邻画面通过共享色彩、表面层次和光质连成同一家店铺。' + category.physical : digitalCampaign ? '每格独立构图，相邻画面通过同一色彩、表面反射和光质连成店铺；使用场景和产品静物属于同一次拍摄。人物为原创成年人，握持、按键操作或佩戴符合该产品外形，部件连续，不悬空穿插；有无人物及景别按本格计划，不强塞佩戴。' : '每格独立构图，不是同一照片切片；相邻画面通过共享色彩、材质和光质连成店铺，不能只因款式不同就另换摄影风格。人物为原创成年人，饰品与人体接触自然。',
     '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。分隔带内只填纯色，每格有自己的不透明背景，物体及阴影不跨格，画面内禁用分隔色。',
-    digitalCampaign ? '按本格比例与排字安全区构图，完整展示需要说明的轮廓与部件。同款各图维持外观与配色，不新增接口、内部芯片或爆炸拆解；屏幕用无字抽象图或反射。商品是同类示意，不继承案例品牌、型号、参数或系统UI，不绘制文案、编号、水印或虚构功能证明。' : '按各格比例构图并给饰品留安全边距。商品为示意设计，不绘制文字、编号、品牌、水印或界面，不增加未提供的真实材质与性能宣称。',
+    category ? category.bounds : digitalCampaign ? '按本格比例与排字安全区构图，完整展示需要说明的轮廓与部件。同款各图维持外观与配色，不新增接口、内部芯片或爆炸拆解；屏幕用无字抽象图或反射。商品是同类示意，不继承案例品牌、型号、参数或系统UI，不绘制文案、编号、水印或虚构功能证明。' : '按各格比例构图并给饰品留安全边距。商品为示意设计，不绘制文字、编号、品牌、水印或界面，不增加未提供的真实材质与性能宣称。',
   ].filter(Boolean).join('\n\n');
   if (usesJewelryCampaign(visualProfile)) return [
     '生成一张可裁剪的珠宝广告摄影素材总图。每格是按自身描述构图的完整照片，人物佩戴、环境静物及商品浏览各有画面，不是同一场景的连续切片，也不是网页截图。',

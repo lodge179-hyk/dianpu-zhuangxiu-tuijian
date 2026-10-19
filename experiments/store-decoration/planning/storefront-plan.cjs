@@ -7,12 +7,28 @@ const { contentBatches, evidenceFor } = require('./content-plan.cjs');
 const { artworkGeometry, artworkBrief, artworkFitFeedback } = require('./slot-artwork.cjs');
 
 function compileStorefront(brief, value, recognition, profile) {
-  const parsed = storefrontContentSchema(campaignVisualSchema, campaignBackdropSchema).safeParse(value);
-  if (!parsed.success) throw Error('装修叙事方案不完整：' + parsed.error.issues.slice(0, 4).map(i => i.path.join('.')).join('、') + '。已保存响应，可从本阶段继续。');
+  let parsed = storefrontContentSchema(campaignVisualSchema, campaignBackdropSchema).safeParse(value);
+  if (!parsed.success) {
+    // Explicit empty references can be reviewed without inventing products.
+    // Missing/malformed fields still fail; empty arrays are reported below and
+    // can never become an executable plan, including on the final-design path.
+    const reviewable = storefrontContentSchema(campaignVisualSchema, campaignBackdropSchema, { allowEmptyProductReferences: true }).safeParse(value);
+    if (!reviewable.success) throw Error('装修叙事方案不完整：' + parsed.error.issues.slice(0, 4).map(i => i.path.join('.')).join('、') + '。已保存响应，可从本阶段继续。');
+    parsed = reviewable;
+  }
   const content = parsed.data, evidence = new Map(evidenceFor(recognition, profile).map(item => [item.id, item]));
-  const designs = new Map(), categories = new Set(), assets = [], modules = [], tasks = [], decisions = [], copyIssues = [];
+  const designs = new Map(), categories = new Set(), assets = [], modules = [], tasks = [], decisions = [], copyIssues = [], referenceIssues = [];
   for (const item of content.collection) {
-    if (designs.has(item.id) || !recognition.categories.includes(item.category)) throw Error('款式编号重复或引用未确认品类，已保留方案。');
+    if (designs.has(item.id)) throw Error('款式编号重复：' + item.id + '，已保留方案。');
+    if (!recognition.categories.includes(item.category)) {
+      // Mixed Chinese/Latin category labels sometimes gain typography spaces
+      // (T恤 -> T 恤). Canonicalize only a unique whitespace-only match; do not
+      // infer synonyms, split a category, or change any appearance/visual copy.
+      const compact = item.category.replace(/\s+/gu, '');
+      const matches = recognition.categories.filter(category => category.replace(/\s+/gu, '') === compact);
+      if (matches.length !== 1) throw Error('款式 ' + item.id + ' 引用的品类“' + item.category + '”无法唯一对应已确认品类，已保留方案，未猜测类别。');
+      item.category = matches[0];
+    }
     designs.set(item.id, item);
   }
   const checkReference = ref => {
@@ -27,17 +43,34 @@ function compileStorefront(brief, value, recognition, profile) {
       checkReference(visual.visualPlan.visualReference);
       // Resolve only explicit collection references for this image. Never swap
       // ID prefixes or infer a category from the subject/picture text.
+      const evidenceIdForDesign = id => {
+        const design = designs.get(id);
+        if (!design || !visual.visualPlan.designIds.includes(id)) throw Error('品类资料引用中的款式 ' + id + ' 未定义或不属于本图，已保留方案。');
+        const matches = [...evidence.values()].filter(e => e.category === design.category);
+        if (matches.length !== 1) throw Error('款式 ' + id + ' 无法唯一对应经营资料，未猜测或替换品类。');
+        return matches[0].id;
+      };
+      // A signboard may omit redundant category IDs while explicitly selecting
+      // known designs. Follow that exact design -> category -> evidence relation;
+      // an empty design list still means no selected product and is never guessed.
+      if (entry.family === 'signboard' && !visual.evidenceIds.length && visual.visualPlan.designIds.length) {
+        visual.evidenceIds = [...new Set(visual.visualPlan.designIds.map(evidenceIdForDesign))];
+      }
       if (visual.evidenceIds.some(id => id.startsWith('design-'))) {
         visual.evidenceIds = [...new Set(visual.evidenceIds.map(id => {
           if (!id.startsWith('design-')) return id;
-          const design = designs.get(id);
-          if (!design || !visual.visualPlan.designIds.includes(id)) throw Error('品类资料引用中的款式 ' + id + ' 未定义或不属于本图，已保留方案。');
-          const matches = [...evidence.values()].filter(e => e.category === design.category);
-          if (matches.length !== 1) throw Error('款式 ' + id + ' 无法唯一对应经营资料，未猜测或替换品类。');
-          return matches[0].id;
+          return evidenceIdForDesign(id);
         }))];
       }
-      if (entry.family === 'signboard' && !!visual.evidenceIds.length !== !!visual.visualPlan.designIds.length) throw Error('招牌若不展示商品，两组商品引用均应为空；展示商品时均须填写。已保留方案。');
+      const mismatchedSignboard = entry.family === 'signboard' && !!visual.evidenceIds.length !== !!visual.visualPlan.designIds.length;
+      const emptyProductReferences = entry.family !== 'signboard' && (!visual.evidenceIds.length || !visual.visualPlan.designIds.length);
+      if (mismatchedSignboard || emptyProductReferences) referenceIssues.push({
+        path: `content.modules.${index}.visuals.${slotIndex}`, component: item.type,
+        evidenceIds: [...visual.evidenceIds], designIds: [...visual.visualPlan.designIds],
+        reason: mismatchedSignboard
+          ? '招牌两组商品引用不一致。由你依据画面修正：展示商品时两组均须对应实际商品；无商品背景时两组均为空。不猜填编号。'
+          : '正文与导航必须同时引用本图已定义款式和对应经营资料。请调整画面与引用；若是凑数的无商品导航，由你改选或重组模块，不添加虚构品类，不只补编号而保留不对应的图。',
+      });
       for (const id of visual.evidenceIds) {
         if (!evidence.has(id)) throw Error('方案引用未知经营资料 ' + id + '，已保留响应。');
         categories.add(evidence.get(id).category);
@@ -91,14 +124,15 @@ function compileStorefront(brief, value, recognition, profile) {
   if (!assets.length) throw Error('整页须有1至12张素材，尚未生图。');
   const missing = recognition.categories.filter(category => !categories.has(category));
   if (missing.length) throw Error('整页叙事尚未覆盖经营品类：' + missing.join('、') + '。已保存响应。');
-  if (assets.length > 12 || copyIssues.length) {
+  if (assets.length > 12 || copyIssues.length || referenceIssues.length) {
     const overBudget = assets.length > 12;
     const error = Error(overBudget
       ? `整页实际安排${assets.length}张素材，须为1至12张（各模块：${content.modules.map(m => `${m.type}=${m.visuals.length}`).join('、')}）。请调整组件或图数，保留招牌与品类覆盖；尚未生图。`
+      : referenceIssues.length ? `画面商品引用尚未完成：${referenceIssues.map(issue => `${issue.path}：${issue.reason}`).join('；')}`
       : `图片文案排版尚未完成：${copyIssues.map(issue => `${issue.path}：${issue.reason}`).join('；')}`);
     // This is review input only, never a generation-ready plan. A complete
     // draft with these design issues can reach the existing review; the final stays strict.
-    error.code = overBudget ? 'STOREFRONT_IMAGE_BUDGET' : 'STOREFRONT_COPY_LAYOUT';
+    error.code = overBudget ? 'STOREFRONT_IMAGE_BUDGET' : referenceIssues.length ? 'STOREFRONT_PRODUCT_REFERENCES' : 'STOREFRONT_COPY_LAYOUT';
     error.reviewDraft = {
       content,
       pageOrder: modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, narrative: m.narrative })),
@@ -106,10 +140,12 @@ function compileStorefront(brief, value, recognition, profile) {
       requiredChanges: {
         code: error.code, actualImages: assets.length, maxImages: 12, reduceByAtLeast: Math.max(0, assets.length - 12),
         moduleCounts: modules.map(m => ({ type: m.type, chapter: m.narrative.chapter, images: m.props.assetIds.length })),
+        ...(referenceIssues.length ? { referenceIssues } : {}),
         ...(copyIssues.length ? { copyIssues: copyIssues.map(issue => ({
           ...issue, fit: artworkFitFeedback(assets.find(asset => asset.id === issue.id).artwork, issue.allowedPlacements),
         })) } : {}),
         instruction: [
+          referenceIssues.length ? '按referenceIssues修正商品引用与关联画面。无商品导航不能靠填假编号通过；由你修改相关画面或重组组件。招牌若显示商品，两组引用须对应；只有不含商品的招牌背景可两组为空。程序没有更改原引用或代选模块。' : '',
           overBudget ? '先调整模块组合与各模块图数，使实际图片总数不超过12，再返回完整终稿。由你决定删减或改选哪些组件，保留必备招牌、品类覆盖、核心叙事和视觉亮点；不是只改报出的总数或换句话重复原结构。' : '',
           copyIssues.length ? '按reason与fit逐项修订copyIssues。fit.currentCopyFitsAt是当前全文能放下的位置；若为空，换位置也不能解决，必须由你精简文案或改选更大组件。fit.headingOnlyFitsAt只说明保留原标题、不带正文时可用的位置，供设计取舍，不是程序已删正文。小图可保留短标题，将有必要的说明融入本章大图文案；不要原样复制放不下的正文。同步修改picture，排字与留白必须同侧，主体在另一侧。返回完整终稿，不能仅写修订说明。' : '',
         ].filter(Boolean).join('\n'),

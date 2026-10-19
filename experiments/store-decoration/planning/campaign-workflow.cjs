@@ -48,7 +48,7 @@ function compileCreative(value, recognition, profile, { draft = false } = {}) {
       : compileContent(brief, creative.content, recognition, { visualProfile: profile });
   } catch (error) {
     if (profile.pageComposition === 'platform-slots-v1'
-      && ['STOREFRONT_IMAGE_BUDGET', 'STOREFRONT_COPY_LAYOUT'].includes(error.code) && error.reviewDraft) {
+      && ['STOREFRONT_IMAGE_BUDGET', 'STOREFRONT_COPY_LAYOUT', 'STOREFRONT_PRODUCT_REFERENCES'].includes(error.code) && error.reviewDraft) {
       const { content, ...reviewContext } = error.reviewDraft;
       error.creativeDraft = { creative: { ...creative, content }, reviewContext };
       if (draft) return error.creativeDraft;
@@ -99,7 +99,7 @@ async function planCampaign(run, profile, save, { fetcher, reuse, setStage }) {
     run.state.research = {
       concept: creative.concept, reason: creative.reason, style: creative.style, anchors: creative.anchors,
       selectedSources: [], sources: [], visualSkill: profile.visualSkill, visualReferences: visual.references, pageReferences: visual.pageReferences,
-      basis: profile.id === 'digital' ? '实际读取所附数码摄影与页面案例，结合已核对官网的叙事记录，依据经营边界统一创作；运行时不联网搜索，效果待用户生图验收。' : '实际读取所附整页、人物佩戴和静物案例，依据AI提炼的经营边界统一创作；本流程不执行网页检索。效果待用户生图验收。',
+      basis: profile.editorialReferences ? '实际读取所附品类摄影案例，结合已核对官网的叙事记录，依据经营边界统一创作；整页附图以pageReferences为准，运行时不联网搜索，效果待用户生图验收。' : '实际读取所附整页、人物佩戴和静物案例，依据AI提炼的经营边界统一创作；本流程不执行网页检索。效果待用户生图验收。',
     };
     writeJson(run.folder, 'style-research.json', run.state.research);
     writeJson(run.folder, 'content-plan.json', creative.content);
@@ -112,13 +112,20 @@ async function planCampaign(run, profile, save, { fetcher, reuse, setStage }) {
   saveCreative(draft);
 
   setStage(run, 'designing', usesNarrativePage(profile) ? '正在修订内容衔接、图文表达与视觉一致性' : usesCampaignIdentity(profile) ? '正在修订整页的一致性、视觉焦点与画面变化' : '正在进行一次整套修订：款式变化、人物佩戴与案例运用', save);
-  const draftSignature = createHash('sha256').update(JSON.stringify({ creative: draft.creative, businessScope, profile })).digest('hex');
+  const signatureForDraft = creative => createHash('sha256').update(JSON.stringify({ creative, businessScope, profile })).digest('hex');
+  const draftSignature = signatureForDraft(draft.creative);
   const previous = reuse ? stages(run.folder, 'design')[0] : null;
   let reviewed = null;
   if (previous) {
     try {
       const input = JSON.parse(fs.readFileSync(path.join(run.folder, previous.name + '-input.json'), 'utf8'));
-      if (input.draftSignature === draftSignature) reviewed = cachedCreative('design')?.value || null;
+      // Deterministic reference normalization must not discard an already-saved
+      // revision. Require both the original signature and the same parsed draft;
+      // different content, scope or profile still invalidates this cache.
+      const sameDraft = input.draftSignature === draftSignature
+        || (input.draft && signatureForDraft(input.draft) === input.draftSignature
+          && signatureForDraft(parse(input.draft, 'content').creative) === draftSignature);
+      if (sameDraft) reviewed = cachedCreative('design')?.value || null;
     } catch {}
   }
   const reviewDraft = incompleteRevision || draft;

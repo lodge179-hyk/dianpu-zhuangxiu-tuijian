@@ -34,6 +34,7 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
   if (visual.records.length) {
     const cohesive = batch.backgroundGuidance === 'campaign-identity-v1';
     const digitalCampaign = batch.campaignDomain === 'digital';
+    const categoryCampaign = ['apparel', 'footwear', 'fragrance', 'bags'].includes(batch.campaignDomain);
     const master = cohesive ? visual.records.find(ref => ref.campaign) : null;
     if (cohesive && !master) throw Error('本批缺少全套摄影基准图片，尚未请求生图。');
     const referenceBackground = batch.backgroundGuidance === 'reference-background-v1';
@@ -41,10 +42,10 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
     const plannedReference = batch.backgroundGuidance === 'planned-reference-v1' || campaignReference;
     const referenceGuide = cohesive ? [
       `【全套视觉基准】参考图片${master.attachment}是整页共同的摄影基准，适用于所有格子，不只用于首图。借鉴：${master.campaign.borrow}；不继承：${master.campaign.avoid}。全套色彩、光质和后期首先服从正文的“全套摄影约定”，这张参考提供实现这些约定的视觉依据。`,
-      digitalCampaign ? '【参考分工】这是一家店铺的同一组产品摄影，场景与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的色系、光质或后期。统一摄影语言仍需保留主视觉冲击力、使用关系和产品外观变化，不能把所有照片拍成同一素底。' : '【参考分工】这是一家店铺的同一组广告摄影，人物与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的调色、背景色系、光质或后期；不要将多张案例拼成不同品牌的拼贴。统一摄影语言仍需保留主视觉冲击力、人物参与和不同款式的变化，不能把所有照片拍成同一素底。',
+      digitalCampaign || categoryCampaign ? '【参考分工】这是一家店铺的同一组产品摄影，场景与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的色系、光质或后期。统一摄影语言仍需保留主视觉冲击力、使用关系和产品外观变化，不能把所有照片拍成同一素底。' : '【参考分工】这是一家店铺的同一组广告摄影，人物与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的调色、背景色系、光质或后期；不要将多张案例拼成不同品牌的拼贴。统一摄影语言仍需保留主视觉冲击力、人物参与和不同款式的变化，不能把所有照片拍成同一素底。',
       ...visual.records.filter(ref => ref.uses.length).map(ref => `参考图片${ref.attachment}的局部构图用途（共同摄影基准优先）：\n` + ref.uses.map(use => `第${use.row}行第${use.column}格：借鉴${use.borrow}；不继承${use.avoid}。只把适合的姿态或空间关系带入本套光色体系。`).join('\n')),
       previousSheetAttachment ? `参考图片${previousSheetAttachment}是同任务上一批成图。延续其符合全套约定的白平衡、高光、颗粒和表面质感；不要重画上一批商品或布景。若其局部偏离约定，仍以固定基准图和全套约定为准，不放大偏差。` : '',
-      digitalCampaign ? '参考中的人物身份、产品、商标、文案、参数和系统UI不复制；商品以本店经营方向及逐格设计为准。只借光影、表面、尺度及使用构图，不复制蓝色桌面或白色耳机成为所有图的模板。人物为原创成年人，手持、操作或佩戴关系按该格产品决定。所有行列、比例和洋红分隔带按正文执行。' : '参考中的人物身份、商品、品牌、文字和UI不复制；商品与款式以正文中的本店设计为准。人物为原创成年人，佩戴关系自然。所有行列、比例和洋红分隔带按正文执行。',
+      categoryCampaign ? '参考只借光影、表面、空间、尺度和画面关系，不复制原人物身份、商标、专属纹样、商品外形或文案；不把案例的产品当成本店经营品类。人物为原创成年人，穿着、携带、摆放或使用关系按本格商品决定，香氛不强塞佩戴、箱包不套饰品姿势。所有行列、比例和洋红分隔带按正文执行。' : digitalCampaign ? '参考中的人物身份、产品、商标、文案、参数和系统UI不复制；商品以本店经营方向及逐格设计为准。只借光影、表面、尺度及使用构图，不复制蓝色桌面或白色耳机成为所有图的模板。人物为原创成年人，手持、操作或佩戴关系按该格产品决定。所有行列、比例和洋红分隔带按正文执行。' : '参考中的人物身份、商品、品牌、文字和UI不复制；商品与款式以正文中的本店设计为准。人物为原创成年人，佩戴关系自然。所有行列、比例和洋红分隔带按正文执行。',
     ].filter(Boolean).join('\n\n') : [
       campaignReference ? '本套包含人物佩戴与静物摄影，分别按各格方案执行。人物参考只借姿态、服装配合、景别和光线，创作新的成年人物与本格饰品，不复制案例人物身份或商品。不得把人物画面改为无人的静物台。' : '',
       plannedReference

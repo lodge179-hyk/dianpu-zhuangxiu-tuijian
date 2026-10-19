@@ -3,6 +3,8 @@ const { skillSnapshot, integrationContract, skillStageInstructions, seriesConten
 const { usesPageDirection, pageDirectionStages } = require('./page-direction.cjs');
 const { campaignProfile, usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contract.cjs');
 const { digitalCampaignProfile, usesDigitalCampaign } = require('./digital-campaign.cjs');
+const { categoryCampaignProfile, usesCategoryCampaign } = require('./category-campaign.cjs');
+const modeNames = { general: '通用', jewelry: '珠宝', digital: '数码', apparel: '服装', footwear: '鞋履', fragrance: '香氛', bags: '箱包' };
 
 // Saved tasks keep their visual rules; legacy jewelry tasks also skip the retired mode gate.
 const jewelryRecognitionPolicy = '用户已经选择珠宝模式，直接采用该模式，不进行适用性、品类白名单或案例覆盖判断，不需要输出 modeAssessment。独立识别实际经营商品及可见特点，不把其他商品改识别为珠宝；佩戴背景或道具不算经营商品。保留原有商品信息充足性判断，sufficient 只依据截图是否清晰、信息是否足够，不依据是否符合珠宝模式。商品描述仍使用原有 description 和 imageIndex 字段，不新增字段。';
@@ -135,8 +137,8 @@ const footwearProfile = {
 };
 
 function createVisualProfile(mode = 'general') {
-  const profile = mode === 'general' ? generalProfile : mode === 'jewelry' ? campaignProfile : mode === 'digital' ? digitalCampaignProfile : mode === 'footwear' ? footwearProfile : null;
-  if (!profile) throw Error('装修模式无效，请选择通用自动、珠宝、数码或鞋履。');
+  const profile = mode === 'general' ? generalProfile : mode === 'jewelry' ? campaignProfile : mode === 'digital' ? digitalCampaignProfile : categoryCampaignProfile(mode);
+  if (!profile) throw Error('装修模式无效，请选择通用、珠宝、数码、服装、鞋履、香氛或箱包。');
   const saved = JSON.parse(JSON.stringify(profile));
   saved.visualSkill = skillSnapshot(mode);
   if (usesJewelryCampaign(saved)) {
@@ -146,6 +148,10 @@ function createVisualProfile(mode = 'general') {
   } else if (usesDigitalCampaign(saved)) {
     saved.visualSkill.referenceIds = ['xiaomi-sculpture-v1', 'apple-motion-v1', 'apple-product-v1', 'apple-detail-v1', 'logitech-workspace-v1', 'realme-light-v1'];
     saved.visualSkill.pageReferenceIds = ['digital-page-rhythm-v1'];
+    saved.visualSkill.backgroundGuidance = 'campaign-identity-v1';
+  } else if (usesCategoryCampaign(saved)) {
+    saved.visualSkill.referenceIds = [...saved.referenceIds];
+    saved.visualSkill.pageReferenceIds = [];
     saved.visualSkill.backgroundGuidance = 'campaign-identity-v1';
   } else if (usesPageDirection(saved)) {
     for (const stage of ['style', 'content', 'design']) saved.stages[stage] += '\n' + integrationContract;
@@ -165,10 +171,10 @@ function visualProfileFor(state) {
   // Legacy general tasks have no profile; keep their original planning and generation path.
   if (!state.generationMode || (state.generationMode === 'general' && !state.visualProfile)) return null;
   const profile = state.visualProfile;
-  if (!['general', 'jewelry', 'digital', 'footwear'].includes(state.generationMode) || profile?.id !== state.generationMode || !Number.isInteger(profile.version) || profile.version < 1
+  if (!Object.hasOwn(modeNames, state.generationMode) || profile?.id !== state.generationMode || !Number.isInteger(profile.version) || profile.version < 1
     || !Array.isArray(profile.rules) || !profile.rules.length || profile.rules.some(rule => typeof rule !== 'string' || !rule)
     || ['recognition', 'style', 'content', 'design'].some(stage => typeof profile.stages?.[stage] !== 'string' || !profile.stages[stage])) {
-    throw Error(`本任务缺少已保存的${state.generationMode === 'general' ? '通用' : state.generationMode === 'footwear' ? '鞋履' : state.generationMode === 'digital' ? '数码' : '珠宝'}规则，已停止；请新建任务，不会替换旧任务规则。`);
+    throw Error(`本任务缺少已保存的${modeNames[state.generationMode] || state.generationMode}规则，已停止；请新建任务，不会替换旧任务规则。`);
   }
   return profile;
 }
@@ -184,7 +190,7 @@ function profileInstructions(profile, stage) {
       ? '\n【品类覆盖与创作依据】主视觉与正文合计覆盖全部已确认品类。heroEvidenceIds 与正文 evidenceIds 引用本图所示品类及代表性经营特征的来源资料，不要求来源商品的具体款式入画；同一编号可支持多个不同示意款式。不得借用画面中未展示品类的编号凑覆盖。已在首图展示的品类不必在正文重复，导航和店招不计入覆盖。保持原素材预算，不自动添加图片。'
       : '\n【品类覆盖口径修正】主视觉与正文合计覆盖全部已确认品类；本条替代旧规则中的“正文覆盖全部品类”。heroEvidenceIds 必须引用主视觉实际展示的商品资料，正文仍用 evidenceIds。已在首图展示的品类不必在正文重复；导航和店招不计入覆盖，不能填写未出现在画面中的商品编号凑覆盖。只在原有素材预算内安排，不自动添加图片。')
     : '';
-  return `\n\n【${profile.id === 'general' ? '通用' : profile.id === 'footwear' ? '鞋履' : profile.id === 'digital' ? '数码' : '珠宝'}模式：本任务保存的设计规则】\n` + profile.stages[stage] + rules + coverageContract;
+  return `\n\n【${modeNames[profile.id] || profile.name}模式：本任务保存的设计规则】\n` + profile.stages[stage] + rules + coverageContract;
 }
 
 function profileContext(profile) {
