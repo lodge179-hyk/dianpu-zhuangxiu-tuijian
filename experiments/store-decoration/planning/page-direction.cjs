@@ -1,8 +1,9 @@
 const { z } = require('zod');
+const { usesDigitalCampaign } = require('./digital-campaign.cjs');
 
-// Opt in only for new jewelry tasks; old snapshots keep their planning/layout path.
+// New campaign profiles opt in; saved snapshots keep their planning/layout path.
 function usesPageDirection(profile) {
-  return profile?.id === 'jewelry' && profile.version >= 17 && profile.pageDirection === 'jewelry-page-v1';
+  return (profile?.id === 'jewelry' && profile.version >= 17 && profile.pageDirection === 'jewelry-page-v1') || usesDigitalCampaign(profile);
 }
 
 // Accept only observed field-name variants; do not infer or replace design content.

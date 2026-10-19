@@ -2,6 +2,7 @@ const { productVisualStages } = require('./visual-method.cjs');
 const { skillSnapshot, integrationContract, skillStageInstructions, seriesContentInstructions, generationReferenceInstructions } = require('./visual-skill.cjs');
 const { usesPageDirection, pageDirectionStages } = require('./page-direction.cjs');
 const { campaignProfile, usesJewelryCampaign, usesCampaignIdentity } = require('./campaign-contract.cjs');
+const { digitalCampaignProfile, usesDigitalCampaign } = require('./digital-campaign.cjs');
 
 // Saved tasks keep their visual rules; legacy jewelry tasks also skip the retired mode gate.
 const jewelryRecognitionPolicy = '用户已经选择珠宝模式，直接采用该模式，不进行适用性、品类白名单或案例覆盖判断，不需要输出 modeAssessment。独立识别实际经营商品及可见特点，不把其他商品改识别为珠宝；佩戴背景或道具不算经营商品。保留原有商品信息充足性判断，sufficient 只依据截图是否清晰、信息是否足够，不依据是否符合珠宝模式。商品描述仍使用原有 description 和 imageIndex 字段，不新增字段。';
@@ -134,7 +135,7 @@ const footwearProfile = {
 };
 
 function createVisualProfile(mode = 'general') {
-  const profile = mode === 'general' ? generalProfile : mode === 'jewelry' ? campaignProfile : mode === 'digital' ? digitalProfile : mode === 'footwear' ? footwearProfile : null;
+  const profile = mode === 'general' ? generalProfile : mode === 'jewelry' ? campaignProfile : mode === 'digital' ? digitalCampaignProfile : mode === 'footwear' ? footwearProfile : null;
   if (!profile) throw Error('装修模式无效，请选择通用自动、珠宝、数码或鞋履。');
   const saved = JSON.parse(JSON.stringify(profile));
   saved.visualSkill = skillSnapshot(mode);
@@ -142,6 +143,10 @@ function createVisualProfile(mode = 'general') {
     saved.visualSkill.referenceIds = ['jewelry-portrait-v1', 'jewelry-wearing-v1', 'piaget-possession-v2', 'piaget-rose-v2', 'jewelry-editorial-v1'];
     saved.visualSkill.pageReferenceIds = ['jewelry-fashion-page-v1', 'jewelry-page-rhythm-v1'];
     saved.visualSkill.backgroundGuidance = usesCampaignIdentity(saved) ? 'campaign-identity-v1' : 'campaign-reference-v1';
+  } else if (usesDigitalCampaign(saved)) {
+    saved.visualSkill.referenceIds = ['xiaomi-sculpture-v1', 'apple-motion-v1', 'apple-product-v1', 'apple-detail-v1', 'logitech-workspace-v1', 'realme-light-v1'];
+    saved.visualSkill.pageReferenceIds = ['digital-page-rhythm-v1'];
+    saved.visualSkill.backgroundGuidance = 'campaign-identity-v1';
   } else if (usesPageDirection(saved)) {
     for (const stage of ['style', 'content', 'design']) saved.stages[stage] += '\n' + integrationContract;
     saved.visualSkill.referenceIds = ['piaget-possession-v2', 'piaget-rose-v2', 'jewelry-editorial-v1'];

@@ -11,8 +11,8 @@ const { nextStage, cachedStage } = require('./stage-cache.cjs');
 const { visualProfileFor, profileInstructions, profileContext, usesCategoryReference, usesProductContext } = require('./visual-profile.cjs');
 const { usesVisualSkill, usesGenerationReferences, visualSkillInput, referenceMetadata, prepareVisualReferences } = require('./visual-skill.cjs');
 const { usesPageDirection } = require('./page-direction.cjs');
-const { usesJewelryCampaign, campaignRecognitionPrompt, attachBusinessScope } = require('./campaign-contract.cjs');
-const { planJewelryCampaign } = require('./campaign-workflow.cjs');
+const { usesCreativeCampaign, campaignRecognitionPrompt, attachBusinessScope } = require('./campaign-contract.cjs');
+const { planCampaign } = require('./campaign-workflow.cjs');
 
 const limits = { maxImages: 6, maxImageMB: 10, maxTotalMB: 30 };
 const { recognitionRequestSchema, recognitionSchema, researchSchema, designSchema, validateRecognition, validateResearch, applyDesign } = require('./model-contracts.cjs');
@@ -20,7 +20,7 @@ const schemaPrompt = schema => '\n仅输出符合此结构的 JSON，不输出 M
 function recognitionPrompt(profile, imageCount = 6) {
   // A compact populated-data contract also applies on manual v18 resume.
   // Other profiles keep their original schema and recognition instructions.
-  if (usesJewelryCampaign(profile)) return campaignRecognitionPrompt(imageCount);
+  if (usesCreativeCampaign(profile)) return campaignRecognitionPrompt(imageCount, profile);
   const outputSchema = recognitionRequestSchema;
   const recognitionRules = profileInstructions(profile, 'recognition');
   const outputContract = [
@@ -164,7 +164,7 @@ async function productWorkflow(run, images, save, { fetcher, generate = true } =
 }
 async function continuePlanning(run, prepared, save, { fetcher, generate, reuse }) {
   const profile = visualProfileFor(run.state);
-  const campaign = usesJewelryCampaign(profile);
+  const campaign = usesCreativeCampaign(profile);
   const parseRecognition = value => {
     const result = validateRecognition(value, prepared.inputs.length);
     return campaign ? attachBusinessScope(result, value.businessScope, value.groups) : result;
@@ -190,7 +190,7 @@ async function continuePlanning(run, prepared, save, { fetcher, generate, reuse 
   run.state.recognition = recognition; writeJson(run.folder, 'recognition.json', recognition); save(run.folder, run.state);
   if (!recognition.sufficient) { run.state.status = 'needs-input'; setStage(run, 'needs-input', recognition.missing.join('；') || '请补充更多清楚的商品列表截图。', save); return run.state; }
   if (campaign) {
-    await planJewelryCampaign(run, profile, save, { fetcher, reuse, setStage });
+    await planCampaign(run, profile, save, { fetcher, reuse, setStage });
     compile(run); run.state.status = 'ready'; setStage(run, 'planned', '整页创作与修订已完成', save);
     if (generate) return generateRemaining(run, save, { fetcher });
     return run.state;

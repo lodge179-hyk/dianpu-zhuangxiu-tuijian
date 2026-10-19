@@ -51,7 +51,9 @@ function artworkGeometry(artwork) {
       panel: { x, y, width: boxWidth, height: bandHeight },
       textX: x + pad, textY: side ? (height - textHeight) / 2 : y + pad };
   }
-  throw Error('文案超出当前图片槽位的可读范围，请在画面设计中缩短文案或选择更大的组件；未移到图片外。');
+  const error = Error('文案超出当前图片槽位的可读范围，请在画面设计中缩短文案或选择更大的组件；未移到图片外。');
+  error.code = 'ARTWORK_TEXT_OVERFLOW';
+  throw error;
 }
 function artworkBrief(artwork) {
   const g = artworkGeometry(artwork);
@@ -61,6 +63,20 @@ function artworkBrief(artwork) {
   const fade = Math.min(artwork.width, artwork.height) * .03;
   const fraction = side ? (g.panel.width + fade) / artwork.width : (g.panel.height + fade) / artwork.height;
   return `本图成品将在${names[artwork.placement]}约${Math.ceil(fraction * 100)}%区域合入标题“${artwork.heading}”及短文“${artwork.body}”。此区域保留平静空间，主体与人物关键部位放在其余区域，不能被排字遮挡。排字区域以${artwork.background}衔接画面；这是图片内部设计，不是店铺底色。模型只生成摄影内容，不画文字，程序裁剪后把文字写入同一PNG。`;
+}
+// Report deterministic size constraints to the designer without changing its copy
+// or placement. Use the exact same geometry and readable limits as PNG export.
+function artworkFitFeedback(artwork, allowedPlacements) {
+  const fits = (placement, body) => {
+    try { return !!artworkGeometry({ ...artwork, placement, body }); }
+    catch (error) { if (error.code === 'ARTWORK_TEXT_OVERFLOW') return false; throw error; }
+  };
+  return {
+    width: artwork.width, height: artwork.height,
+    currentCopy: { heading: artwork.heading, body: artwork.body, placement: artwork.placement },
+    currentCopyFitsAt: allowedPlacements.filter(placement => fits(placement, artwork.body)),
+    headingOnlyFitsAt: artwork.heading ? allowedPlacements.filter(placement => fits(placement, '')) : [],
+  };
 }
 function readable(foreground, background) {
   const lum = hex => hex.slice(1).match(/../g).map(v => parseInt(v, 16) / 255)
@@ -89,4 +105,4 @@ async function bakeArtwork(bytes, value) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${meta.width}" height="${meta.height}" viewBox="0 0 ${a.width} ${a.height}" preserveAspectRatio="none"><defs><linearGradient id="fade" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"><stop stop-color="${a.background}"/><stop offset="1" stop-color="${a.background}" stop-opacity="0"/></linearGradient></defs><rect x="${p.x}" y="${p.y}" width="${p.width}" height="${p.height}" fill="${a.background}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#fade)"/><g fill="${readable(a.foreground, a.background)}">${text(g.heading, g.textY, g.titleSize, g.titleLine, true)}${text(g.body, g.textY + g.heading.length * g.titleLine + g.gap, g.bodySize, g.bodyLine, false)}</g></svg>`;
   return sharp(bytes).composite([{ input: Buffer.from(svg) }]).png().toBuffer();
 }
-module.exports = { copySchema, artworkSchema, artworkGeometry, artworkBrief, bakeArtwork };
+module.exports = { copySchema, artworkSchema, artworkGeometry, artworkBrief, artworkFitFeedback, bakeArtwork };

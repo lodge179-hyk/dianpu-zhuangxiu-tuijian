@@ -47,16 +47,18 @@ function compileCreative(value, recognition, profile, { draft = false } = {}) {
       ? compileNarrative(brief, creative.content, recognition, profile)
       : compileContent(brief, creative.content, recognition, { visualProfile: profile });
   } catch (error) {
-    if (draft && profile.pageComposition === 'platform-slots-v1' && error.code === 'STOREFRONT_IMAGE_BUDGET' && error.reviewDraft) {
+    if (profile.pageComposition === 'platform-slots-v1'
+      && ['STOREFRONT_IMAGE_BUDGET', 'STOREFRONT_COPY_LAYOUT'].includes(error.code) && error.reviewDraft) {
       const { content, ...reviewContext } = error.reviewDraft;
-      return { creative: { ...creative, content }, reviewContext };
+      error.creativeDraft = { creative: { ...creative, content }, reviewContext };
+      if (draft) return error.creativeDraft;
     }
     throw error;
   }
   return { creative: { ...creative, content: skeleton.content }, skeleton };
 }
 
-async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStage }) {
+async function planCampaign(run, profile, save, { fetcher, reuse, setStage }) {
   const recognition = creativeRecognition(run.state.recognition);
   const businessScope = run.state.recognition.businessScope;
   const visual = await prepareVisualReferences(profile, { includePage: true });
@@ -65,15 +67,20 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
     visualReferences: visual.references, pageReferences: visual.pageReferences,
     attachmentRoles: '附图均为视觉案例，不是商品原图；摄影案例用于画面表现，整页案例用于浏览节奏。经营方向仅来自 businessScope。',
     assetBudget: 12, maxBatches: 2,
+    ...(profile.editorialReferences ? { editorialReferences: profile.editorialReferences } : {}),
   };
   const parse = (value, base) => compileCreative(value, recognition, profile, { draft: base === 'content' });
   const validationFailures = new Map();
+  let incompleteRevision = null;
   const cachedCreative = base => cachedStage(run.folder, base, value => {
     try { return parse(value, base); }
     catch (error) {
       // Feed the actual failure into the existing user-requested continuation.
       // No extra call, automatic retry, or program-selected creative changes.
       if (profile.pageComposition === 'platform-slots-v1') validationFailures.set(base, { error: error.message });
+      // A user-requested continuation repairs the latest revision, not the older
+      // content draft. Only reached for a matching draft signature below.
+      if (base === 'design' && error.creativeDraft) incompleteRevision = error.creativeDraft;
       throw error;
     }
   });
@@ -92,7 +99,7 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
     run.state.research = {
       concept: creative.concept, reason: creative.reason, style: creative.style, anchors: creative.anchors,
       selectedSources: [], sources: [], visualSkill: profile.visualSkill, visualReferences: visual.references, pageReferences: visual.pageReferences,
-      basis: '实际读取所附整页、人物佩戴和静物案例，依据AI提炼的经营边界统一创作；本流程不执行网页检索。效果待用户生图验收。',
+      basis: profile.id === 'digital' ? '实际读取所附数码摄影与页面案例，结合已核对官网的叙事记录，依据经营边界统一创作；运行时不联网搜索，效果待用户生图验收。' : '实际读取所附整页、人物佩戴和静物案例，依据AI提炼的经营边界统一创作；本流程不执行网页检索。效果待用户生图验收。',
     };
     writeJson(run.folder, 'style-research.json', run.state.research);
     writeJson(run.folder, 'content-plan.json', creative.content);
@@ -114,13 +121,16 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
       if (input.draftSignature === draftSignature) reviewed = cachedCreative('design')?.value || null;
     } catch {}
   }
+  const reviewDraft = incompleteRevision || draft;
   reviewed ||= await call('design', {
-    ...context, draftSignature, draft: draft.creative,
-    ...(draft.reviewContext || {
-      pageOrder: draft.skeleton.plan.modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}), ...(m.narrative ? { narrative: m.narrative } : {}) })),
-      currentSlots: draft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
+    ...context, draftSignature, draft: reviewDraft.creative,
+    ...(reviewDraft.reviewContext || {
+      pageOrder: reviewDraft.skeleton.plan.modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, ...(m.story ? { story: m.story } : {}), ...(m.narrative ? { narrative: m.narrative } : {}) })),
+      currentSlots: reviewDraft.skeleton.tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
     }),
-    reviewScope: '这些槽位描述初稿显示方式，不冻结创意。可以修正款式、图片数量、顺序与组件组合，返回完整终稿；仍遵守12张和两批预算。只评审计划和参考，不声称看过尚未生成的成图。',
+    reviewScope: incompleteRevision
+      ? 'draft是上次已保存但未通过交付检查的最新修订稿。按requiredChanges修正明确问题及关联构图，保留其他已完成内容；需要时可调整相关组件和文案，返回完整终稿。仍遵守12张和两批预算，不声称看过尚未生成的成图。'
+      : '这些槽位描述初稿显示方式，不冻结创意。可以修正款式、图片数量、顺序与组件组合，返回完整终稿；仍遵守12张和两批预算。只评审计划和参考，不声称看过尚未生成的成图。',
   }, true);
 
   const { creative, skeleton } = reviewed;
@@ -150,4 +160,4 @@ async function planJewelryCampaign(run, profile, save, { fetcher, reuse, setStag
   save(run.folder, run.state);
 }
 
-module.exports = { planJewelryCampaign, compileCreative };
+module.exports = { planCampaign, planJewelryCampaign: planCampaign, compileCreative };

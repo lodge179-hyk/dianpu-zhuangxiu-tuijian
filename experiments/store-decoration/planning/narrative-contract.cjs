@@ -1,8 +1,9 @@
 const { z } = require('zod');
 const { referenceSchema } = require('./page-direction.cjs');
+const { usesDigitalCampaign } = require('./digital-campaign.cjs');
 
 function usesNarrativePage(profile) {
-  return profile?.id === 'jewelry' && profile.version >= 20 && ['narrative-v1', 'platform-slots-v1'].includes(profile.pageComposition);
+  return (profile?.id === 'jewelry' && profile.version >= 20 && ['narrative-v1', 'platform-slots-v1'].includes(profile.pageComposition)) || usesDigitalCampaign(profile);
 }
 const hex = z.string().regex(/^#[\da-fA-F]{6}$/);
 const pageDesignSchema = z.object({

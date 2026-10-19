@@ -4,13 +4,13 @@ const { storefrontContentSchema, chapterSchema } = require('./storefront-contrac
 const { campaignVisualSchema, campaignBackdropSchema } = require('./campaign-contract.cjs');
 const { validatePlan, aspectRatios } = require('./plan.cjs');
 const { contentBatches, evidenceFor } = require('./content-plan.cjs');
-const { artworkGeometry, artworkBrief } = require('./slot-artwork.cjs');
+const { artworkGeometry, artworkBrief, artworkFitFeedback } = require('./slot-artwork.cjs');
 
 function compileStorefront(brief, value, recognition, profile) {
   const parsed = storefrontContentSchema(campaignVisualSchema, campaignBackdropSchema).safeParse(value);
   if (!parsed.success) throw Error('装修叙事方案不完整：' + parsed.error.issues.slice(0, 4).map(i => i.path.join('.')).join('、') + '。已保存响应，可从本阶段继续。');
   const content = parsed.data, evidence = new Map(evidenceFor(recognition, profile).map(item => [item.id, item]));
-  const designs = new Map(), categories = new Set(), assets = [], modules = [], tasks = [], decisions = [];
+  const designs = new Map(), categories = new Set(), assets = [], modules = [], tasks = [], decisions = [], copyIssues = [];
   for (const item of content.collection) {
     if (designs.has(item.id) || !recognition.categories.includes(item.category)) throw Error('款式编号重复或引用未确认品类，已保留方案。');
     designs.set(item.id, item);
@@ -50,14 +50,31 @@ function compileStorefront(brief, value, recognition, profile) {
       const id = signboard ? 'identity-bg' : assets.some(a => a.id === 'overview') ? `story-${assets.length + 1}` : 'overview';
       const role = signboard ? 'atmosphere' : entry.family === 'navigation' ? 'category' : entry.family === 'showcase' ? 'product' : id === 'overview' ? 'hero' : visual.visualPlan.camera === 'macro' ? 'detail' : 'scene';
       const hasCopy = !!(visual.copy.heading || visual.copy.body);
+      const missingCopyPlacement = hasCopy && visual.copy.placement === 'none';
+      let copyNeedsReview = missingCopyPlacement;
       if (entry.family === 'navigation' && hasCopy) throw Error('圆形导航图不能承载设计文案，请使用原生导航名称。已保留方案。');
-      if (signboard && hasCopy && visual.copy.placement !== 'top') throw Error('招牌下部是固定店铺信息区，设计文案需放在顶部，已保留方案。');
+      if (signboard && hasCopy && !missingCopyPlacement && visual.copy.placement !== 'top') throw Error('招牌下部是固定店铺信息区，设计文案需放在顶部，已保留方案。');
+      if (missingCopyPlacement) copyIssues.push({
+        path: `content.modules.${index}.visuals.${slotIndex}.copy.placement`, id, component: item.type,
+        allowedPlacements: signboard ? ['top'] : ['left', 'right', 'top', 'bottom'],
+        reason: '已有标题或正文，但placement为none。由画面设计选择排字位置，并同步修改picture留白。',
+      });
       const alternate = visual.copy.tone === 'alternate', theme = content.pageDesign;
       const artwork = hasCopy ? { ...visual.copy, width: slot.width, height: slot.height,
         background: alternate ? theme.alternateBackground : theme.background,
         foreground: alternate ? theme.alternateForeground : theme.foreground, typography: theme.typography } : null;
-      if (artwork) artworkGeometry(artwork); // Catch impossible copy before any image call.
-      const layoutBrief = `章节：${item.chapter}。本模块讲清：${item.message}。衔接：${item.transition || '开场'}。真实组件${item.type}第${slotIndex + 1}槽，显示${slot.width}×${slot.height}。模块外固定白色，不依赖全页染色。${artwork ? artworkBrief(artwork) : '本图无设计文字，按内容构图。'}${signboard ? '本图是招牌背景，下方36%保留平静空间给平台头像、店名和数据；重要主体放上部，不绘制这些原生控件。' : ''}${role === 'category' ? '主体置于中央65%，适应圆形裁剪。' : ''}`;
+      if (artwork && !missingCopyPlacement) {
+        try { artworkGeometry(artwork); }
+        catch (error) {
+          if (error.code !== 'ARTWORK_TEXT_OVERFLOW') throw error;
+          copyNeedsReview = true;
+          copyIssues.push({ path: `content.modules.${index}.visuals.${slotIndex}.copy`, id, component: item.type,
+            allowedPlacements: signboard ? ['top'] : ['left', 'right', 'top', 'bottom'], reason: error.message });
+        }
+      }
+      const copyBrief = copyNeedsReview ? '本图文案排版尚未满足交付条件，具体原因见copyIssues；须经画面设计修订，不能生图。'
+        : artwork ? artworkBrief(artwork) : '本图无设计文字，按内容构图。';
+      const layoutBrief = `章节：${item.chapter}。本模块讲清：${item.message}。衔接：${item.transition || '开场'}。真实组件${item.type}第${slotIndex + 1}槽，显示${slot.width}×${slot.height}。模块外固定白色，不依赖全页染色。${copyBrief}${signboard ? '本图是招牌背景，下方36%保留平静空间给平台头像、店名和数据；重要主体放上部，不绘制这些原生控件。' : ''}${role === 'category' ? '主体置于中央65%，适应圆形裁剪。' : ''}`;
       assets.push({ id, aspect, subject: visual.subject, composition: visual.visualPlan.picture.slice(0, 300),
         visualReference: visual.visualPlan.visualReference, layoutBrief, ...(artwork ? { artwork } : {}),
         direction: { role, camera: visual.visualPlan.camera, treatment: visual.visualPlan.treatment, background: brief.style.background.slice(0, 180), accents: brief.style.palette.join('、') } });
@@ -74,19 +91,28 @@ function compileStorefront(brief, value, recognition, profile) {
   if (!assets.length) throw Error('整页须有1至12张素材，尚未生图。');
   const missing = recognition.categories.filter(category => !categories.has(category));
   if (missing.length) throw Error('整页叙事尚未覆盖经营品类：' + missing.join('、') + '。已保存响应。');
-  if (assets.length > 12) {
-    const error = Error(`整页实际安排${assets.length}张素材，须为1至12张（各模块：${content.modules.map(m => `${m.type}=${m.visuals.length}`).join('、')}）。请调整组件或图数，保留招牌与品类覆盖；尚未生图。`);
+  if (assets.length > 12 || copyIssues.length) {
+    const overBudget = assets.length > 12;
+    const error = Error(overBudget
+      ? `整页实际安排${assets.length}张素材，须为1至12张（各模块：${content.modules.map(m => `${m.type}=${m.visuals.length}`).join('、')}）。请调整组件或图数，保留招牌与品类覆盖；尚未生图。`
+      : `图片文案排版尚未完成：${copyIssues.map(issue => `${issue.path}：${issue.reason}`).join('；')}`);
     // This is review input only, never a generation-ready plan. A complete
-    // over-budget draft can reach the existing review; the final stays strict.
-    error.code = 'STOREFRONT_IMAGE_BUDGET';
+    // draft with these design issues can reach the existing review; the final stays strict.
+    error.code = overBudget ? 'STOREFRONT_IMAGE_BUDGET' : 'STOREFRONT_COPY_LAYOUT';
     error.reviewDraft = {
       content,
       pageOrder: modules.map(m => ({ type: m.type, purpose: m.purpose, assetIds: m.props.assetIds, narrative: m.narrative })),
       currentSlots: tasks.map(t => ({ id: t.id, aspect: t.aspect, display: t.display, safeArea: t.safeArea, designIds: t.visualPlan.designIds })),
       requiredChanges: {
-        code: error.code, actualImages: assets.length, maxImages: 12, reduceByAtLeast: assets.length - 12,
+        code: error.code, actualImages: assets.length, maxImages: 12, reduceByAtLeast: Math.max(0, assets.length - 12),
         moduleCounts: modules.map(m => ({ type: m.type, chapter: m.narrative.chapter, images: m.props.assetIds.length })),
-        instruction: '先调整模块组合与各模块图数，使实际图片总数不超过12，再返回完整终稿。由你决定删减或改选哪些组件，保留必备招牌、品类覆盖、核心叙事和视觉亮点；不是只改报出的总数或换句话重复原结构。',
+        ...(copyIssues.length ? { copyIssues: copyIssues.map(issue => ({
+          ...issue, fit: artworkFitFeedback(assets.find(asset => asset.id === issue.id).artwork, issue.allowedPlacements),
+        })) } : {}),
+        instruction: [
+          overBudget ? '先调整模块组合与各模块图数，使实际图片总数不超过12，再返回完整终稿。由你决定删减或改选哪些组件，保留必备招牌、品类覆盖、核心叙事和视觉亮点；不是只改报出的总数或换句话重复原结构。' : '',
+          copyIssues.length ? '按reason与fit逐项修订copyIssues。fit.currentCopyFitsAt是当前全文能放下的位置；若为空，换位置也不能解决，必须由你精简文案或改选更大组件。fit.headingOnlyFitsAt只说明保留原标题、不带正文时可用的位置，供设计取舍，不是程序已删正文。小图可保留短标题，将有必要的说明融入本章大图文案；不要原样复制放不下的正文。同步修改picture，排字与留白必须同侧，主体在另一侧。返回完整终稿，不能仅写修订说明。' : '',
+        ].filter(Boolean).join('\n'),
       },
     };
     throw error;
