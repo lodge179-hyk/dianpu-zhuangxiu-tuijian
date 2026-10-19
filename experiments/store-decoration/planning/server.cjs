@@ -172,7 +172,7 @@ const server = http.createServer(async (req, res) => {
       locks.add(id);
       try {
         const state = load(id), png = filename === 'shop.png';
-        const bytes = await (png ? shopPng(folderFor(id), state) : materialsZip(folderFor(id), state));
+        const bytes = await (png ? shopPng(folderFor(id), state) : materialsZip(folderFor(id), state, { includePreview: url.searchParams.get('includePreview') === '1' }));
         if (req.method === 'POST') {
           const exportFolder = path.join(folderFor(id), 'downloads');
           fs.mkdirSync(exportFolder, { recursive: true });

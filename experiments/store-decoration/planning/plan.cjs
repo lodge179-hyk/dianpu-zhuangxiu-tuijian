@@ -1,6 +1,7 @@
 const { z } = require('zod');
 const { catalog, entries } = require('./catalog.cjs');
 const { usesProductVisualMethod } = require('./visual-profile.cjs');
+const { usesJewelryCampaign } = require('./campaign-contract.cjs');
 const { batchVisualReferences, usesGenerationReferences, usesReferenceBackground } = require('./visual-skill.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
@@ -100,6 +101,18 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
   });
 }
 function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {
+  if (usesJewelryCampaign(visualProfile)) return [
+    '生成一张可裁剪的珠宝广告摄影素材总图。每格是按自身描述构图的完整照片，人物佩戴、环境静物及商品浏览各有画面，不是同一场景的连续切片，也不是网页截图。',
+    '每格的具体款式、人物、环境和明暗以该格提示为准。整套以色彩关系和摄影品质呼应，不把同一款式、台面或背景套给所有图片。',
+    index ? '上一批总图仅辅助保持摄影品质与色彩联系；本批的新款、人物和场景按各格描述，不沿用上一批的商品清单或背景。' : '',
+    `严格 ${batch.rows.flat().length} 个矩形画面，${batch.rows.length} 行，各行画面数量为 ${batch.rows.map(r => r.length).join(' / ')}。总图宽高比约 1:${total.toFixed(2)}。`,
+    ...batch.rows.map((row, i) => `第 ${i + 1} 行，占有效高度约 ${Math.round(weights[i] / total * 100)}%：\n` + row.map((id, j) => {
+      const a = lookup.get(id);
+      return `第 ${j + 1} 格（仅供定位，不绘制编号），比例 ${a.aspect}：${a.prompt}${a.direction?.role === 'category' ? '主体关键轮廓位于中央65%，适应圆形裁剪。' : ''}`;
+    }).join('\n')),
+    '外边距、各行和各格之间使用纯洋红 #FF00FF 直线分隔带，宽约总图的 1–2%。每格有自己的不透明背景，物体及阴影不跨格。画面内禁止出现该分隔色。',
+    '按各格比例构图，饰品关键轮廓留足安全边距。人物为原创成年人，佩戴接触与人体姿态自然。商品为示意设计，不绘制文字、编号、品牌标识、水印或界面。',
+  ].filter(Boolean).join('\n\n');
   // Versioned profiles keep saved tasks on their original generation instructions.
   const focusedDigital = visualProfile?.id === 'digital' && visualProfile.version >= 2;
   const sharedMethod = usesProductVisualMethod(visualProfile);

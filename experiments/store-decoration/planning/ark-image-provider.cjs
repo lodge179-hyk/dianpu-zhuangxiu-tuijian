@@ -33,8 +33,10 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
   if (images.length) body.image = images.length === 1 ? images[0] : images;
   if (visual.records.length) {
     const referenceBackground = batch.backgroundGuidance === 'reference-background-v1';
-    const plannedReference = batch.backgroundGuidance === 'planned-reference-v1';
+    const campaignReference = batch.backgroundGuidance === 'campaign-reference-v1';
+    const plannedReference = batch.backgroundGuidance === 'planned-reference-v1' || campaignReference;
     const referenceGuide = [
+      campaignReference ? '本套包含人物佩戴与静物摄影，分别按各格方案执行。人物参考只借姿态、服装配合、景别和光线，创作新的成年人物与本格饰品，不复制案例人物身份或商品。不得把人物画面改为无人的静物台。' : '',
       plannedReference
         ? '【输入图片用途与整页计划】按下文各格已定的商品、场景、构图、尺度及明暗安排创作总图，不拼贴输入图片。参考照片只用于该格“借鉴”所明确的焦点、空间或光影关系，不自动继承整套背景；实际场景和视觉强度以该格描述为准，不能把清楚浏览图改成与主图相同的复杂布景，也不能把丰富场景简化成素底摆拍。案例商品、品牌、文字、UI和真实商品属性不继承。行列、比例和洋红分隔带按正文要求。'
         : referenceBackground

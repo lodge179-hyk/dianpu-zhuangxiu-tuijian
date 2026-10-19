@@ -25,16 +25,16 @@ const visualPlanSchema = z.preprocess(value => fieldAliases(value, { picture: 'd
   difference: z.string().trim().min(1).max(160),
   visualReference: referenceSchema,
 }));
-function pageContentSchema(base) {
+function pageContentSchema(base, pictureSchema = visualPlanSchema) {
   return base.extend({
     pageDirection: z.object({
       referenceId: z.string().min(1).max(40),
       adaptation: z.string().trim().min(1).max(300),
       rhythm: z.string().trim().min(1).max(300),
     }),
-    heroVisualPlan: visualPlanSchema,
+    heroVisualPlan: pictureSchema,
     sections: z.array(base.shape.sections.element.extend({
-      visuals: z.array(base.shape.sections.element.shape.visuals.element.extend({ visualPlan: visualPlanSchema })).min(1).max(3),
+      visuals: z.array(base.shape.sections.element.shape.visuals.element.extend({ visualPlan: pictureSchema })).min(1).max(3),
     })).min(2).max(8),
   });
 }
@@ -76,4 +76,4 @@ function pageContentPrompt(profile) {
   ].join('\n');
 }
 
-module.exports = { usesPageDirection, pageContentSchema, pageContentPrompt, pageDirectionStages };
+module.exports = { usesPageDirection, pageContentSchema, pageContentPrompt, pageDirectionStages, referenceSchema, fieldAliases };

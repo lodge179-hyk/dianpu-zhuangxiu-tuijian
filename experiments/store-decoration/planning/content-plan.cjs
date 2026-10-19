@@ -4,6 +4,7 @@ const { validatePlan, aspectRatios } = require('./plan.cjs');
 const { entries } = require('./catalog.cjs');
 const { usesCategoryReference, usesProductContext, usesJewelryVariants, usesJewelrySeries, usesProductVisualMethod, usesProductPageLayout } = require('./visual-profile.cjs');
 const { usesPageDirection, pageContentSchema, pageContentPrompt } = require('./page-direction.cjs');
+const { usesJewelryCampaign, campaignContentSchema, campaignVisuals, validateCampaignReferences } = require('./campaign-contract.cjs');
 
 const contentSchema = z.object({
   narrative: z.string().trim().min(1).max(400),
@@ -82,7 +83,8 @@ function contentPrompt(profile = null) {
 function validateContent(value, recognition, profile = null) {
   const productContext = usesProductContext(profile);
   // Saved plans without hero evidence retain their original body-only coverage check.
-  const schema = usesPageDirection(profile) ? pageContentSchema(productContextContentSchema)
+  const campaign = usesJewelryCampaign(profile);
+  const schema = campaign ? campaignContentSchema(productContextContentSchema) : usesPageDirection(profile) ? pageContentSchema(productContextContentSchema)
     : productContext && value?.heroEvidenceIds !== undefined ? productContextContentSchema : contentSchema;
   const result = schema.safeParse(value);
   if (!result.success) throw Error('内容规划不完整：' + result.error.issues.slice(0, 3).map(i => i.code === 'too_small' && i.path.length === 5 && i.path[0] === 'sections' && i.path[2] === 'visuals' && i.path[4] === 'evidenceIds'
@@ -92,12 +94,13 @@ function validateContent(value, recognition, profile = null) {
   if (usesPageDirection(profile)) {
     // Validate explicit IDs only; creative choices remain authored by the planner.
     if (!profile.visualSkill.pageReferenceIds.includes(content.pageDirection.referenceId)) throw Error('整页规划引用了本任务之外的页面案例，已保留响应，未自行换图。');
-    for (const visual of [content.heroVisualPlan, ...content.sections.flatMap(section => section.visuals.map(v => v.visualPlan))]) {
+    for (const visual of campaign ? campaignVisuals(content) : [content.heroVisualPlan, ...content.sections.flatMap(section => section.visuals.map(v => v.visualPlan))]) {
       if (!profile.visualSkill.referenceIds.includes(visual.visualReference.id)) throw Error('逐图规划引用了本任务之外的摄影案例，已保留响应，未自行换图。');
     }
   }
   // Too few categories cannot fill a real four/five-item navigation.
   content.navigation = content.navigation && recognition.categories.length >= 4;
+  if (campaign) validateCampaignReferences(content, recognition);
   const usedCategories = new Set(), subjects = new Set();
   if (productContext && content.heroEvidenceIds) for (const id of content.heroEvidenceIds) {
     if (!evidence.has(id)) throw Error('主视觉引用了未知商品证据 ' + id + '，未猜测品类。');
@@ -196,7 +199,10 @@ function compileContent(brief, input, recognition, { visualProfile = null } = {}
   addModule('identity', sign.length ? 'signboard.default' : 'signboard.minimal', '店铺身份', sign, sign.length ? '独立氛围背景承接整页主题。' : '以简洁身份区开始，保留正文空间。');
   const nav = () => {
     if (!content.navigation) return;
-    const ids = brief.categories.map((c, i) => addAsset(`nav-${i + 1}`, '1:1', 'category', c + '的清楚品类示意，单个或少量代表物', [c]));
+    const ids = brief.categories.map((c, i) => {
+      const visual = usesJewelryCampaign(visualProfile) ? content.navigationVisuals.find(v => v.category === c) : null;
+      return addAsset(`nav-${i + 1}`, '1:1', 'category', visual?.subject || c + '的清楚品类示意，单个或少量代表物', [c], [], null, visual?.visualPlan);
+    });
     addModule('categories', `navigation.${ids.length === 4 ? 'four' : 'five'}`, '识别经营范围', ids, '每项对应已确认品类。', { labels: brief.categories });
   };
   if (content.navigationPlacement === 'before-hero') nav();

@@ -77,12 +77,20 @@ async function call(folder, stage, model, payload, { textOnly = false, timeout =
   fs.writeFileSync(path.join(folder, `${stage}-response.txt`), redact(responseText(data)));
   return data;
 }
-async function ask(folder, stage, system, input, { images = [], search = false, fetcher } = {}) {
+async function ask(folder, stage, system, input, { images = [], search = false, temperature, jsonMode = true, fetcher } = {}) {
   fs.writeFileSync(path.join(folder, `${stage}-instructions.txt`), system);
   writeJson(folder, `${stage}-input.json`, input);
   const c = settings(), text = JSON.stringify(input);
   const messages = search ? [{ role: 'system', content: system }, { role: 'user', content: text }] : [{ role: 'system', content: [{ text: system }] }, { role: 'user', content: [{ text }, ...images.map(image => ({ image }))] }];
-  const parameters = { result_format: 'message', max_tokens: 10000, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : { response_format: { type: 'json_object' } }) };
+  if (typeof jsonMode !== 'boolean' || (search && !jsonMode)) throw Error('模型输出模式参数无效，尚未请求模型。');
+  const parameters = { result_format: 'message', max_tokens: 10000, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : jsonMode ? { response_format: { type: 'json_object' } } : {}) };
+  // Opt-in for extraction only. Creative, legacy and search callers retain
+  // their original sampling; do not add a provider-wide default or retry.
+  if (temperature !== undefined) {
+    if (search || !Number.isFinite(temperature) || temperature < 0 || temperature >= 2) throw Error('识别采样参数无效，尚未请求模型。');
+    parameters.temperature = temperature;
+  }
+  if (temperature !== undefined || !jsonMode) writeJson(folder, `${stage}-settings.json`, { model: c.vision, parameters, inputImageCount: images.length, outputMode: jsonMode ? 'json_object' : 'prompt-json' });
   return call(folder, stage, search ? c.search : c.vision, { input: { messages }, parameters }, { textOnly: search, fetcher });
 }
 async function askJson(...args) {
