@@ -45,6 +45,7 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
     const plannedReference = batch.backgroundGuidance === 'planned-reference-v1' || campaignReference;
     const referenceGuide = batch.studio ? [
       '视觉案例只借构图和光影方法，用户选定风格与每格图像形式优先；line-art和flat-icon保持图形语言，不继承摄影背景。案例商品与标识不复制。',
+      ...visual.records.filter(ref=>ref.referenceKind==='page').map(ref=>`附件${ref.attachment}是整页案例，只借色彩、图形、文字与留白关系。不要把整页截图画进任何一格，不复制其中的商品、文案、网格、按钮或平台控件；每格画面、比例及总图分隔以本批正文为准。`),
       ...visual.records.map(ref=>`附件${ref.attachment}为视觉参考：${ref.campaign ? ref.campaign.borrow : ''}；${ref.uses.map(use=>`第${use.row}行第${use.column}格借鉴${use.borrow}，避免${use.avoid}`).join('；')}`),
       previousSheetAttachment ? `附件${previousSheetAttachment}为上一批，仅参考符合本次设计的色彩联系，不能覆盖原商品身份或把摄影形式强加给图标。` : '',
     ].filter(Boolean).join('\n\n') : cohesive ? [

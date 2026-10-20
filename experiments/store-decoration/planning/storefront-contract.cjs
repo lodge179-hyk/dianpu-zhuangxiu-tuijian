@@ -1,8 +1,8 @@
 const { z } = require('zod');
 const { entries } = require('./catalog.cjs');
-const { referenceSchema } = require('./page-direction.cjs');
+const { referenceSchema, fieldAliases } = require('./page-direction.cjs');
 const { pageDesignSchema } = require('./narrative-contract.cjs');
-const { copySchema } = require('./slot-artwork.cjs');
+const { copySchema, nativeCopySchema } = require('./slot-artwork.cjs');
 const { usesDigitalCampaign } = require('./digital-campaign.cjs');
 const { usesCategoryCampaign } = require('./category-campaign.cjs');
 
@@ -18,12 +18,81 @@ const chapterSchema = z.object({
 // omitted its enum, so saved responses contain "dramatic", "poetic" or "".
 // Use the declared base palette for an unspecified selection; do not infer colors
 // from mood words. Keep the persisted artwork schema strict.
-const modelCopySchema = z.preprocess(value => {
+const modelCopy = schema => z.preprocess(value => {
   if (!value || typeof value !== 'object' || Array.isArray(value) || typeof value.tone !== 'string') return value;
   const tone = value.tone.trim();
   return { ...value, tone: ['base', 'alternate'].includes(tone) ? tone : 'base' };
-}, copySchema);
-function storefrontContentSchema(visualSchema, backdropSchema, { allowEmptyProductReferences = false, studio = false } = {}) {
+}, schema);
+const modelCopySchema=modelCopy(copySchema),nativeModelCopySchema=modelCopy(nativeCopySchema);
+const referenceBoundary = '只借视觉表现，不复制案例商品、品牌、文字或平台控件；商品与经营范围以本任务为准。';
+function normalizeStudioReference(value, available, parent) {
+  const ref = fieldAliases(value, { borrow: 'Borrow', avoid: 'Avoid' });
+  if (!ref || typeof ref !== 'object' || Array.isArray(ref) || !available.has(ref.id)) return ref;
+  const empty = text => text === undefined || typeof text === 'string' && !text.trim();
+  const usable = text => typeof text === 'string' && text.trim().length > 0 && text.trim().length <= 120;
+  for (const field of ['borrow', 'avoid']) {
+    if (!empty(ref[field])) continue;
+    // Only inherit case-specific instructions from the exact same reference.
+    // A different selected case uses its already-supplied catalog focus and the
+    // existing identity boundary, never another case's colors/objects to avoid.
+    const fallback = parent?.id === ref.id && usable(parent[field]) ? parent[field]
+      : field === 'borrow' ? available.get(ref.id).focus : referenceBoundary;
+    if (usable(fallback)) ref[field] = fallback;
+  }
+  return ref;
+}
+function normalizeStudioContent(value, profile, evidence = []) {
+  if (profile?.studio?.version !== 2 || !value || !Array.isArray(value.modules)) return value;
+  const content = structuredClone(value);
+  const visualSkill = require('./visual-skill.cjs');
+  const references = new Set(visualSkill.generationReferenceIds(profile));
+  const available = new Map(visualSkill.referenceMetadata(profile, { includePage: true }).map(ref => [ref.id, ref]));
+  content.reference = normalizeStudioReference(content.reference, available);
+  const collection = Array.isArray(content.collection) ? content.collection : [];
+  const sameCategory = (a, b) => typeof a === 'string' && typeof b === 'string' && a.replace(/\s+/gu, '') === b.replace(/\s+/gu, '');
+  const sourceFor = id => {
+    const designs = collection.filter(d => d?.id === id);
+    if (designs.length !== 1) return null;
+    const design = designs[0];
+    // In preservation mode a category can contain several original products.
+    // Only the model's explicit source binding identifies the chosen one.
+    const matches = evidence.filter(e => sameCategory(e.category, design.category)
+      && (!profile.studio.options.preserveProducts || e.id === design.sourceEvidenceId && e.imageIndex));
+    return matches.length === 1 ? matches[0].id : null;
+  };
+  for (const m of content.modules) {
+    if (!m || typeof m !== 'object') continue;
+    if (typeof m.type === 'string' && m.type.startsWith('text.') && m.visuals === undefined) m.visuals = [];
+    for (const v of Array.isArray(m.visuals) ? m.visuals : []) {
+      if (!v || typeof v !== 'object') continue;
+      const reference = v.visualPlan?.visualReference;
+      if (v.visualPlan && (reference === undefined || reference && typeof reference === 'object' && !Array.isArray(reference) && !Object.keys(reference).length)) v.visualPlan.visualReference = structuredClone(content.reference);
+      if (v.visualPlan) v.visualPlan.visualReference = normalizeStudioReference(v.visualPlan.visualReference, available, content.reference);
+      if (v.copy && !['left','right'].includes(v.copy.placement)) delete v.copy.widthRatio;
+      const ids = v.evidenceIds, selected = v.visualPlan?.designIds;
+      if (!Array.isArray(ids) || !Array.isArray(selected)) continue;
+      const misplaced = ids.filter(id => references.has(id));
+      if (ids.length && !misplaced.length) continue;
+      const sources = selected.map(sourceFor);
+      const backdrop = typeof m.type === 'string' && (m.type.startsWith('signboard.')
+        || m.type === 'carousel.small' && ['graphic', 'texture'].includes(v.visualPlan.treatment));
+      if (sources.some(id => !id) || (!selected.length && !backdrop)) continue;
+      const expected = [...new Set(sources)];
+      const explicit = ids.filter(id => !references.has(id)).map(id => typeof id === 'string' && id.startsWith('design-') && selected.includes(id) ? sourceFor(id) : id);
+      // Repair only absent/redundant evidence or known visual-reference IDs.
+      // Unknown IDs and conflicting explicit product choices remain errors.
+      if (explicit.length && (explicit.some(id => !expected.includes(id)) || expected.some(id => !explicit.includes(id)))) continue;
+      v.evidenceIds = expected;
+    }
+  }
+  return content;
+}
+function storefrontContentSchema(visualSchema, backdropSchema, { allowEmptyProductReferences = false, studio = false, studioVersion = 1 } = {}) {
+  if(studio && studioVersion>=2){
+    const {createCampaignVisualSchema}=require('./campaign-contract.cjs');
+    visualSchema=createCampaignVisualSchema({nativeComposition:true});
+    backdropSchema=createCampaignVisualSchema({nativeComposition:true,allowEmptyDesigns:true});
+  }
   const moduleSchema = (types, schema, minimumReferences) => chapterSchema.extend({
     type: z.enum(types),
     ...(studio ? { text:z.string().trim().max(180).default('') } : {}),
@@ -32,20 +101,20 @@ function storefrontContentSchema(visualSchema, backdropSchema, { allowEmptyProdu
       // it through the declared category; persisted evidence remains product-*.
       evidenceIds: z.array(z.string().regex(/^(product|design)-[1-9]\d*$/)).min(minimumReferences).max(6),
       subject: z.string().trim().min(1).max(180), caption: z.string().trim().max(32).default(''),
-      copy: modelCopySchema.default({ heading: '', body: '', placement: 'none', tone: 'base' }),
-      ...(studio ? { imageForm:z.enum(require('./studio-contract.cjs').imageForms) } : {}),
+      copy: (studio && studioVersion>=2?nativeModelCopySchema:modelCopySchema).default({ heading: '', body: '', placement: 'none', tone: 'base' }),
+      ...(studio ? { imageForm:z.enum(require('./studio-contract.cjs').imageForms.filter(f=>studioVersion>=2||f!=='still-life')) } : {}),
       visualPlan: schema,
     })).max(9),
   });
   return z.object({
     narrative: z.string().trim().min(1).max(400), reason: z.string().trim().min(1).max(300),
     reference: referenceSchema, pageDesign: pageDesignSchema,
-    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().trim().min(1).max(20), appearance: z.string().trim().min(1).max(240), ...(studio ? { sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() } : {}) })).min(1).max(studio ? 24 : 12),
+    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().trim().min(1).max(20), appearance: z.string().trim().min(1).max(240), ...(studio ? { sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() } : {}) })).min(1).max(studioVersion>=2 ? 40 : studio ? 24 : 12),
     modules: z.array(z.discriminatedUnion('type', [
       moduleSchema(storefrontTypes.filter(type => type.startsWith('signboard.')), backdropSchema, 0),
       moduleSchema(storefrontTypes.filter(type => !type.startsWith('signboard.')), allowEmptyProductReferences ? backdropSchema : visualSchema, allowEmptyProductReferences ? 0 : 1),
       ...(studio ? [chapterSchema.extend({ type:z.enum(Object.keys(entries).filter(t=>t.startsWith('text.'))), text:z.string().trim().min(1).max(180), visuals:z.array(z.never()).length(0) })] : []),
-    ])).min(3).max(studio ? 16 : 10),
+    ])).min(3).max(studioVersion>=2 ? 24 : studio ? 16 : 10),
   });
 }
 function storefrontPrompt(profile, { review = false } = {}) {
@@ -83,4 +152,4 @@ function storefrontPrompt(profile, { review = false } = {}) {
     '实际图片覆盖所有已确认品类，完整返回全部模块。程序只落实固定尺寸、编号与图片排字，不替你改写主题、编造款式或自动合并模块。',
   ].filter(Boolean).join('\n\n');
 }
-module.exports = { storefrontTypes, chapterSchema, storefrontContentSchema, storefrontPrompt };
+module.exports = { storefrontTypes, chapterSchema, storefrontContentSchema, storefrontPrompt, normalizeStudioContent };

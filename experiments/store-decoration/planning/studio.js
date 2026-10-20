@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id);
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 const visible=(id,show)=>$(id).classList.toggle('hidden',!show);
-let config=null,current=null,busy=false,exporting=false,poll=null,uploadQueue=Promise.resolve(),uploadPending=0,previewKey='',restoreToken=0;
+let config=null,current=null,busy=false,exporting=false,poll=null,uploadQueue=Promise.resolve(),uploadPending=0,previewKey='',restoreToken=0,uploadRevision=0;
 const selectedImages=[];
 const storage={get:key=>{try{return localStorage.getItem(key);}catch{return null;}},set:(key,value)=>{try{localStorage.setItem(key,value);}catch{}},remove:key=>{try{localStorage.removeItem(key);}catch{}}};
 async function api(url,options={}){const response=await fetch(url,options);let data;try{data=await response.json();}catch{throw Error('服务响应异常，请稍后重试。');}if(!response.ok)throw Object.assign(Error(data.error||'操作未完成'),{status:response.status});return data;}
@@ -12,8 +12,10 @@ function updateSummary(){
  if(!config)return;
  const mode=config.studio.modes.find(m=>m.id===$('generation-mode').value),o=options();
  const style=o.styleId==='auto'?'AI 推荐':mode.styles.find(s=>s.id===o.styleId)?.name||'AI 推荐';
- $('creation-summary').textContent=`${mode.name} · ${style} · ${o.modules.length} 类模块`;
- $('fidelity-description').textContent=o.preserveProducts?'开启：保留原商品的款式、配色与结构，重新设计背景和构图。':'关闭：保留经营方向，允许设计同类新款。';
+ $('creation-summary').textContent=`${mode.name} · ${style} · ${o.preserveProducts?'保留原商品':'创意示意'}`;
+ $('module-summary').textContent=`${o.modules.length} 项必含，其余由 AI 搭配`;
+ $('fidelity-description').textContent=o.preserveProducts?'原图用于生成，保留款式与结构；重绘细节需核对。':'保持经营方向，允许设计同类新款。';
+ $('clear-images').disabled=busy||exporting||(!selectedImages.length&&!uploadPending);
  $('plan').disabled=busy||exporting||uploadPending>0||!config.configured;
 }
 function renderStyles(selected='auto'){
@@ -29,28 +31,30 @@ function renderModules(selected=config.studio.defaults.modules){
  for(const item of config.studio.families){const label=el('label',undefined,'module-option'),input=el('input'),copy=el('span');input.type='checkbox';input.name='module';input.value=item.id;input.checked=item.required||selected.includes(item.id);input.disabled=!!item.required;input.onchange=updateSummary;copy.append(el('strong',item.name+(item.required?' · 必备':'')),el('small',item.description));label.append(input,copy);$('module-options').append(label);}
  updateSummary();
 }
-function lock(value){busy=value;document.body.classList.toggle('is-busy',value);for(const field of document.querySelectorAll('#studio-form fieldset'))field.disabled=value||exporting;for(const id of ['new-project','recent-runs','download','download-png'])$(id).disabled=value||exporting;for(const n of document.querySelectorAll('.input-remove,.recovery-actions button,.batch input'))n.disabled=value||exporting;$('plan').textContent=value?'创作进行中…':current?'按当前设置生成新方案':'开始生成 ↗';updateSummary();}
+function lock(value){busy=value;document.body.classList.toggle('is-busy',value);for(const field of document.querySelectorAll('#studio-form fieldset'))field.disabled=value||exporting;for(const id of ['new-project','recent-runs','download','download-png'])$(id).disabled=value||exporting;for(const n of document.querySelectorAll('.input-remove,.recovery-actions button,.batch input'))n.disabled=value||exporting;$('plan').textContent=value?'创作进行中…':current?'生成一套新设计 ↗':'生成整店设计 ↗';updateSummary();}
 function renderInputs(){
- $('input-list').replaceChildren();$('input-count').textContent=selectedImages.length+' / 6 张';
+ $('input-list').replaceChildren();$('input-count').textContent=selectedImages.length+' / 6';$('drop-zone').classList.toggle('has-images',!!selectedImages.length);$('upload-label').textContent=selectedImages.length?'添加图片':'上传商品图片';updateSummary();
  for(const item of selectedImages){const box=el('div',undefined,'input-item'),img=el('img'),remove=el('button','×','input-remove');img.src=item.url;img.alt=item.name;remove.type='button';remove.setAttribute('aria-label','移除 '+item.name);remove.disabled=busy||exporting;remove.onclick=()=>{if(busy||exporting)return;if(item.file)URL.revokeObjectURL(item.url);selectedImages.splice(selectedImages.indexOf(item),1);renderInputs();};box.append(img,remove,el('p',item.name),el('small',`${item.width} × ${item.height}${item.file?' · '+(item.file.size/1024/1024).toFixed(1)+' MB':' · 已保存'}`));$('input-list').append(box);}
 }
-function clearImages(){for(const item of selectedImages)if(item.file)URL.revokeObjectURL(item.url);selectedImages.length=0;renderInputs();}
+function clearImages(){uploadRevision++;for(const item of selectedImages)if(item.file instanceof File)URL.revokeObjectURL(item.url);selectedImages.length=0;$('screenshot').value='';notice('upload-errors','');renderInputs();}
+$('clear-images').onclick=()=>{if(busy||exporting)return;clearImages();notice('form-error','');$('screenshot').focus();};
 function addFiles(files){
  if(busy||exporting)return;
- const incoming=[...files];uploadPending++;updateSummary();
+ const incoming=[...files],revision=uploadRevision;uploadPending++;updateSummary();
  uploadQueue=uploadQueue.then(async()=>{
   const errors=[];
   for(const file of incoming){
+   if(revision!==uploadRevision)break;
    if(selectedImages.some(i=>i.file&&i.file.name===file.name&&i.file.size===file.size&&i.file.lastModified===file.lastModified))continue;
    if(!['image/png','image/jpeg','image/webp'].includes(file.type)){errors.push(file.name+'：仅支持 JPG、PNG、WebP。');continue;}
    if(file.size>10*1024*1024){errors.push(file.name+'：单张超过 10 MB。');continue;}
    if(selectedImages.length>=6){errors.push('最多 6 张，请先移除不需要的图片。');break;}
    if(selectedImages.reduce((s,i)=>s+(i.file?.size||i.bytes||0),0)+file.size>30*1024*1024){errors.push('图片合计超过 30 MB。');continue;}
    const url=URL.createObjectURL(file),img=new Image();img.src=url;
-   try{await img.decode();if(Math.min(img.naturalWidth,img.naturalHeight)<80||img.naturalWidth*img.naturalHeight>60000000)throw Error('短边需至少80 px，总像素不能超过6000万。');selectedImages.push({file,name:file.name,url,width:img.naturalWidth,height:img.naturalHeight});}
+   try{await img.decode();if(revision!==uploadRevision){URL.revokeObjectURL(url);break;}if(Math.min(img.naturalWidth,img.naturalHeight)<80||img.naturalWidth*img.naturalHeight>60000000)throw Error('短边需至少80 px，总像素不能超过6000万。');selectedImages.push({file,name:file.name,url,width:img.naturalWidth,height:img.naturalHeight});}
    catch(e){URL.revokeObjectURL(url);errors.push(file.name+'：'+(e.message.includes('80')?e.message:'无法读取，请换一张完整图片。'));}
   }
-  renderInputs();notice('upload-errors',errors.join(' '),true);
+  if(revision===uploadRevision){renderInputs();notice('upload-errors',errors.join(' '),true);}
  }).finally(()=>{uploadPending--;updateSummary();});
 }
 $('screenshot').onchange=e=>{addFiles(e.target.files);e.target.value='';};
@@ -64,7 +68,7 @@ async function inputData(item){if(item.file)return fileData(item.file);const res
 $('studio-form').onsubmit=async e=>{
  e.preventDefault();if(busy||exporting||uploadPending)return;
  notice('form-error','');if(!selectedImages.length){notice('form-error','请先上传至少一张商品图片。',true);notice('upload-errors','请先上传至少一张商品图片。',true);$('screenshot').focus();return;}
- const chosen=options();if(!chosen.modules.some(m=>['carousel','poster','showcase'].includes(m))){notice('form-error','至少选择一种图片展示模块：轮播与横幅、主题海报或商品橱窗。',true);return;}
+ const chosen=options();
  const generationMode=$('generation-mode').value;lock(true);notice('form-error','正在上传商品并创建方案…');
  try{const images=await Promise.all(selectedImages.map(async item=>({name:item.name,data:await inputData(item)})));const state=await api('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images,generationMode,options:chosen})});notice('form-error','');previewKey='';show(state);$('result-title').scrollIntoView({block:'nearest',behavior:'smooth'});await recentRuns();}
  catch(error){lock(false);notice('form-error',error.message,true);}
@@ -88,6 +92,9 @@ function show(state){
  if(state.status==='ready'&&total>filled){if(state.generationError)status(state.generationError,true);else status('已保留完成的素材，可以继续剩余部分。');recovery('继续未完成素材','/api/runs/'+state.id+'/generate',{regenerate:false});$('recovery-note').textContent='优先复用已保存的总图；尚未生成的部分会继续调用模型。';if(state.generationFailure&&state.generationFailure.kind!=='generation'){recovery('重新生成未完成批次','/api/runs/'+state.id+'/generate',{regenerate:true}).className='';$('recovery-note').textContent+=' 原总图无法处理时可重新生成，会再次计费；已完成批次保留。';}}
  const preview=!!state.preview&&!!state.layout&&filled>0;visible('preview-panel',preview);
  if(preview){$('frame').style.height=Math.ceil(state.layout.height)+'px';const key=state.id+':'+filled+':'+JSON.stringify(state.generatedSheets||{})+':'+JSON.stringify(state.importedBatches||[]);if(key!==previewKey){previewKey=key;$('frame').src=state.preview+'?v='+encodeURIComponent(key);}$('open-preview').href=state.preview;requestAnimationFrame(fitPreview);}
+ $('page-size').textContent=state.layout?`${state.plan.modules.length} 个模块 · ${Math.round(state.layout.height)} px 长页`:'上下滚动浏览整店';
+ $('page-outline').replaceChildren(el('p','页面目录'));
+ if(preview)for(const [i,m] of state.plan.modules.entries()){const b=el('button',`${String(i+1).padStart(2,'0')}  ${m.narrative?.chapter||m.purpose}`);b.type='button';b.title=m.purpose;b.onclick=()=>{const section=$('frame').contentDocument?.getElementById(m.id);if(section)$('preview-canvas').scrollTo({top:section.offsetTop*Math.min(483,$('preview-canvas').clientWidth)/483,behavior:'smooth'});};$('page-outline').append(b);}
  visible('download-actions',complete);renderBatches(state,complete);if(pending)poll=setTimeout(()=>refresh(state.id),2200);
 }
 function renderBatches(state,complete){
@@ -106,12 +113,12 @@ async function refresh(id){try{const state=await api('/api/runs/'+id);if(current
 async function restoreRun(id){
  if(busy||exporting||uploadPending)return;
  const token=++restoreToken;clearTimeout(poll);lock(true);
- try{const state=await api('/api/runs/'+id);if(token!==restoreToken)return;clearImages();const o=state.visualProfile?.studio?.options||config.studio.defaults;$('generation-mode').value=config.studio.modes.some(m=>m.id===state.generationMode)?state.generationMode:'general';$('shop-name').value=o.shopName||'';$('preserve-products').checked=!!o.preserveProducts;renderStyles(o.styleId);renderModules(o.modules);for(const input of state.inputs||[])selectedImages.push({...input,url:`/runs/${state.id}/${input.file}`});renderInputs();previewKey='';show(state);}
+ try{const state=await api('/api/runs/'+id);if(token!==restoreToken)return;clearImages();const o=state.visualProfile?.studio?.options||config.studio.defaults;$('generation-mode').value=config.studio.modes.some(m=>m.id===state.generationMode)?state.generationMode:'general';$('shop-name').value=o.shopName||'';$('preserve-products').checked=!!o.preserveProducts;renderStyles(o.styleId);renderModules(o.modules);for(const input of state.inputs||[])selectedImages.push({...input,file:null,savedFile:input.file,url:`/runs/${state.id}/${input.file}`});renderInputs();previewKey='';show(state);}
  catch(e){if(token!==restoreToken)return;if(!e.status||e.status>=500){current={id};lock(true);status('连接暂时中断，正在重新连接；没有重发生成请求。',true);poll=setTimeout(()=>{if(token===restoreToken){busy=false;restoreRun(id);}},5000);}else{lock(false);status(e.message,true);}}
 }
 async function recentRuns(){try{const runs=await api('/api/runs');$('recent-runs').replaceChildren(el('option','最近作品'));$('recent-runs').firstChild.value='';for(const run of runs){const item=el('option',`${run.name} · ${new Date(run.createdAt).toLocaleDateString('zh-CN')}`);item.value=run.id;$('recent-runs').append(item);}}catch{/* The current task remains usable if history is unavailable. */}}
 $('recent-runs').onchange=e=>{if(e.target.value)restoreRun(e.target.value);};
-$('new-project').onclick=()=>{if(!config||busy||exporting||uploadPending)return;++restoreToken;clearTimeout(poll);current=null;previewKey='';clearImages();storage.remove('store-planning-run');history.replaceState(null,'','/');$('generation-mode').value='general';$('shop-name').value='';$('preserve-products').checked=false;renderStyles();renderModules();for(const id of ['progress','run-info','preview-panel','download-actions','material-details'])visible(id,false);visible('empty-preview',true);$('result-title').textContent='设计预览';$('result-badge').textContent='等待创作';$('download-status').textContent='';status('');notice('form-error','');notice('upload-errors','');lock(false);$('screenshot').focus();};
+$('new-project').onclick=()=>{if(!config||busy||exporting||uploadPending)return;++restoreToken;clearTimeout(poll);current=null;previewKey='';clearImages();storage.remove('store-planning-run');history.replaceState(null,'','/');$('generation-mode').value='general';$('shop-name').value='';$('preserve-products').checked=false;$('module-settings').open=false;renderStyles();renderModules();for(const id of ['progress','run-info','preview-panel','download-actions','material-details'])visible(id,false);visible('empty-preview',true);$('result-title').textContent='设计预览';$('result-badge').textContent='等待创作';$('download-status').textContent='';status('');notice('form-error','');notice('upload-errors','');lock(false);$('screenshot').focus();};
 async function download(kind){if(busy||exporting||!current)return;exporting=true;lock(false);$('download-status').textContent='正在准备下载…';try{const result=await api(`/api/runs/${current.id}/download/${kind}`,{method:'POST'});const link=el('a');link.href=result.url;link.download='';document.body.append(link);link.click();link.remove();$('download-status').textContent=kind==='shop.png'?'长图已开始下载。':'素材包已开始下载。解压后按模块说明使用。';}catch(e){$('download-status').textContent=e.message+(kind==='shop.png'?' 你仍可单独下载素材包。':'');}finally{exporting=false;lock(false);}}
 $('download').onclick=()=>download('materials.zip');$('download-png').onclick=()=>download('shop.png');
 async function boot(){

@@ -83,7 +83,7 @@ async function ask(folder, stage, system, input, { images = [], search = false, 
   const c = settings(), text = JSON.stringify(input);
   const messages = search ? [{ role: 'system', content: system }, { role: 'user', content: text }] : [{ role: 'system', content: [{ text: system }] }, { role: 'user', content: [{ text }, ...images.map(image => ({ image }))] }];
   if (typeof jsonMode !== 'boolean' || (search && !jsonMode)) throw Error('模型输出模式参数无效，尚未请求模型。');
-  if(!Number.isInteger(maxTokens)||maxTokens<1000||maxTokens>24000)throw Error('规划输出长度参数无效。');
+  if(!Number.isInteger(maxTokens)||maxTokens<1000||maxTokens>40000)throw Error('规划输出长度参数无效。');
   const parameters = { result_format: 'message', max_tokens: maxTokens, enable_thinking: false, ...(search ? { enable_search: true, search_options: { forced_search: true, enable_source: true, search_strategy: 'max' } } : jsonMode ? { response_format: { type: 'json_object' } } : {}) };
   // Opt-in for extraction only. Creative, legacy and search callers retain
   // their original sampling; do not add a provider-wide default or retry.

@@ -170,6 +170,7 @@ function createVisualProfile(mode = 'general', options) {
     const pages={general:['seafood','flowers'],jewelry:['jewelry','seafood'],digital:['seafood','footwear'],apparel:['apparel','kids'],footwear:['footwear','kids'],fragrance:['beauty','flowers'],bags:['bags','flowers']};
     saved.visualSkill.pageReferenceIds = pages[mode].map(name=>'studio-'+name+'-page');
     saved.visualSkill.backgroundGuidance = 'studio-v1';
+    saved.visualSkill.referenceIds = ['studio-banner-wave','studio-nav-line','studio-banner-editorial','studio-heading-air', ...saved.visualSkill.referenceIds.slice(0,2)];
     saved.name = (modeNames[mode] || mode) + ' · 整店设计';
   }
   return saved;

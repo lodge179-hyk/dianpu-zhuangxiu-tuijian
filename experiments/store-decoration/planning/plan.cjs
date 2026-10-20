@@ -25,25 +25,28 @@ const planSchema = z.object({
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   campaign: z.object({
     reference: visualReferenceSchema,
-    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240), sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() }).strict()).min(1).max(24),
+    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240), sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() }).strict()).min(1).max(40),
   }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), narrative: chapterSchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, imageForm: z.enum(require('./studio-contract.cjs').imageForms).optional(), productReferences: z.array(z.object({ evidenceId:z.string().regex(/^product-[1-9]\d*$/), imageIndex:z.number().int().min(1).max(6), description:z.string().min(1).max(180) }).strict()).max(6).optional(), artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(24),
-  batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(6),
+  assets: z.array(z.object({ id, imageForm: z.enum(require('./studio-contract.cjs').imageForms).optional(), productReferences: z.array(z.object({ evidenceId:z.string().regex(/^product-[1-9]\d*$/), imageIndex:z.number().int().min(1).max(6), description:z.string().min(1).max(180) }).strict()).max(6).optional(), artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6).optional(), prompt: z.string().trim().min(1).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(40),
+  batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(10),
 }).strict();
 
 function validatePlan(input) {
   const parsed = planSchema.safeParse(input);
   if (!parsed.success) throw new Error('方案格式不合格：' + parsed.error.issues.slice(0, 6).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const plan = parsed.data;
+  if(!(plan.studio?.version>=2) && plan.assets.some(a=>a.prompt!==undefined && a.prompt.length<20))throw Error('旧版本画面提示词至少20个字符。');
   const platformSlots = plan.delivery === 'platform-slots-v1';
   if (!plan.studio && (plan.assets.length>12 || plan.batches.length>2 || (plan.campaign?.collection.length||0)>12)) throw Error('旧版本方案最多12张素材和两批总图。');
   if(plan.studio){
     if(!platformSlots)throw Error('整店设计必须使用可上传的原生组件。');
     if(plan.modules.length<plan.studio.minModules||plan.modules.length>plan.studio.maxModules)throw Error('整店设计模块数未满足已保存要求。');
     const selected=new Set(plan.studio.options.modules), actual=new Set(plan.modules.map(m=>m.type.split('.')[0]));
-    if([...selected].some(f=>!actual.has(f))||[...actual].some(f=>!selected.has(f)))throw Error('方案模块与用户勾选不一致。');
+    if([...selected].some(f=>!actual.has(f))||(plan.studio.version===1&&[...actual].some(f=>!selected.has(f))))throw Error('方案模块与用户勾选不一致。');
+    if(plan.assets.length>plan.studio.maxAssets||plan.batches.length>plan.studio.maxBatches||(plan.campaign?.collection.length||0)>plan.studio.maxAssets)throw Error('方案超出本次保存的素材或批次预算。');
+    if(plan.studio.version>=2&&require('./studio-layout.cjs').measureStudioModules(plan.modules).height<plan.studio.minPageHeight)throw Error('整店实际纵向长度未满足本次长篇要求。');
     if(plan.assets.some(a=>!a.imageForm))throw Error('整店图片缺少表现形式。');
     if(plan.studio.options.preserveProducts && plan.assets.some(a=>a.direction?.role!=='atmosphere'&&!a.productReferences?.length))throw Error('保真方案缺少实际商品图引用。');
     if(!plan.studio.options.preserveProducts && plan.assets.some(a=>a.productReferences?.length))throw Error('创意模式不能携带保真商品附件。');
@@ -70,7 +73,7 @@ function validatePlan(input) {
   const allowsEmptyDesigns = asset => {
     if (!platformSlots || asset.direction?.role !== 'atmosphere') return false;
     const uses = plan.modules.filter(m => m.props.assetIds.includes(asset.id));
-    return uses.length > 0 && uses.every(m => ['signboard.default', 'signboard.classic'].includes(m.type));
+    return uses.length > 0 && uses.every(m => ['signboard.default', 'signboard.classic'].includes(m.type) || plan.studio?.version>=2&&m.type==='carousel.small'&&['graphic','texture'].includes(asset.direction.treatment)&&!asset.productReferences?.length);
   };
   for (const asset of plan.assets) if (asset.designIds?.length === 0 && !allowsEmptyDesigns(asset)) throw Error(`素材 ${asset.id} 不是独立招牌背景，款式引用不能为空。`);
   if (plan.campaign) {
@@ -104,7 +107,7 @@ function validatePlan(input) {
       if (platformSlots && asset.artwork) {
         if (Math.abs(asset.artwork.width - slot.width) > .01 || Math.abs(asset.artwork.height - slot.height) > .01) throw Error('图片排字规格与真实组件槽位不一致。');
         if (entry.family === 'navigation') throw Error('导航圆形图片不能叠加设计文案。');
-        artworkGeometry(asset.artwork);
+        if(asset.artwork.version!==3)artworkGeometry(asset.artwork);
       }
       const removed = 1 - Math.min(ratio / slot.aspect, slot.aspect / ratio);
       if (removed > .35) warnings.push(`${m.id} 第${index + 1}张使用 ${assetId}，适配槽位约裁去${Math.round(removed * 100)}%面积，需留意构图。`);

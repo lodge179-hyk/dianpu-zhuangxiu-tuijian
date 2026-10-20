@@ -1,7 +1,7 @@
 const { z } = require('zod');
 const { usesPageDirection } = require('./page-direction.cjs');
 const { planSchema, validatePlan } = require('./plan.cjs');
-const { usesGenerationReferences } = require('./visual-skill.cjs');
+const { usesGenerationReferences, generationReferenceIds } = require('./visual-skill.cjs');
 const clean = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : v;
 const key = v => typeof v === 'string' ? v.normalize('NFKC').replace(/\s+/g, '').toLowerCase() : '';
 const list = v => Array.isArray(v) ? v : [];
@@ -93,13 +93,13 @@ function applyDesign(skeleton, value, { visualProfile = null } = {}) {
   const art = value.artDirection || {};
   const assets = skeleton.assets.map(task => {
     const a = byId.get(task.id), d = a.direction || {};
-    const prompt = parseModel(z.string().trim().min(20).max(1600), clean(a.prompt, 1600), `画面提示词 ${task.id}`);
+    const prompt = parseModel(z.string().trim().min(skeleton.studio?.version>=2?1:20).max(1600), clean(a.prompt, 1600), `画面提示词 ${task.id}`);
     const choose = (value, allowed, fallback) => allowed.includes(value) ? value : fallback;
     let visualReference;
     if (usesGenerationReferences(visualProfile)) {
       const ref = usesPageDirection(visualProfile) && task.visualReference ? task.visualReference : a.visualReference;
       visualReference = parseModel(planSchema.shape.assets.element.shape.visualReference.unwrap(), { id: clean(ref?.id, 40), borrow: clean(ref?.borrow, 120), avoid: clean(ref?.avoid, 120) }, `画面 ${task.id} 的视觉参考`);
-      if (!visualProfile.visualSkill.referenceIds.includes(visualReference.id)) throw Error(`画面 ${task.id} 引用了本任务之外的案例编号；已保留响应，未自行换图。`);
+      if (!generationReferenceIds(visualProfile).includes(visualReference.id)) throw Error(`画面 ${task.id} 引用了本任务之外的案例编号；已保留响应，未自行换图。`);
     }
     return { ...task, ...(visualReference ? { visualReference } : {}), subject: clean(a.subject || task.subject, 180), composition: clean(a.composition || prompt, 300), prompt, direction: { role: task.direction.role, camera: choose(a.camera || d.camera, ['wide', 'eye-level', 'top-down', 'macro'], task.direction.camera), treatment: choose(a.treatment || d.treatment, ['environment', 'human-use', 'still-life', 'texture', 'graphic'], task.direction.treatment), background: clean(d.background || skeleton.style.background, 180), accents: clean(d.accents || skeleton.style.palette.join('、'), 120) } };
   });

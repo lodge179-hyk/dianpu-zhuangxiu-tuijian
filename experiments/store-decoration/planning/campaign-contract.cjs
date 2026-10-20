@@ -105,12 +105,18 @@ const campaignVisualFields = z.object({
   treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']),
   visualReference: referenceSchema,
 });
-const campaignVisualSchema = z.preprocess(value => fieldAliases(value, { picture: 'description' }), campaignVisualFields);
+function createCampaignVisualSchema({nativeComposition=false,allowEmptyDesigns=false}={}) {
+  return z.preprocess(value => fieldAliases(value, { picture: 'description' }), campaignVisualFields.extend({
+    // Studio includes subject, source designs, camera and layout separately.
+    // A concise picture can be complete; character count is not design quality.
+    ...(nativeComposition?{picture:z.string().trim().min(1).max(600)}:{}),
+    ...(allowEmptyDesigns?{designIds:z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6)}:{}),
+  }));
+}
+const campaignVisualSchema = createCampaignVisualSchema();
 // Storefront signboards may have no product. The draft-review parser also uses
 // this shape to report empty references; the compiler blocks those product plans.
-const campaignBackdropSchema = z.preprocess(value => fieldAliases(value, { picture: 'description' }), campaignVisualFields.extend({
-  designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6),
-}));
+const campaignBackdropSchema = createCampaignVisualSchema({allowEmptyDesigns:true});
 function campaignContentSchema(base) {
   return pageContentSchema(base, campaignVisualSchema).extend({
     collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().trim().min(1).max(20), appearance: z.string().trim().min(1).max(240) })).min(1).max(12),
@@ -165,4 +171,4 @@ function campaignPrompt(profile, { review = false } = {}) {
   ].filter(Boolean).join('\n\n');
 }
 
-module.exports = { usesJewelryCampaign, usesCreativeCampaign, usesCampaignIdentity, campaignProfile, businessScopeSchema, campaignRecognitionPrompt, attachBusinessScope, campaignContentSchema, campaignVisualSchema, campaignBackdropSchema, campaignVisuals, validateCampaignReferences, campaignPrompt };
+module.exports = { usesJewelryCampaign, usesCreativeCampaign, usesCampaignIdentity, campaignProfile, businessScopeSchema, campaignRecognitionPrompt, attachBusinessScope, campaignContentSchema, campaignVisualSchema, campaignBackdropSchema, createCampaignVisualSchema, campaignVisuals, validateCampaignReferences, campaignPrompt };

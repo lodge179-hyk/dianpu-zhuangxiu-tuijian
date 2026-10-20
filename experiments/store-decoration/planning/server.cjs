@@ -78,7 +78,7 @@ const server = http.createServer(async (req, res) => {
       for(const id of fs.readdirSync(root)){if(!/^[a-f0-9-]{36}$/.test(id))continue;try{const state=load(id);runs.push({id,createdAt:state.createdAt,name:state.plan?.shop.name||state.visualProfile?.studio?.options.shopName||'未完成方案',status:state.status});}catch{}}
       return json(res,200,runs.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,20));
     }
-    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, maxGenerationBatches: 6, studio:publicStudio() });
+    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, maxGenerationBatches: 10, studio:publicStudio() });
     if (req.method === 'GET' && pathname === '/api/catalog') return json(res, 200, publicCatalog());
     if (req.method === 'GET' && pathname === '/api/navigation-library') return json(res, 200, publicNavigationLibrary());
     const libraryFile = pathname.match(/^\/navigation-assets\/([a-z0-9-]+)\.png$/);
@@ -217,6 +217,7 @@ const server = http.createServer(async (req, res) => {
         state.importedBatches = [...new Set([...state.importedBatches, batchId])];
         state.cropReports = { ...(state.cropReports || {}), [batchId]: report };
         delete state.generationError;
+        if (state.generationFailure?.batchId === batchId) delete state.generationFailure;
         if (state.workflow) state.workflow = { ...state.workflow, stage: state.plan.assets.every(a => state.filledAssets.includes(a.id)) ? 'complete' : 'planned', label: '已手动填入素材' };
         return json(res, 200, finish({ id, folder, state }, compose(folder, state.plan, { visualProfile: visualProfileFor(state) })));
       } finally { locks.delete(id); }

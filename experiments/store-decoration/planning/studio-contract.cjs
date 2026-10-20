@@ -1,7 +1,8 @@
 const { entries } = require('./catalog.cjs');
 const { families } = require('./studio-config.cjs');
-const imageForms=['cutout','line-art','flat-icon','editorial','lifestyle','macro','graphic-collage'];
+const imageForms=['cutout','line-art','flat-icon','editorial','lifestyle','macro','graphic-collage','still-life'];
 function studioPrompt(profile,{review=false}={}) {
+ if(profile.studio.version>=2)return require('./studio-contract-v2.cjs').studioEditorialPrompt(profile,{review});
  const s=profile.studio, selected=s.options.modules;
  const types=Object.values(entries).filter(e=>selected.includes(e.family)&&e.type!=='signboard.fullscreen');
  return [

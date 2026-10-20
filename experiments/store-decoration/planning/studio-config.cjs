@@ -49,25 +49,28 @@ const styles = {
 };
 const modeNames = { general:'通用', jewelry:'珠宝', digital:'数码', apparel:'服装', footwear:'鞋履', fragrance:'香氛', bags:'箱包' };
 const optionsSchema = z.object({
-  modules: z.array(z.enum(families.map(f=>f.id))).min(2).max(6),
+  modules: z.array(z.enum(families.map(f=>f.id))).min(1).max(6),
   styleId: z.string().max(30).default('auto'),
   preserveProducts: z.boolean().default(false),
   shopName: z.string().trim().max(30).default(''),
 }).strict();
-const studioSchema = z.object({ version:z.literal(1), mode:z.enum(Object.keys(modeNames)), options:optionsSchema,
-  minModules:z.number().int().min(6).max(12), maxModules:z.literal(16), maxAssets:z.literal(24), maxBatches:z.literal(6),
+const studioSchema = z.object({ version:z.union([z.literal(1),z.literal(2)]), mode:z.enum(Object.keys(modeNames)), options:optionsSchema,
+  minModules:z.number().int().min(6).max(20), maxModules:z.union([z.literal(16),z.literal(24)]), maxAssets:z.union([z.literal(24),z.literal(40)]), maxBatches:z.union([z.literal(6),z.literal(10)]),
+  minPageHeight:z.number().int().positive().optional(),
   style: z.object({ id:z.string(),name:z.string(),colors:z.array(z.string()),description:z.string(),direction:z.string() }).strict(),
-}).strict();
-function createStudio(mode, input = {}) {
+}).strict().superRefine((studio,ctx)=>{
+  if(studio.version>=2 && !(studio.minPageHeight>=4800))ctx.addIssue({code:'custom',path:['minPageHeight'],message:'新版整店必须按原生组件高度达到4800px。'});
+});
+function createStudio(mode, input = {}, {version=2} = {}) {
   if (!styles[mode]) throw Error('请选择有效的店铺品类。');
-  const parsed=optionsSchema.safeParse({ modules:families.map(f=>f.id), ...input });
+  const parsed=optionsSchema.safeParse({ modules:version===1?families.map(f=>f.id):['signboard','carousel'], ...input });
   if (!parsed.success) throw Error('创作选项无效，请检查模块、风格和商品保真设置。');
   const options=parsed.data;
   if (new Set(options.modules).size!==options.modules.length || !options.modules.includes('signboard')) throw Error('店铺招牌必备，模块不能重复。');
-  if (!options.modules.some(m=>['carousel','poster','showcase'].includes(m))) throw Error('请至少选择轮播与横幅、主题海报或商品橱窗中的一项。');
+  if (version===1 && !options.modules.some(m=>['carousel','poster','showcase'].includes(m))) throw Error('请至少选择轮播与横幅、主题海报或商品橱窗中的一项。');
   const style=options.styleId==='auto' ? preset('auto','AI 推荐',[], '根据商品选择合适的方向', '依据商品本色与实际经营内容选择设计方向，保留浅底浏览区、明确banner和轻盈导航。') : styles[mode].find(s=>s.id===options.styleId);
   if (!style) throw Error('此风格不属于当前品类，请重新选择。');
-  return studioSchema.parse({version:1,mode,options,style,minModules:8,maxModules:16,maxAssets:24,maxBatches:6});
+  return studioSchema.parse({version,mode,options,style,...(version===1?{minModules:8,maxModules:16,maxAssets:24,maxBatches:6}:{minModules:16,maxModules:24,maxAssets:40,maxBatches:10,minPageHeight:4800})});
 }
-function publicStudio() { return {version:1,families,modes:Object.entries(modeNames).map(([id,name])=>({id,name,styles:styles[id]})),defaults:{modules:families.map(f=>f.id),styleId:'auto',preserveProducts:false,shopName:''},maxAssets:24,maxBatches:6}; }
+function publicStudio() { return {version:2,families,modes:Object.entries(modeNames).map(([id,name])=>({id,name,styles:styles[id]})),defaults:{modules:['signboard','carousel'],styleId:'auto',preserveProducts:false,shopName:''},maxAssets:40,maxBatches:10,minModules:16,maxModules:24}; }
 module.exports={ families,styles,optionsSchema,studioSchema,createStudio,publicStudio };

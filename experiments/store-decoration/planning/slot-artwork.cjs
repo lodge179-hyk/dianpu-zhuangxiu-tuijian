@@ -12,12 +12,21 @@ const copySchema = z.object({
   size:z.enum(['quiet','normal','display']).optional(),
   widthRatio:z.number().min(.30).max(.62).optional(),
 }).strict();
+// Native image typography is composed by the image model, so it can use center
+// placement and right alignment. Legacy overlays keep their supported geometry.
+const nativeCopySchema=copySchema.extend({
+  placement:z.enum(['none','left','right','top','bottom','center']).default('none'),
+  align:z.enum(['left','center','right']).optional(),
+}).strict();
 const color = z.string().regex(/^#[\da-fA-F]{6}$/);
-const artworkSchema = copySchema.extend({
-  version:z.literal(2).optional(),
+const artworkFields={
   width: z.number().positive().max(1000), height: z.number().positive().max(1200),
   background: color, foreground: color, typography: z.enum(['sans', 'editorial']),
-}).strict();
+};
+const artworkSchema=z.union([
+  copySchema.extend({version:z.literal(2).optional(),...artworkFields}).strict(),
+  nativeCopySchema.extend({version:z.literal(3),...artworkFields}).strict(),
+]);
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 
 function wrap(value, width, size) {
@@ -34,7 +43,7 @@ function wrap(value, width, size) {
 function artworkGeometry(artwork) {
   if (!artwork.heading && !artwork.body) return null;
   if (artwork.placement === 'none') throw Error('图片文案已有内容但没有排字位置，请在画面设计中选择位置。');
-  if(artwork.version===2)return studioGeometry(artwork);
+  if(artwork.version>=2)return studioGeometry(artwork);
   const { width, height, placement } = artwork;
   const pad = Math.max(8, Math.min(28, width * .06, height * .06));
   const side = placement === 'left' || placement === 'right';
@@ -81,6 +90,7 @@ function studioGeometry(a){
   const error=Error('文案在实际槽位中无法保持清楚、舒展的排版，请精简文字或选择更大的组件。');error.code='ARTWORK_TEXT_OVERFLOW';throw error;
 }
 function artworkBrief(artwork) {
+  if(artwork.version===3)return `本格为图文一体设计，由生图模型绘制准确文字：标题${JSON.stringify(artwork.heading)}，说明${JSON.stringify(artwork.body)}。构图意图${artwork.placement}，${artwork.align||'left'}对齐，标题主导、说明次要。文字与商品轮廓分离，留在平静背景，清楚对比，不压住主体，四周保留约8%安全边界。字体气质${artwork.typography}，参考字色${artwork.foreground}，按实际背景提高对比。无需绘制白色文字板，不使用后贴遮罩，程序不会二次叠字。`;
   const g = artworkGeometry(artwork);
   if (!g) return '本图不叠加设计文案，按本格内容构图。';
   const names = { left: '左侧', right: '右侧', top: '顶部', bottom: '底部' };
@@ -112,7 +122,9 @@ function readable(foreground, background) {
 }
 async function bakeArtwork(bytes, value) {
   if (!value) return bytes;
-  const a = artworkSchema.parse(value), g = artworkGeometry(a);
+  const a = artworkSchema.parse(value);
+  if(a.version===3)return bytes;
+  const g = artworkGeometry(a);
   if (!g) return bytes;
   const meta = await sharp(bytes).metadata();
   const font = a.typography === 'editorial' ? 'SimSun,Songti SC,Noto Serif CJK SC,serif' : 'Microsoft YaHei,PingFang SC,Noto Sans CJK SC,sans-serif';
@@ -139,4 +151,4 @@ async function bakeArtwork(bytes, value) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${meta.width}" height="${meta.height}" viewBox="0 0 ${a.width} ${a.height}" preserveAspectRatio="none"><defs><linearGradient id="fade" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"><stop stop-color="${a.background}"/><stop offset="1" stop-color="${a.background}" stop-opacity="0"/></linearGradient></defs><rect x="${p.x}" y="${p.y}" width="${p.width}" height="${p.height}" fill="${a.background}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#fade)"/><g fill="${readable(a.foreground, a.background)}">${text(g.heading, g.textY, g.titleSize, g.titleLine, true)}${text(g.body, g.textY + g.heading.length * g.titleLine + g.gap, g.bodySize, g.bodyLine, false)}</g></svg>`;
   return sharp(bytes).composite([{ input: Buffer.from(svg) }]).png().toBuffer();
 }
-module.exports = { copySchema, artworkSchema, artworkGeometry, artworkBrief, artworkFitFeedback, bakeArtwork };
+module.exports = { copySchema, nativeCopySchema, artworkSchema, artworkGeometry, artworkBrief, artworkFitFeedback, bakeArtwork };

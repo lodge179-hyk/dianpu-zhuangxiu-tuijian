@@ -65,12 +65,16 @@ function visualSkillInput(profile, stage) {
     documents: files.map(file => ({ file, text: fs.readFileSync(path.join(sourceRoot, file), 'utf8') })),
   } };
 }
-function referenceMetadata(profile) {
+function generationReferenceIds(profile) {
+  return [...new Set([...(profile?.visualSkill?.referenceIds||[]),...(profile?.studio?.version>=2 && usesPageDirection(profile)?profile.visualSkill.pageReferenceIds||[]:[])])];
+}
+function referenceMetadata(profile, {includePage=false}={}) {
   if (!usesVisualSkill(profile)) return [];
-  return profile.visualSkill.referenceIds.map((id, index) => {
+  return (includePage?generationReferenceIds(profile):profile.visualSkill.referenceIds).map((id, index) => {
     const ref = catalog.references.find(item => item.id === id);
     if (!ref) throw Error(`视觉参考资料缺失：${id}`);
-    return { attachment: index + 1, ...ref, role: '视觉风格参考，非本店商品或经营品类证据' };
+    const page=profile.visualSkill.pageReferenceIds?.includes(id);
+    return { attachment: index + 1, ...ref, ...(page?{referenceKind:'page'}:{}), role: page?'整页设计语言参考，只借色彩、图形、文字与留白关系，不复制整页网格或平台控件':'视觉风格参考，非本店商品或经营品类证据' };
   });
 }
 async function prepareReferenceImage(ref) {
@@ -92,7 +96,7 @@ async function prepareVisualReferences(profile, { includePage = false } = {}) {
   const pageReferences = includePage && usesPageDirection(profile) ? profile.visualSkill.pageReferenceIds.map((id, index) => {
     const ref = catalog.references.find(item => item.id === id);
     if (!ref) throw Error(`整页参考资料缺失：${id}`);
-    return { ...ref, attachment: references.length + index + 1, role: '整页主次与浏览节奏参考，仅供规划，不传入火山、不作为商品或单图参考' };
+    return { ...ref, attachment: references.length + index + 1, role: profile.studio?.version>=2?'整页主次与浏览节奏参考，也可选作设计语言依据；生图只借表现方法，不复制整页网格、控件、商品或文案':'整页主次与浏览节奏参考，仅供规划，不传入火山、不作为商品或单图参考' };
   }) : [];
   const images = await Promise.all([...references, ...pageReferences].map(prepareReferenceImage));
   return { references, pageReferences, images };
@@ -100,9 +104,9 @@ async function prepareVisualReferences(profile, { includePage = false } = {}) {
 
 function batchVisualReferences(plan, batch, profile) {
   if (!usesGenerationReferences(profile)) return [];
-  const available = new Map(referenceMetadata(profile).map(ref => [ref.id, ref]));
+  const available = new Map(referenceMetadata(profile,{includePage:true}).map(ref => [ref.id, ref]));
   const chosen = new Map();
-  if (profile.studio || profile.visualSkill.backgroundGuidance === 'campaign-identity-v1') {
+  if (profile.studio?.version===1 || !profile.studio && profile.visualSkill.backgroundGuidance === 'campaign-identity-v1') {
     const selection = plan.campaign?.reference;
     if (!selection || !available.has(selection.id)) throw Error('整页摄影基准不在本任务参考中，尚未生图，未自行换图。');
     const { attachment, ...ref } = available.get(selection.id);
@@ -122,7 +126,7 @@ function batchVisualReferences(plan, batch, profile) {
   // provider's ten-image input limit. Every panel still has a complete text brief.
   if(profile.studio){
     const all=[...chosen.values()];
-    return [all[0],...all.slice(1).sort((a,b)=>b.uses.length-a.uses.length)].slice(0,3);
+    return (profile.studio.version>=2 ? all.sort((a,b)=>b.uses.length-a.uses.length) : [all[0],...all.slice(1).sort((a,b)=>b.uses.length-a.uses.length)]).slice(0,3);
   }
   return [...chosen.values()];
 }
@@ -138,9 +142,9 @@ async function prepareGenerationReferences(folder, references = []) {
       fs.writeFileSync(file, Buffer.from(data.slice(data.indexOf(',') + 1), 'base64'));
     }
     images.push('data:image/jpeg;base64,' + fs.readFileSync(file).toString('base64'));
-    records.push({ attachment: index + 1, id: ref.id, file: relative, source: ref.source, uses: selection.uses, ...(selection.campaign ? { campaign: selection.campaign } : {}) });
+    records.push({ attachment: index + 1, id: ref.id, file: relative, source: ref.source, uses: selection.uses, ...(selection.referenceKind?{referenceKind:selection.referenceKind}:{}), ...(selection.campaign ? { campaign: selection.campaign } : {}) });
   }
   return { images, records };
 }
 
-module.exports = { skillSnapshot, usesVisualSkill, usesGenerationReferences, usesReferenceBackground, integrationContract, skillStageInstructions, seriesContentInstructions, generationReferenceInstructions, visualSkillInput, referenceMetadata, prepareVisualReferences, batchVisualReferences, prepareGenerationReferences };
+module.exports = { skillSnapshot, usesVisualSkill, usesGenerationReferences, usesReferenceBackground, integrationContract, skillStageInstructions, seriesContentInstructions, generationReferenceInstructions, visualSkillInput, generationReferenceIds, referenceMetadata, prepareVisualReferences, batchVisualReferences, prepareGenerationReferences };
