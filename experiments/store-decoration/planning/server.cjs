@@ -13,6 +13,7 @@ const { plannerPrompt, publicCatalog } = require('./planner.cjs');
 const { limits, recognitionPrompt, productWorkflow, generateRemaining, cachedResearch, resumeResearch } = require('./product-workflow.cjs');
 const { publicSettings, redact, writeJson } = require('./qwen-provider.cjs');
 const { createVisualProfile, visualProfileFor } = require('./visual-profile.cjs');
+const { publicStudio } = require('./studio-config.cjs');
 const { validateBrief, manualBrief, exampleBrief, briefFromPlan, recommendPlan } = require('./structure.cjs');
 const { fillStructureExample } = require('./structure-example.cjs');
 let port = Number(process.env.PLANNER_PORT || 5182);
@@ -68,7 +69,16 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return json(res, 403, { error: '来源不允许' });
     const url = new URL(req.url, `http://127.0.0.1:${port}`), pathname = decodeURIComponent(url.pathname);
     if (req.method === 'GET' && pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(fs.readFileSync(path.join(__dirname, 'index.html'))); }
-    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, maxGenerationBatches: 2 });
+    if(req.method==='GET' && ['/studio.css','/studio.js'].includes(pathname)){
+      res.writeHead(200,{'Content-Type':pathname.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+      return res.end(fs.readFileSync(path.join(__dirname,pathname.slice(1))));
+    }
+    if(req.method==='GET' && pathname==='/api/runs'){
+      const runs=[];
+      for(const id of fs.readdirSync(root)){if(!/^[a-f0-9-]{36}$/.test(id))continue;try{const state=load(id);runs.push({id,createdAt:state.createdAt,name:state.plan?.shop.name||state.visualProfile?.studio?.options.shopName||'未完成方案',status:state.status});}catch{}}
+      return json(res,200,runs.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,20));
+    }
+    if (req.method === 'GET' && pathname === '/api/config') return json(res, 200, { ...publicSettings(), ...limits, maxGenerationBatches: 6, studio:publicStudio() });
     if (req.method === 'GET' && pathname === '/api/catalog') return json(res, 200, publicCatalog());
     if (req.method === 'GET' && pathname === '/api/navigation-library') return json(res, 200, publicNavigationLibrary());
     const libraryFile = pathname.match(/^\/navigation-assets\/([a-z0-9-]+)\.png$/);
@@ -121,10 +131,10 @@ const server = http.createServer(async (req, res) => {
       try {
         if (/^application\/json/.test(req.headers['content-type'] || '')) {
           const request = JSON.parse((await body(req, 42 * 1024 * 1024)).toString('utf8'));
-          images = request.images; visualProfile = createVisualProfile(request.generationMode);
+          images = request.images; visualProfile = createVisualProfile(request.generationMode || 'general', request.options);
         }
-        else { imageType(req); visualProfile = createVisualProfile('general'); images = [{ name: '商品截图', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
-        if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
+        else { imageType(req); visualProfile = createVisualProfile('general'); images = [{ name: '商品图片', data: `data:${req.headers['content-type'].split(';')[0]};base64,${(await body(req, 10 * 1024 * 1024)).toString('base64')}` }]; }
+        if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品照片或列表截图。');
       } catch (error) { planning = false; throw error; }
       let run; try { run = makeRun('product-screenshots', visualProfile); } catch (error) { planning = false; throw error; } locks.add(run.id);
       json(res, 202, run.state);

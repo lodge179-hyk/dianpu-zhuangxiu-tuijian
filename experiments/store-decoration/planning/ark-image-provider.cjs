@@ -20,6 +20,8 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
   const body = { model: c.model, prompt: batch.prompt, size: batchSize(plan, batch).replace('*', 'x'), stream: false, response_format: 'b64_json', watermark: false };
   const visual = await prepareGenerationReferences(folder, batch.visualReferences);
   const images = [...visual.images];
+  const products = await require('./product-references.cjs').prepareProductReferences(folder,batch,images.length);
+  images.push(...products.images);
   let previousSheetAttachment = null;
   // Seedream 5 Pro produces one sheet; do not send Qwen parameters or group-generation options.
   if (batch.referenceBatchId) {
@@ -30,6 +32,7 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
     previousSheetAttachment = images.length;
   }
   // The official image API accepts a string or string[]. Keep legacy single-reference requests unchanged.
+  if(images.length>10)throw Error('参考图片超过当前模型的10张输入上限，未发起生图。');
   if (images.length) body.image = images.length === 1 ? images[0] : images;
   if (visual.records.length) {
     const cohesive = batch.backgroundGuidance === 'campaign-identity-v1';
@@ -40,7 +43,11 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
     const referenceBackground = batch.backgroundGuidance === 'reference-background-v1';
     const campaignReference = batch.backgroundGuidance === 'campaign-reference-v1';
     const plannedReference = batch.backgroundGuidance === 'planned-reference-v1' || campaignReference;
-    const referenceGuide = cohesive ? [
+    const referenceGuide = batch.studio ? [
+      '视觉案例只借构图和光影方法，用户选定风格与每格图像形式优先；line-art和flat-icon保持图形语言，不继承摄影背景。案例商品与标识不复制。',
+      ...visual.records.map(ref=>`附件${ref.attachment}为视觉参考：${ref.campaign ? ref.campaign.borrow : ''}；${ref.uses.map(use=>`第${use.row}行第${use.column}格借鉴${use.borrow}，避免${use.avoid}`).join('；')}`),
+      previousSheetAttachment ? `附件${previousSheetAttachment}为上一批，仅参考符合本次设计的色彩联系，不能覆盖原商品身份或把摄影形式强加给图标。` : '',
+    ].filter(Boolean).join('\n\n') : cohesive ? [
       `【全套视觉基准】参考图片${master.attachment}是整页共同的摄影基准，适用于所有格子，不只用于首图。借鉴：${master.campaign.borrow}；不继承：${master.campaign.avoid}。全套色彩、光质和后期首先服从正文的“全套摄影约定”，这张参考提供实现这些约定的视觉依据。`,
       digitalCampaign || categoryCampaign ? '【参考分工】这是一家店铺的同一组产品摄影，场景与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的色系、光质或后期。统一摄影语言仍需保留主视觉冲击力、使用关系和产品外观变化，不能把所有照片拍成同一素底。' : '【参考分工】这是一家店铺的同一组广告摄影，人物与静物共享视觉语言。下面的局部案例只借姿态、机位、空间或局部构图，不各自带入新的调色、背景色系、光质或后期；不要将多张案例拼成不同品牌的拼贴。统一摄影语言仍需保留主视觉冲击力、人物参与和不同款式的变化，不能把所有照片拍成同一素底。',
       ...visual.records.filter(ref => ref.uses.length).map(ref => `参考图片${ref.attachment}的局部构图用途（共同摄影基准优先）：\n` + ref.uses.map(use => `第${use.row}行第${use.column}格：借鉴${use.borrow}；不继承${use.avoid}。只把适合的姿态或空间关系带入本套光色体系。`).join('\n')),
@@ -64,8 +71,9 @@ async function generateSheet(folder, plan, batch, attempt, { fetcher = fetch } =
     ].filter(Boolean).join('\n\n');
     body.prompt = referenceGuide + '\n\n' + batch.prompt;
   }
+  if(products.records.length)body.prompt = '【保真原图，最高商品身份依据】\n'+products.records.map(r=>`附件${r.attachment}是用户上传的第${r.imageIndex}张原图。${r.products.map(p=>p.evidenceId+'：'+p.description).join('；')}。只取指定商品外观，不取截图UI、价格或无关背景；不要替换成视觉案例中的商品。`).join('\n')+'\n\n'+body.prompt;
   fs.writeFileSync(path.join(folder, `${stage}-prompt.txt`), body.prompt);
-  writeJson(folder, `${stage}-settings.json`, { provider: 'volcengine', model: c.model, size: body.size, stream: false, response_format: body.response_format, watermark: false, referenceBatchId: batch.referenceBatchId, ...(visual.records.length ? { visualReferences: visual.records, previousSheetAttachment, inputImageCount: images.length, ...(batch.backgroundGuidance ? { backgroundGuidance: batch.backgroundGuidance } : {}) } : {}), productReferences: '商品为品类示意，不要求复刻输入SKU；上传商品截图不作为火山视觉案例输入' });
+  writeJson(folder, `${stage}-settings.json`, { provider: 'volcengine', model: c.model, size: body.size, stream: false, response_format: body.response_format, watermark: false, referenceBatchId: batch.referenceBatchId, visualReferences:visual.records, previousSheetAttachment, inputImageCount:images.length, backgroundGuidance:batch.backgroundGuidance, preserveProducts:!!batch.studio?.options.preserveProducts, productReferences:products.records.length ? products.records : '创意示意模式；未附上传商品原图' });
   const record = { provider: 'volcengine', stage, model: c.model, startedAt: new Date().toISOString(), requestAttempts: 1, automaticRetries: 0, status: 'started' };
   const audit = `${stage}-call.json`, start = Date.now(); writeJson(folder, audit, record);
   let response, raw;

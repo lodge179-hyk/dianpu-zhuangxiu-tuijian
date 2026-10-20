@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node --env-file-if-exists=../../../.env.local server.cjs",
     "example": "node example.cjs",
-    "test": "node --require ./test-network-guard.cjs --test navigation-library.test.cjs navigation-labels.test.cjs download.test.cjs structure.test.cjs product-workflow.test.cjs content-plan.test.cjs ark-image-provider.test.cjs"
+    "test": "node --require ./test-network-guard.cjs --test navigation-library.test.cjs navigation-labels.test.cjs download.test.cjs structure.test.cjs product-workflow.test.cjs content-plan.test.cjs ark-image-provider.test.cjs studio-contract.test.cjs",
+    "test:ui": "node --require ./test-network-guard.cjs --test studio-ui.test.cjs"
   },
   "dependencies": {
     "@json-render/core": "0.21.0",

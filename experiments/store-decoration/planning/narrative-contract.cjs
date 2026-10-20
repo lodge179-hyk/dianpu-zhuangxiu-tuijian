@@ -4,7 +4,7 @@ const { usesDigitalCampaign } = require('./digital-campaign.cjs');
 const { usesCategoryCampaign } = require('./category-campaign.cjs');
 
 function usesNarrativePage(profile) {
-  return (profile?.id === 'jewelry' && profile.version >= 20 && ['narrative-v1', 'platform-slots-v1'].includes(profile.pageComposition)) || usesDigitalCampaign(profile) || usesCategoryCampaign(profile);
+  return !!profile?.studio || (profile?.id === 'jewelry' && profile.version >= 20 && ['narrative-v1', 'platform-slots-v1'].includes(profile.pageComposition)) || usesDigitalCampaign(profile) || usesCategoryCampaign(profile);
 }
 const hex = z.string().regex(/^#[\da-fA-F]{6}$/);
 const pageDesignSchema = z.object({

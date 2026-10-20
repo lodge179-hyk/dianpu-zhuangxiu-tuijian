@@ -136,7 +136,7 @@ const footwearProfile = {
   },
 };
 
-function createVisualProfile(mode = 'general') {
+function createVisualProfile(mode = 'general', options) {
   const profile = mode === 'general' ? generalProfile : mode === 'jewelry' ? campaignProfile : mode === 'digital' ? digitalCampaignProfile : categoryCampaignProfile(mode);
   if (!profile) throw Error('装修模式无效，请选择通用、珠宝、数码、服装、鞋履、香氛或箱包。');
   const saved = JSON.parse(JSON.stringify(profile));
@@ -164,6 +164,14 @@ function createVisualProfile(mode = 'general') {
     saved.stages.design += '\n' + generationReferenceInstructions;
   }
   saved.basis += '本版本使用有来源记录的精选案例，画面设计AI选择各图参考及借鉴边界；所选案例图片直接进入火山生图请求。';
+  if (options !== undefined) {
+    saved.studio = require('./studio-config.cjs').createStudio(mode, options);
+    saved.pageComposition = 'platform-slots-v1';
+    const pages={general:['seafood','flowers'],jewelry:['jewelry','seafood'],digital:['seafood','footwear'],apparel:['apparel','kids'],footwear:['footwear','kids'],fragrance:['beauty','flowers'],bags:['bags','flowers']};
+    saved.visualSkill.pageReferenceIds = pages[mode].map(name=>'studio-'+name+'-page');
+    saved.visualSkill.backgroundGuidance = 'studio-v1';
+    saved.name = (modeNames[mode] || mode) + ' · 整店设计';
+  }
   return saved;
 }
 

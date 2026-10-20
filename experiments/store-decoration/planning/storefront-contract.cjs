@@ -23,26 +23,29 @@ const modelCopySchema = z.preprocess(value => {
   const tone = value.tone.trim();
   return { ...value, tone: ['base', 'alternate'].includes(tone) ? tone : 'base' };
 }, copySchema);
-function storefrontContentSchema(visualSchema, backdropSchema, { allowEmptyProductReferences = false } = {}) {
+function storefrontContentSchema(visualSchema, backdropSchema, { allowEmptyProductReferences = false, studio = false } = {}) {
   const moduleSchema = (types, schema, minimumReferences) => chapterSchema.extend({
     type: z.enum(types),
+    ...(studio ? { text:z.string().trim().max(180).default('') } : {}),
     visuals: z.array(z.object({
       // Model responses sometimes put a collection ID here. The compiler resolves
       // it through the declared category; persisted evidence remains product-*.
       evidenceIds: z.array(z.string().regex(/^(product|design)-[1-9]\d*$/)).min(minimumReferences).max(6),
       subject: z.string().trim().min(1).max(180), caption: z.string().trim().max(32).default(''),
       copy: modelCopySchema.default({ heading: '', body: '', placement: 'none', tone: 'base' }),
+      ...(studio ? { imageForm:z.enum(require('./studio-contract.cjs').imageForms) } : {}),
       visualPlan: schema,
     })).max(9),
   });
   return z.object({
     narrative: z.string().trim().min(1).max(400), reason: z.string().trim().min(1).max(300),
     reference: referenceSchema, pageDesign: pageDesignSchema,
-    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().trim().min(1).max(20), appearance: z.string().trim().min(1).max(240) })).min(1).max(12),
+    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().trim().min(1).max(20), appearance: z.string().trim().min(1).max(240), ...(studio ? { sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() } : {}) })).min(1).max(studio ? 24 : 12),
     modules: z.array(z.discriminatedUnion('type', [
       moduleSchema(storefrontTypes.filter(type => type.startsWith('signboard.')), backdropSchema, 0),
       moduleSchema(storefrontTypes.filter(type => !type.startsWith('signboard.')), allowEmptyProductReferences ? backdropSchema : visualSchema, allowEmptyProductReferences ? 0 : 1),
-    ])).min(3).max(10),
+      ...(studio ? [chapterSchema.extend({ type:z.enum(Object.keys(entries).filter(t=>t.startsWith('text.'))), text:z.string().trim().min(1).max(180), visuals:z.array(z.never()).length(0) })] : []),
+    ])).min(3).max(studio ? 16 : 10),
   });
 }
 function storefrontPrompt(profile, { review = false } = {}) {

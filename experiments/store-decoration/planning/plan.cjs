@@ -9,6 +9,7 @@ const { pageDesignSchema, storySchema } = require('./narrative-contract.cjs');
 const { moduleGeometry } = require('./narrative-layout.cjs');
 const { chapterSchema, storefrontTypes } = require('./storefront-contract.cjs');
 const { artworkSchema, artworkGeometry } = require('./slot-artwork.cjs');
+const { studioSchema } = require('./studio-config.cjs');
 const id = z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/);
 const visualReferenceSchema = z.object({ id, borrow: z.string().min(1).max(120), avoid: z.string().min(1).max(120) }).strict();
 const aspectRatios = { '3:1': 3, '483:258': 483 / 258, '483:224': 483 / 224, '4:3': 4 / 3, '1:1': 1, '3:4': 3 / 4, '577:848': 577 / 848 };
@@ -17,18 +18,19 @@ const planSchema = z.object({
   imageMode: z.literal('category-inspired').optional(),
   pageDesign: pageDesignSchema.optional(),
   delivery: z.literal('platform-slots-v1').optional(),
+  studio:studioSchema.optional(),
   shop: z.object({ name: z.string().min(1).max(30), category: z.string().min(1).max(100), observations: z.array(z.string().max(180)).max(10), uncertainties: z.array(z.string().max(180)).max(10) }).strict(),
   summary: z.string().min(1).max(300),
   navigationLibrary: z.object({ style: z.enum(['auto', 'clean', 'warm']) }).strict().optional(),
   artDirection: z.object({ concept: z.string().min(1).max(120), narrative: z.string().min(1).max(400), anchors: z.array(z.string().min(1).max(120)).min(1).max(3), focalAssetId: id }).strict().optional(),
   campaign: z.object({
     reference: visualReferenceSchema,
-    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240) }).strict()).min(1).max(12),
+    collection: z.array(z.object({ id: z.string().regex(/^design-[1-9]\d*$/), category: z.string().min(1).max(20), appearance: z.string().min(1).max(240), sourceEvidenceId:z.string().regex(/^product-[1-9]\d*$/).optional() }).strict()).min(1).max(24),
   }).strict().optional(),
   style: z.object({ palette: z.array(z.string().regex(/^#[\da-fA-F]{6}$/)).min(2).max(4), background: z.string().min(1).max(200), lighting: z.string().min(1).max(200), photography: z.string().min(1).max(200) }).strict(),
   modules: z.array(z.object({ id, type: z.enum(Object.keys(entries)), purpose: z.string().min(1).max(180), story: storySchema.optional(), narrative: chapterSchema.optional(), props: z.object({ assetIds: z.array(id).max(9), text: z.string().max(180), labels: z.array(z.string().max(24)).max(5), titles: z.array(z.string().max(48)).max(9) }).strict() }).strict()).min(3).max(24),
-  assets: z.array(z.object({ id, artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(12),
-  batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(2),
+  assets: z.array(z.object({ id, imageForm: z.enum(require('./studio-contract.cjs').imageForms).optional(), productReferences: z.array(z.object({ evidenceId:z.string().regex(/^product-[1-9]\d*$/), imageIndex:z.number().int().min(1).max(6), description:z.string().min(1).max(180) }).strict()).max(6).optional(), artwork: artworkSchema.optional(), visualReference: visualReferenceSchema.optional(), layoutBrief: z.string().max(900).optional(), designIds: z.array(z.string().regex(/^design-[1-9]\d*$/)).max(6).optional(), prompt: z.string().min(20).max(1600).optional(), subject: z.string().min(1).max(180), composition: z.string().min(1).max(300), aspect: z.enum(Object.keys(aspectRatios)), direction: z.object({ role: z.enum(['atmosphere', 'hero', 'category', 'scene', 'detail', 'product']), camera: z.enum(['wide', 'eye-level', 'top-down', 'macro']), background: z.string().min(1).max(180), accents: z.string().min(1).max(120), treatment: z.enum(['environment', 'human-use', 'still-life', 'texture', 'graphic']).optional() }).strict().optional() }).strict()).min(1).max(24),
+  batches: z.array(z.object({ id, rows: z.array(z.array(id).min(1).max(4)).min(1).max(4) }).strict()).min(1).max(6),
 }).strict();
 
 function validatePlan(input) {
@@ -36,6 +38,16 @@ function validatePlan(input) {
   if (!parsed.success) throw new Error('方案格式不合格：' + parsed.error.issues.slice(0, 6).map(i => `${i.path.join('.')} ${i.message}`).join('；'));
   const plan = parsed.data;
   const platformSlots = plan.delivery === 'platform-slots-v1';
+  if (!plan.studio && (plan.assets.length>12 || plan.batches.length>2 || (plan.campaign?.collection.length||0)>12)) throw Error('旧版本方案最多12张素材和两批总图。');
+  if(plan.studio){
+    if(!platformSlots)throw Error('整店设计必须使用可上传的原生组件。');
+    if(plan.modules.length<plan.studio.minModules||plan.modules.length>plan.studio.maxModules)throw Error('整店设计模块数未满足已保存要求。');
+    const selected=new Set(plan.studio.options.modules), actual=new Set(plan.modules.map(m=>m.type.split('.')[0]));
+    if([...selected].some(f=>!actual.has(f))||[...actual].some(f=>!selected.has(f)))throw Error('方案模块与用户勾选不一致。');
+    if(plan.assets.some(a=>!a.imageForm))throw Error('整店图片缺少表现形式。');
+    if(plan.studio.options.preserveProducts && plan.assets.some(a=>a.direction?.role!=='atmosphere'&&!a.productReferences?.length))throw Error('保真方案缺少实际商品图引用。');
+    if(!plan.studio.options.preserveProducts && plan.assets.some(a=>a.productReferences?.length))throw Error('创意模式不能携带保真商品附件。');
+  }
   // Store identity is required platform structure, not an optional AI chapter.
   // This adds no image slot and preserves all existing asset IDs and batches.
   if (platformSlots) {
@@ -68,7 +80,7 @@ function validatePlan(input) {
   }
   const signs = plan.modules.filter(m => m.type.startsWith('signboard.'));
   if (platformSlots) {
-    if (!plan.pageDesign || plan.modules.some(m => !m.narrative || m.story || !storefrontTypes.includes(m.type))) throw Error('可上传叙事方案缺少章节或使用了非原生模块。');
+    if (!plan.pageDesign || plan.modules.some(m => !m.narrative || m.story || !storefrontTypes.includes(m.type) && !(plan.studio && m.type.startsWith('text.')))) throw Error('可上传叙事方案缺少章节或使用了非原生模块。');
     if (signs.length !== 1 || plan.modules[0] !== signs[0]) throw Error('店铺必须以唯一一个招牌开始。');
   } else if (plan.pageDesign) {
     if (plan.modules.some(m => !m.story)) throw Error('叙事页面的模块缺少图文设计数据');
@@ -156,7 +168,7 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
   return pending.map((batch, index) => {
     const rowWeights = batch.rows.map(row => 1 / (row.length * aspectRatios[lookup.get(row[0]).aspect]));
     const total = rowWeights.reduce((a, b) => a + b, 0);
-    const prompt = plan.imageMode === 'category-inspired' ? productBatchPrompt(plan, batch, lookup, rowWeights, total, index, visualProfile) : [
+    const prompt = plan.studio ? require('./studio-generation.cjs').studioBatchPrompt(plan,batch,lookup,rowWeights,total) : plan.imageMode === 'category-inspired' ? productBatchPrompt(plan, batch, lookup, rowWeights, total, index, visualProfile) : [
       'Create ONE asset sheet for an art-directed store campaign. Each panel is an independent finished visual in the medium specified by its brief, not a website or UI. Do not default every panel to a product packshot.',
       lock,
       plan.artDirection ? `Page concept: ${plan.artDirection.concept}. Narrative and visual hierarchy: ${plan.artDirection.narrative}. Shared anchors: ${plan.artDirection.anchors.join('; ')}. The page focal asset is ${plan.artDirection.focalAssetId}; give supporting visuals quieter or closer framing instead of making every panel compete as a hero. Follow each panel brief; do not repeat the same subject just to create unity.` : '',
@@ -168,7 +180,7 @@ function buildBatches(plan, excludedAssetIds = [], visualProfile = null) {
       'Keep focal content inside a generous safe area for ratio correction. For navigation photos keep the subject inside the central 65% for a circular crop. Signboard backgrounds leave the lower 35% uncluttered for fixed shop information. Intentional partial garment framing is allowed.',
       'Do not render text, panel labels, numbers, logos, watermarks, prices, navigation, buttons or other UI. Goods are illustrative examples, not a claim to reproduce an actual customer SKU.',
     ].filter(Boolean).join('\n\n');
-    return { ...batch, panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, ...(usesGenerationReferences(visualProfile) ? { visualReferences: batchVisualReferences(plan, batch, visualProfile) } : {}), ...(usesReferenceBackground(visualProfile) ? { backgroundGuidance: visualProfile.visualSkill.backgroundGuidance } : {}), ...(usesDigitalCampaign(visualProfile) || usesCategoryCampaign(visualProfile) ? { campaignDomain: visualProfile.id } : {}), styleLock: lock, prompt };
+    return { ...batch, ...(plan.studio ? { studio:plan.studio, productReferences: [...new Map(batch.rows.flat().flatMap(id=>lookup.get(id).productReferences||[]).map(p=>[p.evidenceId,p])).values()] } : {}), panelCount: batch.rows.flat().length, referenceBatchId: index ? pending[index - 1].id : null, ...(usesGenerationReferences(visualProfile) ? { visualReferences: batchVisualReferences(plan, batch, visualProfile) } : {}), ...(usesReferenceBackground(visualProfile) ? { backgroundGuidance: visualProfile.visualSkill.backgroundGuidance } : {}), ...(usesDigitalCampaign(visualProfile) || usesCategoryCampaign(visualProfile) ? { campaignDomain: visualProfile.id } : {}), styleLock: lock, prompt };
   });
 }
 function productBatchPrompt(plan, batch, lookup, weights, total, index, visualProfile) {

@@ -95,18 +95,18 @@ function cachedResearch(run) {
 }
 function readSources(run) { try { return sourceChoices(JSON.parse(fs.readFileSync(path.join(run.folder, 'search-sources.json'), 'utf8'))); } catch { return []; } }
 async function prepareInputs(images, folder, { persist = true } = {}) {
-  if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品列表截图。');
+  if (!Array.isArray(images) || !images.length || images.length > limits.maxImages) throw Error('请上传 1 至 6 张商品照片或列表截图。');
   let total = 0; const inputs = [], visionImages = [];
   for (const [index, item] of images.entries()) {
     const match = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(item?.data || '');
     if (!match) throw Error('截图仅支持 PNG、JPG 或 WebP。');
     const bytes = Buffer.from(match[2], 'base64'); total += bytes.length;
     if (bytes.length > limits.maxImageMB * 1024 * 1024 || total > limits.maxTotalMB * 1024 * 1024) throw Error('每张截图最多 10MB，合计最多 30MB。');
-    const normalized = await sharp(bytes, { limitInputPixels: 60000000 }).rotate().resize({ width: 1600, height: 16000, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 87 }).toBuffer({ resolveWithObject: true });
+    const normalized = await sharp(bytes, { limitInputPixels: 60000000 }).rotate().flatten({background:'#FFFFFF'}).resize({ width: 1600, height: 16000, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 92 }).toBuffer({ resolveWithObject: true });
     if (Math.min(normalized.info.width, normalized.info.height) < 80) throw Error('截图尺寸太小，请提供清楚的商品列表。');
     const { width, height } = normalized.info, file = `input-${index + 1}.jpg`;
     if (persist) fs.writeFileSync(path.join(folder, file), normalized.data);
-    inputs.push({ name: String(item.name || `截图${index + 1}`).slice(0, 100), file, width, height });
+    inputs.push({ name: String(item.name || `商品图${index + 1}`).slice(0, 100), file, width, height, bytes:normalized.data.length });
     const overview = await sharp(normalized.data).resize({ width: 1000, height: 2000, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer();
     visionImages.push({ imageIndex: index + 1, view: '概览', data: 'data:image/jpeg;base64,' + overview.toString('base64') });
     if (height > width * 2.5) for (const top of [0, height - Math.min(height, width * 2)]) {
@@ -166,7 +166,7 @@ async function continuePlanning(run, prepared, save, { fetcher, generate, reuse 
   const profile = visualProfileFor(run.state);
   const campaign = usesCreativeCampaign(profile);
   const parseRecognition = value => {
-    const result = validateRecognition(value, prepared.inputs.length);
+    const result = validateRecognition(value, prepared.inputs.length, { minProducts:profile?.studio ? 1 : 2 });
     return campaign ? attachBusinessScope(result, value.businessScope, value.groups) : result;
   };
   const attached = prepared.visionImages.map(({ imageIndex, view }, i) => ({ attachment: i + 1, imageIndex, view }));

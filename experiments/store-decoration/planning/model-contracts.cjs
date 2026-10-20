@@ -18,7 +18,7 @@ const product = z.object({
 // A product belongs to its enclosing group; there is no second category name to disagree with it.
 const recognitionRequestSchema = z.object({ sufficient: z.boolean(), groups: z.array(z.object({ name: z.string().min(1).max(20), products: z.array(product).min(1).max(16) })).max(5), observations: z.array(z.string().max(180)).max(8), uncertainties: z.array(z.string().max(180)).max(8), missing: z.array(z.string().max(180)).max(5) });
 const recognitionSchema = z.object({ sufficient: z.boolean(), categories: z.array(z.string().min(1).max(20)).max(5), products: z.array(product.extend({ category: z.string().min(1).max(20) })).max(80), observations: z.array(z.string()).max(8), uncertainties: z.array(z.string()).max(8), missing: z.array(z.string()).max(5) });
-function validateRecognition(value, count) {
+function validateRecognition(value, count, { minProducts = 2 } = {}) {
   if (!value || typeof value !== 'object') throw Error('识别结果不是商品资料，已保存响应。');
   const categories = [], products = [], seen = new Set();
   const names = new Map();
@@ -48,7 +48,7 @@ function validateRecognition(value, count) {
   }
   if (categories.length > 5) throw Error('识别出了超过 5 个不同分组；需重新归并分类后继续，原截图已保留。');
   const result = parseModel(recognitionSchema, { sufficient: value.sufficient === 'true' ? true : value.sufficient === 'false' ? false : value.sufficient, categories, products, observations: lines(value.observations, 8), uncertainties: lines(value.uncertainties, 8), missing: lines(value.missing, 5) }, '商品识别');
-  if (result.sufficient && products.length < 2) { result.sufficient = false; result.missing = ['请补充包含至少两种清楚商品或款式的列表截图。']; }
+  if (result.sufficient && products.length < minProducts) { result.sufficient = false; result.missing = [minProducts===1 ? '请提供至少一件清楚可辨的商品照片。' : '请补充包含至少两种清楚商品或款式的列表截图。']; }
   return result;
 }
 function color(v) {

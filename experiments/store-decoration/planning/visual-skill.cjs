@@ -102,7 +102,7 @@ function batchVisualReferences(plan, batch, profile) {
   if (!usesGenerationReferences(profile)) return [];
   const available = new Map(referenceMetadata(profile).map(ref => [ref.id, ref]));
   const chosen = new Map();
-  if (profile.visualSkill.backgroundGuidance === 'campaign-identity-v1') {
+  if (profile.studio || profile.visualSkill.backgroundGuidance === 'campaign-identity-v1') {
     const selection = plan.campaign?.reference;
     if (!selection || !available.has(selection.id)) throw Error('整页摄影基准不在本任务参考中，尚未生图，未自行换图。');
     const { attachment, ...ref } = available.get(selection.id);
@@ -117,6 +117,12 @@ function batchVisualReferences(plan, batch, profile) {
       chosen.set(selection.id, { ...ref, uses: [] });
     }
     chosen.get(selection.id).uses.push({ assetId, row: rowIndex + 1, column: columnIndex + 1, borrow: selection.borrow, avoid: selection.avoid });
+  }
+  // Six uploaded originals + three style references + previous sheet fit the
+  // provider's ten-image input limit. Every panel still has a complete text brief.
+  if(profile.studio){
+    const all=[...chosen.values()];
+    return [all[0],...all.slice(1).sort((a,b)=>b.uses.length-a.uses.length)].slice(0,3);
   }
   return [...chosen.values()];
 }

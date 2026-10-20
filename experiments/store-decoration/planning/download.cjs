@@ -57,7 +57,7 @@ async function materialsZip(folder, state, { includePreview = false } = {}) {
   const addImage = (name, bytes) => { files[name] = [bytes, { level: 0 }]; };
   plan.modules.forEach((module, index) => {
     const name = module.story ? narrativeNames[module.story.layout] : families[module.type.split('.')[0]], directory = `模块素材/${number(index + 1)}-${name}`;
-    const copy = platformSlots ? module.props.assetIds.map(id => assetPlans.get(id).artwork).filter(Boolean).map(a => [a.heading, a.body].filter(Boolean).join('\n')).join('\n')
+    const copy = platformSlots ? module.props.text || module.props.assetIds.map(id => assetPlans.get(id).artwork).filter(Boolean).map(a => [a.heading, a.body].filter(Boolean).join('\n')).join('\n')
       : module.story ? [module.story.heading, module.story.body].filter(Boolean).join('\n') : module.props.text;
     const images = module.props.assetIds.map((id, slot) => {
       const asset = assets.get(id), file = `${directory}/${number(slot + 1)}-${id}.png`;
@@ -65,10 +65,11 @@ async function materialsZip(folder, state, { includePreview = false } = {}) {
       addImage(file, asset.bytes);
       rows.push([index + 1, name, module.type, module.purpose, slot + 1, file, `${asset.width} × ${asset.height}`, label, copy]);
       return { order: slot + 1, assetId: id, file, label, width: asset.width, height: asset.height,
+        ...(plan.studio ? {imageForm:assetPlans.get(id).imageForm,sourceProducts:(assetPlans.get(id).productReferences||[]).map(p=>({evidenceId:p.evidenceId,imageIndex:p.imageIndex}))} : {}),
         ...(platformSlots ? { slotWidth: entries[module.type].slots[slot].width, slotHeight: entries[module.type].slots[slot].height, copyBaked: !!assetPlans.get(id).artwork } : {}) };
     });
     if (!images.length) rows.push([index + 1, name, module.type, module.purpose, '', '', '', '', copy]);
-    addText(`${directory}/模块说明.txt`, `模块 ${number(index + 1)}：${name}\r\n组件：${module.type}\r\n用途：${module.purpose}\r\n${platformSlots ? '图片内文字（已合成，无需另加）' : '文字'}：${copy || '无'}\r\n` + (images.length ? images.map(i => `图片 ${i.order}：${path.posix.basename(i.file)}${i.label ? '\r\n原生名称字段：' + i.label : ''}`).join('\r\n') : platformSlots ? '本模块使用平台原生店铺身份信息。' : '本模块使用文字排版。') + '\r\n');
+    addText(`${directory}/模块说明.txt`, `模块 ${number(index + 1)}：${name}\r\n组件：${module.type}\r\n用途：${module.purpose}\r\n${platformSlots && !module.type.startsWith('text.') ? '图片内文字（已合成，无需另加）' : '平台文字'}：${copy || '无'}\r\n` + (images.length ? images.map(i => `图片 ${i.order}：${path.posix.basename(i.file)}${i.label ? '\r\n原生名称字段：' + i.label : ''}`).join('\r\n') : platformSlots && !module.type.startsWith('text.') ? '本模块使用平台原生店铺身份信息。' : '本模块使用平台原生文字，请复制上方文字内容。') + '\r\n');
     modules.push({ order: index + 1, id: module.id, type: module.type, name, purpose: module.purpose, text: copy, ...(module.story ? { story: module.story } : {}), ...(module.narrative ? { narrative: module.narrative } : {}), images });
   });
   // Explicit allowlist: original uploads, model responses and local config never enter the archive.
@@ -95,9 +96,10 @@ async function materialsZip(folder, state, { includePreview = false } = {}) {
     }
   }
   addText('模块对照表.csv', '\ufeff' + rows.map(row => row.map(csvCell).join(',')).join('\r\n'));
-  addText('素材对照.json', JSON.stringify({ version: 1, shop: plan.shop.name, runId: state.id, ...(platformSlots ? { delivery: plan.delivery, pageBackground: '#FFFFFF' } : {}), modules }, null, 2));
+  addText('素材对照.json', JSON.stringify({ version: 1, shop: plan.shop.name, runId: state.id, ...(plan.studio ? {designOptions:plan.studio.options,style:plan.studio.style.name} : {}), ...(platformSlots ? { delivery: plan.delivery, pageBackground: '#FFFFFF' } : {}), modules }, null, 2));
+  if(plan.studio)addText('本次设计设置.txt', `风格：${plan.studio.style.name}\r\n模块：${plan.studio.options.modules.map(f=>families[f]).join('、')}\r\n商品保真：${plan.studio.options.preserveProducts?'开启；原商品图已作为生成依据，AI重绘细节仍需核对':'关闭；商品为经营范围内的创意示意'}\r\n文字模块请按模块说明填入原生文字；导航和橱窗需绑定自己的实际商品。\r\n`);
   addText('使用说明.txt', platformSlots
-    ? `${plan.shop.name} · 可上传装修素材\r\n\r\n1. 解压后按“模块素材”的数字顺序，在微购添加说明中的同名组件。\r\n2. 每个PNG对应组件的一个图片槽位，按数字顺序分别上传；海报设计标题与短文已经合入PNG，不要再在图外添加。\r\n3. 商品橱窗保留原生商品标题和按钮，导航保留原生标签；按模块说明填写名称并关联实际商品，价格由真实商品数据提供。\r\n4. 店铺及模块外背景保持白色，不需要铺整页底色，不把多列橱窗压成一张全宽海报。\r\n5. “店铺预览/shop.html”与上传素材使用同一批成品PNG。${includePreview ? '“店铺长图.png”供查看、分享，不代替各槽位素材。' : '此包未附长图，但各槽位PNG仍含完整设计文字。'}\r\n\r\n素材对照.json记录真实组件类型、上传顺序和槽位尺寸。图片是原创示意，不证明实际SKU或材料属性；此包不是平台一键导入模板。\r\n`
+    ? `${plan.shop.name} · 可上传装修素材\r\n\r\n1. 解压后按“模块素材”的数字顺序，在微购添加说明中的同名组件。\r\n2. 每个PNG对应组件的一个图片槽位，按数字顺序分别上传；海报设计标题与短文已经合入PNG，不要再在图外添加。\r\n3. 商品橱窗保留原生商品标题和按钮，导航保留原生标签；按模块说明填写名称并关联实际商品，价格由真实商品数据提供。\r\n4. 店铺及模块外背景保持白色，不需要铺整页底色，不把多列橱窗压成一张全宽海报。\r\n5. “店铺预览/shop.html”与上传素材使用同一批成品PNG。${includePreview ? '“店铺长图.png”供查看、分享，不代替各槽位素材。' : '此包未附长图，但各槽位PNG仍含完整设计文字。'}\r\n\r\n素材对照.json记录真实组件类型、上传顺序和槽位尺寸。${plan.studio?.options.preserveProducts ? '商品以用户上传原图为生成依据；AI重绘的商品细节仍需核对，不证明材料或功能属性' : '图片是原创示意，不证明实际SKU或材料属性'}；此包不是平台一键导入模板。\r\n`
     : plan.pageDesign
     ? `${plan.shop.name} · 叙事装修素材\r\n\r\n解压后打开“店铺预览/shop.html”查看包含完整图文的离线页面。\r\n${includePreview ? '“店铺长图.png”是完整页面；“模块成品”按阅读顺序保存每段已经排好文字的PNG，可作为全宽图片依次上传到装修平台，不需要重新拼图或排字。' : '此次仅下载原始素材与离线预览；没有模块成品PNG。需要排好文字的成品时，请使用正常下载。'}\r\n“模块素材”保留单张原图及文字说明，方便后续编辑；“素材对照.json”记录章节与模块用途。\r\n图片为原创示意，不能当作真实在售SKU或材质/性能证明。此ZIP不是平台的一键导入模板。\r\n`
     : `${plan.shop.name} · 装修素材\r\n\r\n1. 先解压 ZIP，再打开“店铺预览/shop.html”查看整页效果，无需启动本工具。\r\n2. 按“模块素材”中的数字顺序，在微购装修中添加对应组件；将各模块文件夹的 PNG 按数字顺序上传。\r\n3. 文字、导航名称和商品标题见“模块说明.txt”或“模块对照表.csv”；后者可用 Excel 打开。\r\n4. 同一图片用于多个模块时，各模块都保留一份，避免手动寻找复用关系。\r\n5. ${includePreview ? '“店铺长图.png”用于查看和分享完整装修效果。' : '本包包含模块素材和离线预览，不含整页 PNG 长图。'}\r\n\r\n图片为装修示意，商品信息需自行核对。店铺头像仍使用现有占位图，实际装修时请换成自己的头像。\r\n此 ZIP 是手动装修素材包，不是微购可一键导入的模板。\r\n`);

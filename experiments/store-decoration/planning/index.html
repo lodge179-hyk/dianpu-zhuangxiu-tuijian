@@ -1,158 +1,17 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f7f8fa">
-<title>呈境 · 店铺视觉创作</title>
-<style>
-:root{color-scheme:light;--bg:#f7f8fa;--ink:#202124;--muted:#787d85;--line:#e7e8ec;--accent:#487365;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font:14px/1.6 var(--font);-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,select,summary{cursor:pointer}button{min-height:40px;border:0;border-radius:12px;background:#ebedf0;color:var(--ink);padding:9px 17px;font-weight:550;transition:background .15s}button:hover:not(:disabled){background:#e0e3e8}button.primary{background:var(--ink);color:white}button.primary:hover:not(:disabled){background:#3c3d41}button:disabled{opacity:.42;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}a{color:var(--accent);text-underline-offset:4px}h1,h2,h3,p{margin:0}.hidden{display:none!important}.muted{color:var(--muted)}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.app-header{height:76px;padding:0 38px;display:flex;align-items:center}.brand{display:flex;align-items:center;gap:10px}.brand svg{width:25px;height:25px;color:var(--accent)}.brand h1{font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:23px;font-weight:600;letter-spacing:3px}
-.workspace{max-width:1240px;margin:auto;min-height:calc(100dvh - 76px);padding:30px 32px 90px;display:flex;justify-content:center;align-items:center}.work-panel{width:min(100%,530px)}.composer{background:white;border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:0 8px 40px -18px #252d4821}.attachments{display:flex;flex-wrap:wrap;gap:10px;align-items:center;min-height:158px;padding:4px}.upload-control{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:11px;width:100%;min-height:150px;border-radius:16px;color:#656c76;cursor:pointer;transition:background .15s}.upload-control:hover{background:#f7f8fa}.upload-control:focus-within{outline:2px solid var(--accent);outline-offset:1px}.upload-control:has(input:disabled){opacity:.4;cursor:wait}.upload-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#eef2f0;color:var(--accent)}.upload-icon svg{width:22px;height:22px}.upload-control>span:last-of-type{font-size:14px}.upload-control input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:inherit}#input-list{display:contents}.input-item{position:relative;width:80px;height:96px;flex:none}.input-item img{width:100%;height:100%;object-fit:cover;border:1px solid #e7e8ea;border-radius:12px}.input-remove{position:absolute;top:-5px;right:-5px;border:2px solid white;border-radius:50%;padding:0;width:28px;min-height:28px;line-height:23px;background:#34363d;color:white;font-size:18px;font-weight:400}.input-remove:hover:not(:disabled){background:#5b5f69}.has-images .attachments{justify-content:flex-start;min-height:128px;align-content:center;gap:12px}.has-images .upload-control{width:64px;min-height:96px;border:1px dashed #dce0e5}.has-images .upload-control>span:last-of-type{display:none}.has-images .upload-icon{background:none}.composer-toolbar{display:flex;align-items:center;gap:9px;margin-top:12px}#input-count{font-size:11px;color:#999fa7;font-variant-numeric:tabular-nums}.composer-toolbar #plan{margin-left:auto;min-width:110px}
-#config{font-size:12px;color:#966c44;margin:14px 8px 0}.status-card{margin:20px 8px 0;font-size:13px}.status-line{display:flex;align-items:center;gap:9px;color:#6d737c}#status-card[data-busy="true"] .status-line:before{content:"";width:12px;height:12px;flex:none;border:1.5px solid #d7dcdf;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#status{overflow-wrap:anywhere}.recovery-actions{display:flex;flex-wrap:wrap;gap:8px}.recovery-actions:not(:empty){margin-top:13px}.recovery-actions button{font-size:12px;min-height:36px;padding:8px 13px}.recovery-note{font-size:11px;color:var(--muted)}.recovery-note:not(:empty){margin-top:8px}details summary{font-size:12px;color:var(--muted)}#error-details{margin-top:7px}#error-message{font-size:12px;color:#9a4d49;line-height:1.8;margin-top:8px;overflow-wrap:anywhere;white-space:pre-wrap}.material-details{margin:18px 8px 0;padding-top:14px;border-top:1px solid var(--line)}#batches{padding-top:14px}.batch{font-size:12px}.batch+.batch{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}.batch h3{font-size:12px;font-weight:550}.batch p{margin-top:8px}.material-upload{display:flex;flex-direction:column;gap:6px;margin:12px 0}.material-upload small{font-size:11px;color:var(--muted)}.material-upload input{max-width:100%;font-size:11px}.material-upload input::file-selector-button{border:1px solid var(--line);border-radius:7px;background:white;padding:7px 9px;color:var(--ink);margin-right:8px;cursor:pointer}
-.workspace.has-preview{display:grid;grid-template-columns:310px minmax(0,1fr);gap:60px;align-items:center;padding-top:12px;padding-bottom:30px}.has-preview .composer{border-radius:21px;padding:14px}.has-preview .attachments{min-height:144px}.has-preview .upload-control{min-height:140px}.has-preview .has-images .upload-control{min-height:96px}.has-preview .has-images .attachments{min-height:128px}.preview-panel{min-width:0;position:relative;display:flex;align-items:center;flex-direction:column}.phone-showcase{width:100%;position:relative;isolation:isolate;display:flex;justify-content:center;padding:8px 20px 24px}.phone-showcase:before{content:"";position:absolute;inset:4% -2% 0;background:radial-gradient(ellipse at center,#e4eae7 0,transparent 65%);z-index:-1;pointer-events:none}.phone-mockup{width:clamp(260px,calc(49dvh - 87px),350px);max-width:100%;aspect-ratio:1/1.95;display:flex;flex-direction:column;padding:6px;background:#292c2b;border:1px solid #565b59;border-radius:34px;box-shadow:0 20px 45px -18px #303c3c4d,0 0 0 2px #fff}.phone-top,.phone-bottom{display:flex;align-items:center;justify-content:center;flex:none;pointer-events:none}.phone-top{height:16px}.phone-top:before{content:"";width:38px;height:3px;border-radius:6px;background:#686f6c}.phone-bottom{height:14px}.phone-bottom:before{content:"";width:82px;height:3px;border-radius:6px;background:#929895}.preview{flex:1 1 0;min-height:0;width:100%;padding:0;overflow:auto;border-radius:21px;background:white;scrollbar-width:thin;scrollbar-color:#c8ceca transparent;overscroll-behavior:contain}.preview-stage{margin:0 auto;width:483px}.preview iframe{display:block;width:483px;max-width:none;border:0;transform-origin:top left;background:white}#download-status{font-size:12px;text-align:center;margin:8px 0;max-width:100%}.error{color:#a14d49;overflow-wrap:anywhere}.text-button{background:none!important;color:var(--muted);font-size:11px;min-height:30px;padding:3px 8px}
-@media(min-width:1600px){.workspace.has-preview{gap:100px}.phone-mockup{width:370px}}
-@media(max-width:900px){.workspace.has-preview{grid-template-columns:285px minmax(0,1fr);gap:28px;padding-left:24px;padding-right:24px}.phone-mockup{width:290px}.app-header{padding:0 26px}}
-@media(max-width:680px){.app-header{height:66px;padding:0 22px}.brand h1{font-size:21px}.brand svg{width:23px;height:23px}.workspace{min-height:calc(100dvh - 66px);padding:24px 20px 100px}.workspace.has-preview{display:flex;flex-direction:column;align-items:stretch;gap:32px;padding:0 20px 40px}.has-preview .work-panel{width:100%;max-width:440px;margin:auto}.preview-panel{order:-1;width:100%}.phone-mockup{width:clamp(250px,calc(46dvh - 70px),320px)}.phone-showcase{padding:8px 20px 18px}.has-preview .attachments{min-height:110px}.has-preview .upload-control{min-height:105px}.has-preview .has-images .attachments{min-height:108px}.composer-toolbar #plan{min-height:44px}}
-.mode-picker{position:relative;flex:none}.mode-toggle{display:flex;align-items:center;gap:9px;min-height:40px;padding:8px 12px;background:#f3f4f6;color:#525963;border-radius:11px;font-size:13px;font-weight:400}.mode-toggle svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.4;transition:transform .15s}.mode-toggle[aria-expanded="true"]{background:#e9eeeb;color:#3d5c4d}.mode-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}.mode-options{position:absolute;bottom:calc(100% + 8px);left:0;z-index:20;width:144px;max-height:min(320px,60vh);overflow-y:auto;padding:5px;border:1px solid #e6e8e9;border-radius:14px;background:#fff;box-shadow:0 12px 32px -8px #1f292333}.mode-options button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:38px;padding:8px 11px;border-radius:9px;background:transparent;text-align:left;font-size:13px;font-weight:400;color:#555e60}.mode-options button:hover,.mode-options button:focus-visible{background:#f3f5f4}.mode-options button[aria-selected="true"]{background:#edf2ef;color:#355b49}.mode-options button[aria-selected="true"]:after{content:"✓";font-size:12px}.download-actions{display:flex;justify-content:center;margin-top:2px}.download-actions button{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:8px 16px;border-radius:12px;background:#e9edeb;color:#4d5b56;font-size:12px;font-weight:450}.download-actions button:hover:not(:disabled){background:#dfe6e2}.download-actions svg{width:16px;height:16px}#download-fallback{margin-top:8px}@media(max-width:680px){.mode-toggle{min-height:44px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-</style>
-</head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f3ed"><title>呈境 · 整店设计工作台</title><link rel="stylesheet" href="/studio.css"></head>
 <body>
-<header class="app-header"><div class="brand"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 5h9v9H5zM18 18h9v9h-9z" fill="currentColor"/><path d="M18 5h9v9h-9zM5 18h9v9H5z" stroke="currentColor" stroke-width="1.4"/></svg><h1>呈境</h1></div></header>
-<main id="workspace" class="workspace">
- <section class="work-panel" aria-label="店铺创作">
-
-  <div id="composer" class="composer">
-   <div class="attachments"><div id="input-list"></div><label class="upload-control" title="最多 6 张 PNG / JPG / WebP，单张 10MB，合计 30MB"><span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span>上传商品截图</span><input id="screenshot" type="file" multiple accept="image/png,image/jpeg,image/webp" aria-label="上传商品截图" aria-describedby="upload-limits"></label></div>
-   <span id="upload-limits" class="sr-only">最多 6 张 PNG、JPG 或 WebP，单张不超过 10MB，合计不超过 30MB。</span>
-   <div class="composer-toolbar"><div id="mode-picker" class="mode-picker"><input id="generation-mode" type="hidden" value="general"><button id="mode-toggle" class="mode-toggle" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="mode-options" aria-label="创作模式：通用"><span id="mode-label">通用</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4 3 3 3-3"/></svg></button><div id="mode-options" class="mode-options hidden" role="listbox" aria-label="创作模式"><button type="button" role="option" data-mode="general" aria-selected="true" tabindex="-1">通用</button><button type="button" role="option" data-mode="jewelry" aria-selected="false" tabindex="-1">珠宝</button><button type="button" role="option" data-mode="digital" aria-selected="false" tabindex="-1">数码</button><button type="button" role="option" data-mode="apparel" aria-selected="false" tabindex="-1">服装</button><button type="button" role="option" data-mode="footwear" aria-selected="false" tabindex="-1">鞋履</button><button type="button" role="option" data-mode="fragrance" aria-selected="false" tabindex="-1">香氛</button><button type="button" role="option" data-mode="bags" aria-selected="false" tabindex="-1">箱包</button></div></div><span id="input-count" aria-live="polite"></span><button id="plan" class="primary">生成店铺</button></div>
-  </div>
-  <div id="config" class="hidden" role="status"></div>
-  <div id="status-card" class="status-card hidden"><div class="status-line"><div id="status" role="status" aria-live="polite"></div></div><details id="error-details" class="hidden"><summary>查看原因</summary><div id="error-message"></div></details><div id="recovery" class="recovery-actions"></div><p id="recovery-note" class="recovery-note"></p></div>
-  <details id="material-details" class="material-details hidden"><summary>处理素材</summary><div id="batches" class="hidden"></div></details>
- </section>
- <section id="preview-panel" class="preview-panel hidden" aria-label="店铺预览">
-  <div class="phone-showcase"><div class="phone-mockup"><div class="phone-top" aria-hidden="true"></div><div id="preview-canvas" class="preview"><div id="preview-stage" class="preview-stage"><iframe id="frame" class="hidden" title="AI 生成的店铺装修示意" sandbox="allow-scripts allow-same-origin"></iframe></div></div><div class="phone-bottom" aria-hidden="true"></div></div></div>
-  <div id="download-actions" class="download-actions hidden"><button id="download" disabled aria-describedby="download-status" title="下载长图、模块素材和离线预览"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m-3-3 3 3 3-3M4 13v3h12v-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="download-label">下载</span></button></div>
-  <button id="download-fallback" class="text-button hidden">仅下载素材</button>
-  <div id="download-status" class="hidden" role="status" aria-live="polite"></div><div id="preview-alerts"></div>
- </section>
-</main>
-<script>
-const $=id=>document.getElementById(id);let current=null,poll=null,busy=false,exporting=false;const selectedImages=[];
-const el=(tag,text,cls)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node;};
-const modeOptions=[...$('mode-options').querySelectorAll('[data-mode]')];
-function setMode(value){if(!modeOptions.some(option=>option.dataset.mode===value))value='general';$('generation-mode').value=value;for(const option of modeOptions){const selected=option.dataset.mode===value;option.setAttribute('aria-selected',String(selected));if(selected){$('mode-label').textContent=option.textContent;$('mode-toggle').setAttribute('aria-label','创作模式：'+option.textContent);}}}
-function closeModes(restoreFocus=false){$('mode-options').classList.add('hidden');$('mode-toggle').setAttribute('aria-expanded','false');if(restoreFocus)$('mode-toggle').focus();}
-function openModes(){if($('mode-toggle').disabled)return;$('mode-options').classList.remove('hidden');$('mode-toggle').setAttribute('aria-expanded','true');modeOptions.find(option=>option.dataset.mode===$('generation-mode').value)?.focus();}
-$('mode-toggle').onclick=()=>{$('mode-options').classList.contains('hidden')?openModes():closeModes(true);};
-$('mode-toggle').onkeydown=event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();openModes();}};
-for(const [index,option] of modeOptions.entries()){option.onclick=()=>{if(busy||exporting)return;setMode(option.dataset.mode);closeModes(true);};option.onkeydown=event=>{let next;if(event.key==='ArrowDown')next=(index+1)%modeOptions.length;if(event.key==='ArrowUp')next=(index+modeOptions.length-1)%modeOptions.length;if(event.key==='Home')next=0;if(event.key==='End')next=modeOptions.length-1;if(next!==undefined){event.preventDefault();modeOptions[next].focus();}if(event.key==='Escape'){event.preventDefault();closeModes(true);}if(event.key==='Tab')closeModes(true);};}
-document.addEventListener('pointerdown',event=>{if(!$('mode-picker').contains(event.target))closeModes();});
-$('mode-picker').addEventListener('focusout',event=>{if(event.relatedTarget&&!$('mode-picker').contains(event.relatedTarget))closeModes();});
-
-
-
-function fitPreview(){const canvas=$('preview-canvas'),frame=$('frame'),stage=$('preview-stage');if(frame.classList.contains('hidden')){stage.style.height='0px';return;}if(!canvas.clientWidth)return;const css=getComputedStyle(canvas),width=Math.min(483,canvas.clientWidth-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight)),scale=Math.max(0,width)/483;stage.style.width=width+'px';stage.style.height=Math.ceil(Number.parseFloat(frame.style.height)*scale)+'px';stage.style.overflow='hidden';frame.style.transform='scale('+scale+')';}
-new ResizeObserver(fitPreview).observe($('preview-canvas'));$('frame').addEventListener('load',fitPreview);
-function updateWorkbench(state){
- const remaining=state.plan?.assets.filter(a=>!state.filledAssets?.includes(a.id)).length,hasPreview=state.status==='ready';
- $('workspace').classList.toggle('has-preview',hasPreview);$('preview-panel').classList.toggle('hidden',!hasPreview);
- const framing=Object.values(state.cropReports||{}).flatMap(r=>r.crops||[]).filter(c=>c.framingReviewRequired);
- $('material-details').classList.toggle('hidden',!hasPreview||(remaining===0&&!framing.length));
- const alerts=$('preview-alerts');alerts.replaceChildren();
- if(hasPreview&&framing.length){const button=el('button','检查裁剪 · '+framing.length+' 张','text-button');button.onclick=()=>{$('material-details').open=true;$('material-details').scrollIntoView({block:'center'});$('material-details').querySelector('summary').focus();};alerts.append(button);}
- requestAnimationFrame(fitPreview);
-}
-function show(state){
- const same=current?.id===state.id,initial=!current?.status,opened=$('material-details').open;
- if(!same||initial)setMode(state.generationMode);
- renderState(state);updateWorkbench(state);
- if(same)$('material-details').open=opened;
-}
-
-function status(text,error=false){
- $('status-card').classList.toggle('hidden',!text);$('status-card').dataset.busy=String(busy&&!error&&Boolean(text));
- const detailed=error&&text.length>70;
- $('status').textContent=detailed?'暂未完成':text;$('error-details').classList.toggle('hidden',!detailed);$('error-message').textContent=detailed?text:'';
- if(!detailed)$('error-details').open=false;
-}
-function lock(value){busy=value;if(value||exporting)closeModes();for(const id of ['plan','generation-mode','mode-toggle'])$(id).disabled=value||exporting;for(const input of document.querySelectorAll('input[type=file],.structure-action,.input-remove'))input.disabled=value||exporting;$('plan').textContent=value?'生成中…':'生成店铺';$('status-card').dataset.busy=String(value&&$('error-details').classList.contains('hidden'));updateDownloads();}
-function updateDownloads(){const ready=current?.status==='ready'&&current.plan.assets.every(a=>current.filledAssets?.includes(a.id));$('download-actions').classList.toggle('hidden',!ready);for(const id of ['download','download-fallback'])$(id).disabled=!ready||busy||exporting;$('plan').classList.toggle('primary',!ready&&!$('recovery').querySelector('button'));}
-function downloadStatus(text,error=false){$('download-status').textContent=text;$('download-status').className=(text?'':'hidden ')+(error?'error':'muted');}
-
-async function download(includePreview=true){
- if(busy||exporting||current?.status!=='ready')return;
- const run=current;exporting=true;lock(false);$('download-label').textContent='打包中…';$('download-fallback').classList.add('hidden');downloadStatus('');
- try{
-  const result=await api('/api/runs/'+run.id+'/download/materials.zip'+(includePreview?'?includePreview=1':''),{method:'POST'}),link=el('a');
-  link.href=result.url;link.download='';document.body.append(link);link.click();link.remove();downloadStatus('已开始下载');
- }catch(e){downloadStatus(e.message||'下载未完成，请重试。',true);if(includePreview)$('download-fallback').classList.remove('hidden');}finally{exporting=false;$('download-label').textContent='下载';lock(false);}
-}
-$('download').onclick=()=>download();$('download-fallback').onclick=()=>download(false);
-async function api(url,options={}){const response=await fetch(url,options);const value=await response.json();if(!response.ok)throw Object.assign(Error(value.error||'操作未完成'),{status:response.status});return value;}
-function reveal(id){const node=$(id);node.replaceChildren();node.classList.remove('hidden');return node;}
-
-function renderState(state){
- current=state;localStorage.setItem('store-planning-run',state.id);clearTimeout(poll);
- $('recovery').replaceChildren();$('recovery-note').textContent='';
-
- history.replaceState(null,'','?run='+state.id);
- const remaining=state.plan?.assets.filter(a=>!state.filledAssets?.includes(a.id)).length;
- downloadStatus('');$('download-fallback').classList.add('hidden');
- if(state.status!=='ready'){$('batches').classList.add('hidden');$('frame').classList.add('hidden');}
- if(['planning','generating'].includes(state.status)){lock(true);const labels={recognizing:'正在理解商品…',researching:'正在寻找风格…','selecting-style':'正在确定风格…','planning-content':'正在规划画面…',designing:'正在设计画面…',generating:'正在生成图片…',cropping:'正在组装预览…'};status(labels[state.workflow?.stage]||'正在创作…');poll=setTimeout(()=>refresh(state.id),1800);return;}
- lock(false);
- if(state.status==='failed'){status('本次创作暂未完成：'+state.error,true);if(state.canResumeResearch){const retry=el('button','继续生成','structure-action primary');retry.onclick=async()=>{if(busy)return;lock(true);try{show(await api('/api/runs/'+state.id+'/resume',{method:'POST'}));}catch(e){lock(false);status(e.message,true);}};$('recovery').append(retry);$('recovery-note').textContent='已保留完成的内容。';$('plan').classList.remove('primary');}return;}
- if(state.status==='needs-input'){status('请补充商品截图');$('error-message').textContent=state.workflow.label;$('error-details').classList.remove('hidden');return;}
- if(state.status==='choosing'){status('可以沿用资料继续创作');const button=el('button','继续生成','structure-action primary');button.onclick=()=>requestRecommendation('/api/runs/'+state.id+'/recommendation');$('recovery').append(button);return;}
- status(remaining?'还有 '+remaining+' 张图片待完成':'');
- const p=state.plan,batches=reveal('batches');
-
- if(state.generationError)status('素材尚未完成：'+state.generationError,true);
-
- if(p.imageMode&&remaining){const makeRetry=(label,regenerate)=>{const button=el('button',label,'structure-action'+(regenerate?'':' primary'));button.onclick=async()=>{if(busy)return;lock(true);try{show(await api('/api/runs/'+state.id+'/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({regenerate})}));}catch(e){lock(false);status(e.message,true);}};$('recovery').append(button);};makeRetry(state.generationFailure?.kind==='download'?'继续处理':'继续生成',false);if(state.generationFailure&&state.generationFailure.kind!=='generation')makeRetry('重新生图',true);$('recovery-note').textContent=state.generationFailure&&state.generationFailure.kind!=='generation'?'重新生图将再次计费。':'';$('plan').classList.remove('primary');}
- for(const [batchIndex,batch] of state.batches.entries()){
-  const filled=batch.rows.flat().filter(id=>state.filledAssets.includes(id)).length,framing=state.cropReports?.[batch.id]?.crops?.filter(c=>c.framingReviewRequired)||[];
-  if(filled===batch.panelCount&&!framing.length)continue;
-  const box=el('div',undefined,'batch');box.append(el('h3','素材 '+(batchIndex+1)+' · '+filled+'/'+batch.panelCount));
-  if(filled<batch.panelCount||framing.length){
-   const label=el('label',undefined,'material-upload');label.append(el('span','补传总图'),el('small','保留分隔带，最大 30MB'));
-   const upload=document.createElement('input');upload.type='file';upload.accept='image/png,image/jpeg,image/webp';upload.setAttribute('aria-label','补传素材组 '+(batchIndex+1)+' 的完整总图');upload.onchange=async()=>{
-    const file=upload.files[0];if(!file)return;if(file.size>30*1024*1024){status('图片超过30MB。',true);return;}
-    upload.disabled=true;lock(true);status('正在处理补充的素材…');
-    try{show(await api('/api/runs/'+state.id+'/batches/'+batch.id,{method:'POST',headers:{'Content-Type':file.type},body:file}));status('补充素材已填入，没有重新生图。');}catch(e){status(e.message,true);}finally{upload.disabled=false;lock(false);}
-   };
-   label.append(upload);box.append(label);
-  }
-  const attempt=state.generatedSheets?.[batch.id];if(attempt){const link=el('a','查看原始总图 ↗');link.href='/runs/'+state.id+'/'+batch.id+'-attempt-'+attempt+'-source.png';link.target='_blank';link.rel='noopener noreferrer';box.append(link);}
-  if(framing.length)box.append(el('p','请检查主体是否完整。','muted'));
-  batches.append(box);
- }
-
-
- $('frame').classList.remove('hidden');$('frame').style.height=Math.ceil(state.layout.height)+'px';$('frame').src=state.preview+'?t='+Date.now();
-}
-async function refresh(id){try{const state=await api('/api/runs/'+id);if(current?.id===id)show(state);}catch(e){if(current?.id!==id)return;if(!e.status||e.status>=500){lock(true);status('连接中断，正在重新连接。',true);poll=setTimeout(()=>refresh(id),5000);}else{lock(false);status(e.message,true);}}}
-function renderInputs(){
- const list=$('input-list');list.replaceChildren();$('composer').classList.toggle('has-images',selectedImages.length>0);
- $('input-count').textContent=selectedImages.length?selectedImages.length+' / 6':'';
- for(const item of selectedImages){const row=el('div',undefined,'input-item'),img=el('img');img.src=item.url;img.alt=item.file.name;row.title=item.file.name;
- const remove=el('button','×','input-remove');remove.setAttribute('aria-label','移除 '+item.file.name);remove.onclick=()=>{URL.revokeObjectURL(item.url);selectedImages.splice(selectedImages.indexOf(item),1);renderInputs();$('screenshot').focus();};row.append(img,remove);list.append(row);}
-}
-
-$('screenshot').onchange=()=>{for(const file of $('screenshot').files){if(selectedImages.some(i=>i.file.name===file.name&&i.file.size===file.size&&i.file.lastModified===file.lastModified))continue;if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>10*1024*1024){status('每张图片需为 PNG/JPG/WebP，且不超过 10MB。',true);continue;}if(selectedImages.length>=6||selectedImages.reduce((n,i)=>n+i.file.size,0)+file.size>30*1024*1024){status('最多 6 张截图，合计不超过 30MB。',true);break;}selectedImages.push({file,url:URL.createObjectURL(file)});}$('screenshot').value='';renderInputs();};
-const dataUrl=file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('截图读取失败'));reader.readAsDataURL(file);});
-
-async function screenshotPlan(){if(busy||exporting)return;if(!selectedImages.length){status('请先上传商品截图。',true);return;}const generationMode=$('generation-mode').value;lock(true);status('正在上传…');try{const images=await Promise.all(selectedImages.map(async({file})=>({name:file.name,data:await dataUrl(file)})));show(await api('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images,generationMode})}));}catch(e){lock(false);status(e.message,true);}}
-$('plan').onclick=()=>screenshotPlan();
-async function requestRecommendation(url,body={}){if(busy||exporting)return;lock(true);status('正在准备创作…');try{show(await api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}));}catch(e){status(e.message,true);lock(false);}}
-api('/api/config').then(c=>{if(!c.configured){$('config').classList.remove('hidden');$('config').textContent='创作服务尚未配置完整，请联系服务维护者。';}}).catch(()=>{$('config').classList.remove('hidden');$('config').textContent='暂时无法连接创作服务，请稍后刷新。';});
-
-const linkedRun=new URLSearchParams(location.search).get('run');
-const previous=linkedRun&&/^[a-f0-9-]{36}$/.test(linkedRun)?linkedRun:localStorage.getItem('store-planning-run');if(previous){current={id:previous};refresh(previous);}
-</script>
-</body>
-</html>
+<header class="topbar"><a class="brand" href="/" aria-label="呈境首页"><span class="brand-mark" aria-hidden="true">呈</span><strong>呈境</strong><span class="brand-caption">店铺设计工作台</span></a><div class="header-actions"><label for="recent-runs" class="sr-only">打开最近作品</label><select id="recent-runs"><option value="">最近作品</option></select><button id="new-project" class="quiet">新建方案 ↗</button></div></header>
+<main class="workspace"><section class="editor" aria-label="创建店铺装修">
+<div class="intro"><p class="eyebrow">FROM PRODUCTS TO A STOREFRONT</p><h1>让商品，成为一家店。</h1><p>上传商品，选择风格与模块。AI 负责整店设计，你负责挑选满意的结果。</p><ol class="journey" aria-label="使用流程"><li><b>01</b> 准备商品图</li><li><b>02</b> 设定设计方向</li><li><b>03</b> 预览与下载</li></ol></div>
+<form id="studio-form">
+<fieldset class="card" id="upload-card"><legend class="sr-only">第一步，上传商品图片</legend><div class="section-heading"><h2><span class="step">01</span> 准备商品图片</h2><span id="input-count" class="meta" aria-live="polite">0 / 6 张</span></div><p class="description">单品照片或商品列表截图都可以。清楚展示商品轮廓、配色和细节。</p><label id="drop-zone" class="drop-zone"><span class="upload-symbol" aria-hidden="true">＋</span><strong>点击上传，或把图片拖到这里</strong><span>也可以粘贴剪贴板中的图片</span><input id="screenshot" type="file" multiple accept="image/png,image/jpeg,image/webp,.jfif" aria-label="上传商品图片" aria-describedby="upload-spec"></label><p id="upload-spec" class="spec"><b>1–6 张 · JPG / PNG / WebP</b><br>单张 ≤ 10 MB，合计 ≤ 30 MB；短边至少 80 px，总像素 ≤ 6000 万。建议短边 ≥ 600 px，清晰原图效果更稳。</p><div id="input-list" class="input-list"></div><div id="upload-errors" class="notice error hidden" role="alert"></div></fieldset>
+<fieldset class="card"><legend class="sr-only">第二步，选择品类与风格</legend><div class="section-heading"><h2><span class="step">02</span> 定下店铺气质</h2><span class="meta">先选品类，再选风格</span></div><div class="field-row"><label class="field">经营品类<select id="generation-mode" name="mode" disabled><option value="general">正在加载…</option></select></label><label class="field">店铺名称 <span class="optional">选填</span><input id="shop-name" type="text" maxlength="30" placeholder="例如：拾光饰品" autocomplete="organization"></label></div><div class="field-label" id="style-label">风格预设</div><div id="style-options" class="style-options" role="radiogroup" aria-labelledby="style-label"></div><p class="hint">预设决定配色、光影和图像表达；AI 会结合商品安排具体设计。</p></fieldset>
+<fieldset class="card"><legend class="sr-only">第三步，选择模块和商品保真</legend><div class="section-heading"><h2><span class="step">03</span> 选择需要的内容</h2><button id="recommended-modules" type="button" class="text-button">恢复推荐组合</button></div><p class="description">勾选的模块一定包含，未勾选的不加入。具体样式、顺序和重复次数交给 AI。</p><div id="module-options" class="module-options"></div><p class="hint">页面按多个内容章节展开；增加搭配、细节与选择信息，不靠重复图片拉长。</p><div class="fidelity"><div><label for="preserve-products" class="switch-title">商品保真</label><p id="fidelity-description">关闭时，允许根据经营方向设计同类新款。</p></div><label class="switch"><input id="preserve-products" type="checkbox" role="switch" aria-describedby="fidelity-description fidelity-note"><span aria-hidden="true"></span></label></div><p id="fidelity-note" class="hint">开启后原图会用于每批相关商品的生成。优先上传单品清晰照片；AI 会重绘画面，细节仍需你核对。</p></fieldset>
+<div id="config-notice" class="notice hidden" role="status"></div><div id="form-error" class="notice error hidden" role="alert"></div><div class="create-bar"><div><strong id="creation-summary">准备你的第一套设计</strong><p>自动规划 8–16 个模块，最多 24 张素材；生成最多 6 批。</p></div><button id="plan" class="primary" type="submit" disabled>开始生成 ↗</button></div><p class="generation-note">点击后开始 AI 规划与图片生成，产生模型调用费用。完成后可预览整页，下载图片和模块说明。</p>
+</form></section>
+<aside class="result-panel" aria-label="设计进度与店铺预览"><div class="result-header"><div><p class="eyebrow">YOUR STOREFRONT</p><h2 id="result-title">设计预览</h2></div><span id="result-badge" class="badge">等待创作</span></div>
+<div id="empty-preview" class="empty-preview"><div class="outline-store" aria-hidden="true"><div class="outline-brand"><span></span><i></i></div><div class="outline-hero"><span>让好商品<br>被看见。</span><i></i></div><div class="outline-nav"><i></i><i></i><i></i><i></i></div><div class="outline-title"></div><div class="outline-products"><i></i><i></i><i></i></div></div><h3>从一张商品图开始</h3><p>这里会展示完整店铺。左侧选择会决定整店的风格、内容与商品表现。</p><span class="wireframe-label">结构示意 · 非生成效果</span></div>
+<div id="run-info" class="run-info hidden"></div><div id="progress" class="progress hidden" aria-live="polite"><ol><li data-stage="0">理解商品</li><li data-stage="1">设计整店</li><li data-stage="2">生成素材</li><li data-stage="3">组装完成</li></ol><p id="progress-message"></p><p id="asset-progress" class="meta"></p></div><div id="status-card" class="notice hidden"><p id="status" role="status" aria-live="polite"></p><details id="error-details" class="hidden"><summary>查看详细原因</summary><p id="error-message"></p></details><div id="recovery" class="recovery-actions"></div><p id="recovery-note" class="hint"></p></div>
+<div id="preview-panel" class="hidden"><div class="preview-toolbar"><span>上下滚动浏览整店</span><a id="open-preview" target="_blank" rel="noopener">打开完整预览 ↗</a></div><div class="phone"><div class="phone-top" aria-hidden="true"><span></span></div><div id="preview-canvas" class="preview-canvas"><div id="preview-stage"><iframe id="frame" title="店铺装修预览" sandbox="allow-scripts allow-same-origin"></iframe></div></div><div class="phone-bottom" aria-hidden="true"></div></div></div><div id="download-actions" class="download-actions hidden"><button id="download" class="primary">下载素材包</button><button id="download-png">下载长图</button><p>素材包含各模块 PNG、排布说明与离线预览，可按顺序上传到装修平台。商品与导航链接需在平台绑定。</p></div><p id="download-status" role="status" aria-live="polite"></p><details id="material-details" class="hidden"><summary>查看未完成素材与处理方式</summary><div id="batches"></div></details></aside>
+</main><footer>呈境 · 把经营内容转化为有秩序的视觉表达</footer><script src="/studio.js" defer></script></body></html>

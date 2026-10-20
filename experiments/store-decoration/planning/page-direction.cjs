@@ -4,7 +4,7 @@ const { usesCategoryCampaign } = require('./category-campaign.cjs');
 
 // New campaign profiles opt in; saved snapshots keep their planning/layout path.
 function usesPageDirection(profile) {
-  return (profile?.id === 'jewelry' && profile.version >= 17 && profile.pageDirection === 'jewelry-page-v1') || usesDigitalCampaign(profile) || usesCategoryCampaign(profile);
+  return !!profile?.studio || (profile?.id === 'jewelry' && profile.version >= 17 && profile.pageDirection === 'jewelry-page-v1') || usesDigitalCampaign(profile) || usesCategoryCampaign(profile);
 }
 
 // Accept only observed field-name variants; do not infer or replace design content.

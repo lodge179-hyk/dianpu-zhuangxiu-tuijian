@@ -45,8 +45,8 @@ function mockProvider(run, options = {}) {
       assert.ok(url.endsWith('/api/v3/images/generations'));
       assert.equal(body.response_format, 'b64_json'); assert.equal(body.stream, false);
       assert.equal(body.parameters, undefined); assert.equal(body.sequential_image_generation, undefined);
-      const batch = run.state.batches.find(b => b.prompt === body.prompt);
-      assert.ok(batch, 'sent prompt must equal the reviewable batch prompt');
+      const batch = run.state.batches.find(b => body.prompt.endsWith(b.prompt));
+      assert.ok(batch, 'sent prompt must retain the complete reviewable batch prompt after any attachment guide');
       const bytes = options.badSheet ? Buffer.from((await screenshot()).data.split(',')[1], 'base64') : await sheet(run.state.plan, batch);
       return response({ data: [{ b64_json: bytes.toString('base64') }], usage: { generated_images: 1 } });
     }
@@ -69,7 +69,7 @@ function mockProvider(run, options = {}) {
     };
     else if (input.tasks) value = {
       artDirection: { concept: research.concept, narrative: '主视觉到品类场景', anchors: research.anchors, focalAssetId: 'overview' },
-      assets: input.tasks.map((a, i) => ({ id: a.id, aspect: a.aspect, subject: a.category + '示意商品', composition: '按图片用途组织画面，主体留出安全边距', prompt: `${a.category}同类型示意商品，画面用途为${a.role}，放置于蓝绿色协调空间中，保持自然光、主体留白以及清楚的外形，每张按用途组织视角，不绘制任何文字或商标。`, direction: { role: a.role, camera: i % 2 ? 'top-down' : 'eye-level', background: '蓝绿空间', accents: '银色局部', treatment: i % 2 ? 'still-life' : 'environment' } }))
+      assets: input.tasks.map((a, i) => ({ id: a.id, ...(input.visualReferences?.length ? { visualReference:{id:input.visualReferences[0].id,borrow:'借鉴清楚轮廓与柔和光线',avoid:'不复制商品与品牌'} } : {}), aspect: a.aspect, subject: a.category + '示意商品', composition: '按图片用途组织画面，主体留出安全边距', prompt: `${a.category}同类型示意商品，画面用途为${a.role}，放置于蓝绿色协调空间中，保持自然光、主体留白以及清楚的外形，每张按用途组织视角，不绘制任何文字或商标。`, direction: { role: a.role, camera: i % 2 ? 'top-down' : 'eye-level', background: '蓝绿空间', accents: '银色局部', treatment: i % 2 ? 'still-life' : 'environment' } }))
     };
     return response({ output: { choices: [{ message: { content: textOnly ? '搜索概括（不要求 JSON）：' + JSON.stringify(value) : [{ text: JSON.stringify(value) }] } }], ...(textOnly ? { search_info: { search_results: options.noSources ? [] : [source] } } : {}) }, usage: { total_tokens: 1 }, request_id: 'mock-text' });
   };
@@ -399,7 +399,7 @@ test('HTTP upload, saved progress, download and restart use the new provider wit
     assert.equal((await post('/api/plan', { images: inputs })).status, 409);
     assert.equal((await post('/api/runs/' + latestId + '/download/materials.zip')).status, 409);
     release(); held = null;
-    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete'); assert.equal(mock.calls.length, 7);
+    let state = await waitReady(); assert.equal(state.workflow.stage, 'complete', state.error || state.generationError); assert.equal(mock.calls.length, 7);
     assert.equal(state.filledAssets.length, 10); assert.equal(state.libraryAssetIds.length, 0);
     assert.equal((await fetch(address + '/runs/' + latestId + '/input-2.jpg')).status, 200);
     assert.equal((await fetch(address + '/runs/' + latestId + '/research-call.json')).status, 404);

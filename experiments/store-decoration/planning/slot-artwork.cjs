@@ -7,9 +7,14 @@ const copySchema = z.object({
   body: z.string().trim().max(80).default(''),
   placement: z.enum(['none', 'left', 'right', 'top', 'bottom']).default('none'),
   tone: z.enum(['base', 'alternate']).default('base'),
+  surface:z.enum(['none','gradient','panel']).optional(),
+  align:z.enum(['left','center']).optional(),
+  size:z.enum(['quiet','normal','display']).optional(),
+  widthRatio:z.number().min(.30).max(.62).optional(),
 }).strict();
 const color = z.string().regex(/^#[\da-fA-F]{6}$/);
 const artworkSchema = copySchema.extend({
+  version:z.literal(2).optional(),
   width: z.number().positive().max(1000), height: z.number().positive().max(1200),
   background: color, foreground: color, typography: z.enum(['sans', 'editorial']),
 }).strict();
@@ -29,6 +34,7 @@ function wrap(value, width, size) {
 function artworkGeometry(artwork) {
   if (!artwork.heading && !artwork.body) return null;
   if (artwork.placement === 'none') throw Error('图片文案已有内容但没有排字位置，请在画面设计中选择位置。');
+  if(artwork.version===2)return studioGeometry(artwork);
   const { width, height, placement } = artwork;
   const pad = Math.max(8, Math.min(28, width * .06, height * .06));
   const side = placement === 'left' || placement === 'right';
@@ -55,6 +61,25 @@ function artworkGeometry(artwork) {
   error.code = 'ARTWORK_TEXT_OVERFLOW';
   throw error;
 }
+function studioGeometry(a){
+  const side=['left','right'].includes(a.placement), pad=Math.max(10,Math.min(26,a.width*.055,a.height*.075));
+  const width=side?a.width*(a.widthRatio||.44):a.width, available=width-2*pad;
+  const maxHeight=(side?a.height:a.height*.44)-2*pad;
+  const base=Math.min(a.size==='display'?36:28,Math.max(15,a.width*(a.size==='quiet'?.045:.06)));
+  for(const factor of [1,.92,.84]){
+    const titleSize=Math.max(14,Math.round(base*factor)),bodySize=a.width<200?12:Math.max(12,Math.round(14*factor));
+    const heading=wrap(a.heading,available,titleSize),body=wrap(a.body,available,bodySize);
+    // Balance short Chinese headings without discarding characters or changing copy.
+    if(heading.length===2&&Array.from(heading[1]).length===1&&Array.from(heading[0]).length>2){const chars=Array.from(heading[0]);heading[1]=chars.pop()+heading[1];heading[0]=chars.join('');}
+    const titleLine=Math.ceil(titleSize*1.3),bodyLine=Math.ceil(bodySize*1.65),gap=heading.length&&body.length?10:0;
+    const textHeight=heading.length*titleLine+body.length*bodyLine+gap;
+    if(textHeight>maxHeight||heading.length>3)continue;
+    const bandHeight=side?a.height:textHeight+2*pad;
+    const x=a.placement==='right'?a.width-width:0,y=a.placement==='bottom'?a.height-bandHeight:0;
+    return {heading,body,titleSize,bodySize,titleLine,bodyLine,gap,textHeight,panel:{x,y,width,height:bandHeight},textX:a.align==='center'?x+width/2:x+pad,textY:side?(a.height-textHeight)/2:y+pad};
+  }
+  const error=Error('文案在实际槽位中无法保持清楚、舒展的排版，请精简文字或选择更大的组件。');error.code='ARTWORK_TEXT_OVERFLOW';throw error;
+}
 function artworkBrief(artwork) {
   const g = artworkGeometry(artwork);
   if (!g) return '本图不叠加设计文案，按本格内容构图。';
@@ -62,7 +87,7 @@ function artworkBrief(artwork) {
   const side = ['left', 'right'].includes(artwork.placement);
   const fade = Math.min(artwork.width, artwork.height) * .03;
   const fraction = side ? (g.panel.width + fade) / artwork.width : (g.panel.height + fade) / artwork.height;
-  return `本图成品将在${names[artwork.placement]}约${Math.ceil(fraction * 100)}%区域合入标题“${artwork.heading}”及短文“${artwork.body}”。此区域保留平静空间，主体与人物关键部位放在其余区域，不能被排字遮挡。排字区域以${artwork.background}衔接画面；这是图片内部设计，不是店铺底色。模型只生成摄影内容，不画文字，程序裁剪后把文字写入同一PNG。`;
+  return `本图成品将在${names[artwork.placement]}约${Math.ceil(fraction * 100)}%区域合入标题“${artwork.heading}”及短文“${artwork.body}”。此区域保留平静空间，主体与人物关键部位放在其余区域，不能被排字遮挡。排字区域以${artwork.background}衔接画面；${artwork.version===2&&artwork.surface!=='panel'?'保持连续自然背景，不画一块生硬空白板。文字位置使用'+(artwork.surface==='none'?'直接叠字':'柔和渐变衬字')+'。':''}这是图片内部设计，不是店铺底色。模型只生成图像内容，不画文字，程序裁剪后把文字写入同一PNG。`;
 }
 // Report deterministic size constraints to the designer without changing its copy
 // or placement. Use the exact same geometry and readable limits as PNG export.
@@ -93,7 +118,16 @@ async function bakeArtwork(bytes, value) {
   const font = a.typography === 'editorial' ? 'SimSun,Songti SC,Noto Serif CJK SC,serif' : 'Microsoft YaHei,PingFang SC,Noto Sans CJK SC,sans-serif';
   const p = g.panel;
   const text = (lines, startY, size, step, heading) => lines.map((line, i) => `<text x="${g.textX}" y="${startY + i * step + size}" font-family="${heading ? font : 'Microsoft YaHei,PingFang SC,Noto Sans CJK SC,sans-serif'}" font-size="${size}" font-weight="${heading ? 600 : 400}">${escape(line)}</text>`).join('');
-  // An opaque text area guarantees contrast; a short fade joins it to the photograph.
+  if(a.version===2){
+    const horizontal=['left','right'].includes(a.placement);
+    const gradient={left:['0%','0%','100%','0%'],right:['100%','0%','0%','0%'],top:['0%','0%','0%','100%'],bottom:['0%','100%','0%','0%']}[a.placement];
+    const extent=horizontal?Math.min(a.width,p.width+a.width*.18):Math.min(a.height,p.height+a.height*.18);
+    const x=a.placement==='right'?a.width-extent:0,y=a.placement==='bottom'?a.height-extent:0;
+    const background=a.surface==='none'?'':a.surface==='panel'?`<rect x="${p.x}" y="${p.y}" width="${p.width}" height="${p.height}" fill="${a.background}"/>`:`<defs><linearGradient id="scrim" x1="${gradient[0]}" y1="${gradient[1]}" x2="${gradient[2]}" y2="${gradient[3]}"><stop stop-color="${a.background}" stop-opacity=".96"/><stop offset=".58" stop-color="${a.background}" stop-opacity=".86"/><stop offset="1" stop-color="${a.background}" stop-opacity="0"/></linearGradient></defs><rect x="${x}" y="${y}" width="${horizontal?extent:a.width}" height="${horizontal?a.height:extent}" fill="url(#scrim)"/>`;
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${meta.width}" height="${meta.height}" viewBox="0 0 ${a.width} ${a.height}">${background}<g fill="${readable(a.foreground,a.background)}" text-anchor="${a.align==='center'?'middle':'start'}">${text(g.heading,g.textY,g.titleSize,g.titleLine,true)}${text(g.body,g.textY+g.heading.length*g.titleLine+g.gap,g.bodySize,g.bodyLine,false)}</g></svg>`;
+    return sharp(bytes).composite([{input:Buffer.from(svg)}]).png().toBuffer();
+  }
+  // Legacy artifacts retain their original geometry and opaque panels.
   const fade = Math.min(a.width, a.height) * .03;
   const fades = {
     left: [p.width, 0, fade, a.height, '0%', '0%', '100%', '0%'],
